@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/ig-clone/static/css/main.694a1558.css",
-    "main.js": "/ig-clone/static/js/main.c0d4b944.js",
+    "main.js": "/ig-clone/static/js/main.e43dedbf.js",
     "static/media/Billabong.ttf": "/ig-clone/static/media/Billabong.0e94b13a1cfb505ff271.ttf",
     "static/media/ig-logo-4.png": "/ig-clone/static/media/ig-logo-4.6c13a7c1de36ac4529b6.png",
     "index.html": "/ig-clone/index.html",
     "main.694a1558.css.map": "/ig-clone/static/css/main.694a1558.css.map",
-    "main.c0d4b944.js.map": "/ig-clone/static/js/main.c0d4b944.js.map"
+    "main.e43dedbf.js.map": "/ig-clone/static/js/main.e43dedbf.js.map"
   },
   "entrypoints": [
     "static/css/main.694a1558.css",
-    "static/js/main.c0d4b944.js"
+    "static/js/main.e43dedbf.js"
   ]
 }
