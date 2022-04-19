@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/markstagram/static/css/main.407deac1.css",
+    "main.css": "/markstagram/static/css/main.4190a032.css",
     "main.js": "/markstagram/static/js/main.0798375c.js",
     "static/media/Billabong.ttf": "/markstagram/static/media/Billabong.0e94b13a1cfb505ff271.ttf",
     "static/media/ig-logo-2.png": "/markstagram/static/media/ig-logo-2.a17062bd41904d7021ff.png",
     "index.html": "/markstagram/index.html",
-    "main.407deac1.css.map": "/markstagram/static/css/main.407deac1.css.map",
+    "main.4190a032.css.map": "/markstagram/static/css/main.4190a032.css.map",
     "main.0798375c.js.map": "/markstagram/static/js/main.0798375c.js.map"
   },
   "entrypoints": [
-    "static/css/main.407deac1.css",
+    "static/css/main.4190a032.css",
     "static/js/main.0798375c.js"
   ]
 }
