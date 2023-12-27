@@ -10,8 +10,7 @@
 		"startdev": "CLIENT_URL=http://localhost:5173 node dist/index.js",
 		"startbuilt": "CLIENT_URL=http://localhost:4173 node dist/index.js",
 		"prisma:generate": "prisma generate && node ./scripts/copyPrismaTypes.js",
-		"postinstall": "npm run prisma:generate",
-		"flybuild": "npm i && npm run build && npx prisma migrate deploy"
+		"postinstall": "npm run prisma:generate"
 	},
 	"keywords": [],
 	"author": "",
