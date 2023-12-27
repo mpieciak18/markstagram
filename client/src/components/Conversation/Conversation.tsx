@@ -16,7 +16,7 @@ interface ConvoRecord extends Conversation, HasUsers {
 
 const ConvoPage = () => {
 	const navigate = useNavigate();
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 
 	// Socket state
 	const [socket, setSocket] = useState<Socket>();
@@ -188,7 +188,11 @@ const ConvoPage = () => {
 	const redirect = () => navigate(`/${otherUserId}`);
 
 	return (
-		<div id='conversation' className='page'>
+		<div
+			id='conversation'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			<div id='conversation-container'>
 				<div id='convo-header'>

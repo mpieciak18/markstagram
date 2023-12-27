@@ -12,6 +12,7 @@ import { ConvoPage } from './components/Conversation/Conversation.js';
 import { useAuth } from './contexts/AuthContext.js';
 import { getLocalUser } from './services/localstor.js';
 import { HomeLoggedOut } from './components/Home/HomeLoggedOut.js';
+import './components/other/other.css';
 
 const App = () => {
 	// Init user context

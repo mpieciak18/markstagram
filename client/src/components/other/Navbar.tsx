@@ -96,6 +96,7 @@ const Navbar = () => {
 
 	return (
 		<div id='navbar'>
+			{/* <Loader /> */}
 			{loading ? <Loader /> : null}
 			{popUpState.notifsOn ? (
 				<Notifications />

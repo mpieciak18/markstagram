@@ -15,7 +15,7 @@ interface ConvoRecord extends Conversation, HasUsers {
 }
 
 const Messages = () => {
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 	const { user } = useAuth();
 	const { popUpState, updatePopUp } = usePopUp();
 
@@ -68,7 +68,11 @@ const Messages = () => {
 	});
 
 	return (
-		<div id='messages' className='page'>
+		<div
+			id='messages'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			{user ? (
 				<div id='convos'>

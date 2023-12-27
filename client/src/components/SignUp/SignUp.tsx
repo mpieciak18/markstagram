@@ -105,7 +105,11 @@ const SignUp = () => {
 	};
 
 	return (
-		<div id='sign-up' className='page'>
+		<div
+			id='sign-up'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<div id='navbar-logo-logged-out'>
 				{loading ? <Loader /> : null}
 				<img id='navbar-logo-icon' src={Logo} />

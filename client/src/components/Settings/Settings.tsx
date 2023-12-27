@@ -11,7 +11,7 @@ import { useLoading } from '../../contexts/LoaderContext.js';
 
 const Settings = () => {
 	const { user, setUser } = useAuth();
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 
 	const location = useLocation();
 
@@ -112,7 +112,11 @@ const Settings = () => {
 	}, [namePasses]);
 
 	return (
-		<div id='settings' className='page'>
+		<div
+			id='settings'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			{user != null ? (
 				<div id='settings-parent'>

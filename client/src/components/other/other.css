@@ -1165,11 +1165,6 @@ div#new-post-image-preview {
 	padding: 0;
 }
 
-/* ---> Disables interaction when overlay is present */
-#loading-animation-parent + .page {
-	pointer-events: none;
-}
-
 #loading-animation {
 	display: inline-block;
 	position: relative;

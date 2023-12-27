@@ -13,7 +13,7 @@ interface SaveRecord extends Save {
 
 const Saved = () => {
 	const { user } = useAuth();
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 
 	// Init savesNumber state
 	const [savesNumber, setSavesNumber] = useState(21);
@@ -33,7 +33,7 @@ const Saved = () => {
 				if (savedArr.length < savesNumber) {
 					setAllLoaded(true);
 				}
-				setLoading(true);
+				setLoading(false);
 			})
 			.catch(() => setLoading(false));
 	}, [savesNumber, user]);
@@ -57,7 +57,11 @@ const Saved = () => {
 	});
 
 	return (
-		<div id='saved' className='page'>
+		<div
+			id='saved'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			{savesArr?.length > 0 ? (
 				<div id='saved-posts'>

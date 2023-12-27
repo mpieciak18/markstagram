@@ -23,7 +23,7 @@ interface CommentRecord extends Comment {
 }
 
 const PostPage = () => {
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 	const { user } = useAuth();
 	const { popUpState, updatePopUp } = usePopUp();
 
@@ -90,7 +90,11 @@ const PostPage = () => {
 	};
 
 	return (
-		<div id='post' className='page'>
+		<div
+			id='post'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			{popUpState.likesOn ? <Likes postId={postId} /> : null}
 			{post !== undefined &&

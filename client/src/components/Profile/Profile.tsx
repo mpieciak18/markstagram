@@ -13,7 +13,7 @@ import { useLoading } from '../../contexts/LoaderContext.js';
 interface PostRecord extends Post, PostStatsCount {}
 
 const Profile = () => {
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 
 	// Get other user id from url parameters
 	const otherUserId = Number(useParams().otherUserId);
@@ -64,7 +64,11 @@ const Profile = () => {
 	});
 
 	return (
-		<div id='profile'>
+		<div
+			id='profile'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			<ProfileProvider>
 				<div id='profile-contents'>

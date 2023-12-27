@@ -12,7 +12,7 @@ interface PostRecord extends Post, PostStatsCount {
 }
 
 const Home = () => {
-	const { setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 
 	// Init postsNumber state
 	const [postsNumber, setPostsNumber] = useState(5);
@@ -57,7 +57,11 @@ const Home = () => {
 	}, [postsNumber]);
 
 	return (
-		<div id='home' className='page'>
+		<div
+			id='home'
+			className='page'
+			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+		>
 			<Navbar />
 			<div id='home-container' onScroll={(e) => loadMore(e)}>
 				<UserCard />
