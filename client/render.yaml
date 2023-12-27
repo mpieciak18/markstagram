@@ -5,5 +5,5 @@ services:
       staticPublishPath: ./dist
       routes:
           - type: rewrite
-            source: /^((?!public\/wasm|public\/images|favicon\.ico).)*$/
+            # source: /^((?!public\/wasm|public\/images|favicon\.ico).)*$/
             destination: /index.html
