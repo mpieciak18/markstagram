@@ -46,6 +46,11 @@ app.post(
 	handleInputErrors,
 	signIn
 );
+// health route / handler
+app.get('/health_status', (req, res) => {
+	res.status(200);
+	res.json({ message: 'the server is running' });
+});
 
 // synchronous error handler
 app.use((err: SyncErr, req: Request, res: Response, next: NextFunction) => {
