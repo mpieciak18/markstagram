@@ -197,7 +197,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/markpieciak/Personal/markstagram/server/node_modules/@prisma/client",
+      "value": "/Users/markpieciak/Repos/markstagram/server/node_modules/@prisma/client",
       "fromEnvVar": null
     },
     "config": {

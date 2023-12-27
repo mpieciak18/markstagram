@@ -6,7 +6,7 @@ This project is from the [the Odin Project](https://www.theodinproject.com) (spe
 
 ~~[Click here] to read more about the project specifications.~~ (Update: the Odin Project has restructured their Full Stack Javascript curriculum since version 1.0 of this app was created, and the original link no longer works. [Click here](https://www.theodinproject.com/lessons/nodejs-odin-book) for what this project has since been ported to.)
 
-Version 2.0 has replaced Firebase as its server (for database API calls & authentication) with its own server, built in Typescript, Node, Express, Prisma, and Postgres.
+Version 2.0 has replaced the Firebase + MongoDB back-end with its own server, built in Typescript, Node, Express, Prisma, and Postgres.
 
 Additionally, the client has been rewritten from Javascript to Typescript, as well as converted from CRA to Vite.
 
@@ -30,19 +30,20 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 <a href="https://www.typescriptlang.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="50" height="50"/></a>
 <a href="https://reactjs.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react" width="50" height="50"/></a>
 <a href="https://nodejs.org/en/learn/getting-started/introduction-to-nodejs" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="nodejs" width="50" height="50"/></a>
-<a href="https://expressjs.com/" target="_blank"><img src="./client/public/images/express.png" alt="express" width="50" height="50"/></a>
-<a href="https://www.prisma.io/" target="_blank"><img src="./client/public/images/prisma.png" alt="prisma" width="50" height="50"/></a>
+<a href="https://expressjs.com/" target="_blank"><img src="./client/public/images/express.svg" alt="express" width="50" height="50"/></a>
+<a href="https://www.prisma.io/" target="_blank"><img src="./client/public/images/prisma.svg" alt="prisma" width="50" height="50"/></a>
 <a href="https://www.postgresql.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" alt="postgres" width="50" height="50"/></a>
 <a href="https://vitejs.dev/" target="_blank"><img src="./client/public/images/vite.svg" alt="vite" width="50" height="50"/></a>
-<a href="https://socket.io/" target="_blank"><img src="./client/public/images/socketio.png" alt="socket.io" width="50" height="50"/></a>
+<a href="https://socket.io/" target="_blank"><img src="./client/public/images/socketio.svg" alt="socket.io" width="50" height="50"/></a>
 </p>
 
 ## Former Technologies Used
 
 <p align="left"> 
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="50" height="50"/></a>
-<a href="https://create-react-app.dev/" target="_blank"><img src="./client/public/images/cra.png" alt="creat-react-app" width="50" height="50"/></a>
+<a href="https://create-react-app.dev/" target="_blank"><img src="./client/public/images/cra.svg" alt="creat-react-app" width="50" height="50"/></a>
 <a href="https://firebase.google.com/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/firebase/firebase-plain.svg" alt="firebase" width="50" height="50"/></a>
+<a href="https://www.mongodb.com/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/mongodb/mongodb-original.svg" alt="firebase" width="50" height="50"/></a>
 </p>
 
 ## App Features
