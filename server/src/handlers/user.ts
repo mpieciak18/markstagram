@@ -11,7 +11,6 @@ import { AuthReq } from '@/types/types.js';
 import { NewUserBody } from '@markstagram/shared-types';
 import { User } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/index.js';
 
 // Creates a new user in the database and returns a signed JWT to the client.
 // Any error is assumed to be related to user input and is returned to the client as such.
@@ -37,7 +36,7 @@ export const createNewUser = async (
     };
     res.json({ token, user });
   } catch (e) {
-    const err = e as PrismaClientKnownRequestError;
+    const err = e as Prisma.PrismaClientKnownRequestError;
     // Checks if error is a 'unique constraint failure'
     if (err.code == 'P2002' && err.meta?.target) {
       const notUnique: string[] = [];
