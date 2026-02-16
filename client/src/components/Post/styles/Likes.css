@@ -1,173 +1,176 @@
 @media (min-width: 800px) {
-    .like-row-left {
-        font-size: medium;
-    }
-    #likes .follow-button {
-        margin-right: 50px;
-        font-size: large;
-        width: 200px;
-    }
+  .like-row-left {
+    font-size: medium;
+  }
+  #likes .follow-button {
+    margin-right: 50px;
+    font-size: large;
+    width: 200px;
+  }
 }
 
 @media (max-width: 800px) {
-    #likes-list {
-        padding-bottom: 60px;
-    }
-    .like-row-left {
-        font-size: small;
-    }
-    #likes .follow-button {
-        font-size: medium;
-        width: 150px;
-    }
+  #likes-list {
+    padding-bottom: 60px;
+  }
+  .like-row-left {
+    font-size: small;
+  }
+  #likes .follow-button {
+    font-size: medium;
+    width: 150px;
+  }
 }
 
 #likes {
-    position: fixed;
-    z-index: 1;
-    width: 100vw;
-    height: 100vh;
-    background-color: white;
-    left: 0;
-    top: 0;
+  position: fixed;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  left: 0;
+  top: 0;
 }
 
 #likes-pop-up {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  align-items: center;
 }
 
 #likes-header {
-    display: flex;
-    flex-direction: row;
-    margin-top: 60px;
-    padding: 20px 0px;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 800px;
+  display: flex;
+  flex-direction: row;
+  margin-top: 60px;
+  padding: 20px 0px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
 }
 
 #likes-title {
-    font-size: x-large;
-    font-weight: bold;
+  font-size: x-large;
+  font-weight: bold;
 }
 
 #likes-x-button {
-    font-size: small;
-    margin-left: 30px;
-    color: rgb(0, 0, 0, 0.75);
+  font-size: small;
+  margin-left: 30px;
+  color: rgb(0, 0, 0, 0.75);
 }
 
 #likes-x-button:hover {
-    cursor: pointer;
-    color: rgb(0, 0, 0, 0.25);
+  cursor: pointer;
+  color: rgb(0, 0, 0, 0.25);
 }
 
 #likes-x-button-hidden {
-    font-size: small;
-    visibility: hidden;
-    margin-right: 30px;
+  font-size: small;
+  visibility: hidden;
+  margin-right: 30px;
 }
 
 #likes-divider {
-    background-color: rgba(0, 0, 0, 0.25);
-    height: 1px;
-    width: 100%;
-    max-width: 740px;
+  background-color: rgba(0, 0, 0, 0.25);
+  height: 1px;
+  width: 100%;
+  max-width: 740px;
 }
 
 #likes-list {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    padding-top: 10px;
-    padding-bottom: 60px;
-    max-width: 800px;
-    width: 100%;
-    overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding-top: 10px;
+  padding-bottom: 60px;
+  max-width: 800px;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .like-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin: 5px 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 30px;
 }
 
 .like-row-left {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 5px;
-    border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 .like-row-left:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-.like-row-left:link, .like-row-left:visited, .like-row-left:active, .like-row-left:hover {
-    text-decoration: none;
-    color: black;
+.like-row-left:link,
+.like-row-left:visited,
+.like-row-left:active,
+.like-row-left:hover {
+  text-decoration: none;
+  color: black;
 }
 
 .like-image {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    object-fit: cover;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .like-text {
-    display: flex;
-    flex-direction: column;
-    padding: 0 5px 0 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 5px 0 10px;
 }
 
 .like-name {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 #likes .follow-button {
-    top: 0px;
-    position: relative;
-    border-color: rgba(0, 0, 0, 0.2);
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: 0 5px 10px 0 rgba(0,0,0,.2);
-    border-radius: 30px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 40px;
-    transition: .2s;
+  top: 0px;
+  position: relative;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 40px;
+  transition: 0.2s;
 }
 
 #likes .follow-button.active:hover {
-    top: -5px;
-    box-shadow: 0 10px 10px 0 rgba(0,0,0,.2);
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.05);
+  top: -5px;
+  box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 #likes .follow-button.inactive:hover {
-    top: -5px;
-    box-shadow: 0 10px 10px 0 rgba(0,0,0,.2);
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.1);
-    color: #777777;
+  top: -5px;
+  box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #777777;
 }
 
 #likes .follow-button.active {
-    background-color: white;
+  background-color: white;
 }
 
 #likes .follow-button.inactive {
-    background-color: rgba(0, 0, 0, 0.1);
-    color: #777777;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #777777;
 }

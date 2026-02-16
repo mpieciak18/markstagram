@@ -1,0 +1,17 @@
+{
+  "name": "@markstagram/shared-types",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.16.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

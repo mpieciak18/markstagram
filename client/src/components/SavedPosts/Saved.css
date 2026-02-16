@@ -1,20 +1,20 @@
 #saved-posts {
-    margin: 80px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
+  margin: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
 #saved-posts-title {
-    font-size: xx-large;
-    font-weight: bold;
+  font-size: xx-large;
+  font-weight: bold;
 }
 #saved-posts-content {
-    max-width: 1000px;
-    display: grid;
-    grid-gap: 1rem;
-    grid-template-columns: repeat(auto-fit, 300px);
-    justify-content: center;
-    width: 100%;
-    margin-top: 20px;
+  max-width: 1000px;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: repeat(auto-fit, 300px);
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
 }

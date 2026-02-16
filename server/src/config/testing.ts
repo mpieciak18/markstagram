@@ -1,3 +1,3 @@
 export const testingConfig = {
-	port: 6000,
+  port: 6000,
 };

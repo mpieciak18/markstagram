@@ -1,17 +1,17 @@
 import { Route, Navigate, BrowserRouter, Routes } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Home } from './components/Home/Home.js';
-import { Messages } from './components/Messages/Messages.js';
-import { PostPage } from './components/Post/Post.js';
-import { Profile } from './components/Profile/Profile.js';
-import { Settings } from './components/Settings/Settings.js';
-import { Saved } from './components/SavedPosts/Saved.js';
-import { SignUp } from './components/SignUp/SignUp.js';
-import { Login } from './components/Login/Login.js';
-import { ConvoPage } from './components/Conversation/Conversation.js';
-import { useAuth } from './contexts/AuthContext.js';
-import { getLocalUser } from './services/localstor.js';
-import { HomeLoggedOut } from './components/Home/HomeLoggedOut.js';
+import { Home } from './components/Home/Home';
+import { Messages } from './components/Messages/Messages';
+import { PostPage } from './components/Post/Post';
+import { Profile } from './components/Profile/Profile';
+import { Settings } from './components/Settings/Settings';
+import { Saved } from './components/SavedPosts/Saved';
+import { SignUp } from './components/SignUp/SignUp';
+import { Login } from './components/Login/Login';
+import { ConvoPage } from './components/Conversation/Conversation';
+import { useAuth } from './contexts/AuthContext';
+import { getLocalUser } from './services/localstor';
+import { HomeLoggedOut } from './components/Home/HomeLoggedOut';
 import './components/other/other.css';
 
 const App = () => {

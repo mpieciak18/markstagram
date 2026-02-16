@@ -1,139 +1,45 @@
-import { JwtPayload } from 'jsonwebtoken';
-import { Request } from 'express';
-import {
-	Comment,
-	Conversation,
-	Like,
-	Message,
-	Notification,
-	Post,
-	Save,
-	User,
-} from '@prisma/client';
-import { Field } from 'multer';
-import { Socket } from 'socket.io';
-
-export interface NewUserBody {
-	email: string;
-	username: string;
-	password: string;
-	name: string;
-}
-
-export interface UserStatsCount {
-	_count: {
-		posts: number;
-		receivedFollows: number;
-		givenFollows: number;
-	};
-}
-
-export interface PostStatsCount {
-	_count: {
-		comments: number;
-		likes: number;
-	};
-}
-
-export interface SaveFromPost extends Save {
-	post: Post & PostStatsCount;
-}
+import type { JwtPayload } from 'jsonwebtoken';
+import type { Request } from 'express';
+import type { User } from '@markstagram/shared-types';
+import type { Field } from 'multer';
+import type { Socket } from 'socket.io';
 
 export interface PreAuth {
-	user: string | JwtPayload;
+  user: string | JwtPayload;
 }
 
 export interface AuthReq extends Request {
-	user: User;
-}
-
-export interface UserUpdateData {
-	email?: string;
-	username?: string;
-	password?: string;
-	name?: string;
-	image?: string;
-	bio?: string;
-}
-
-export interface PostUpdateData {
-	id?: number;
-	caption?: string;
-}
-
-export interface NewNotificationData {
-	userId: number;
-	otherUserId: number;
-	type: string;
-	read: boolean;
-	postId?: number;
+  user: User;
 }
 
 export interface MayHaveFile {
-	file: Field;
-}
-
-export interface MayHaveImage {
-	image: string;
+  file: Field;
 }
 
 export interface HasId {
-	body: { id: number };
+  body: { id: number };
 }
 
 export interface HasLimit {
-	body: { id: number };
+  body: { id: number };
 }
 
 export interface MayHavePostId {
-	body: { postId?: number };
+  body: { postId?: number };
 }
 
 export interface HasCaption {
-	body: { caption: string };
+  body: { caption: string };
 }
+
 export interface HasType {
-	body: { type: string };
+  body: { type: string };
 }
 
 export interface HasMessage {
-	body: { message: string };
-}
-
-export interface NotificationWithOtherUser extends Notification {
-	otherUser: User;
-}
-
-export interface CommentWithUser extends Comment {
-	user: User;
-}
-
-export interface LikeWithUser extends Like {
-	user: User;
-}
-
-export interface UserConversation extends Conversation {
-	users: User[];
-	messages: Message[];
-}
-
-export interface SyncErr extends Error {
-	type?: string;
-}
-
-export interface SocketMessage {
-	id: string;
-	message: string;
-}
-
-export interface SocketMessageErr {
-	message: string;
+  body: { message: string };
 }
 
 export interface SocketWithUser extends Socket {
-	user: User;
-}
-
-export interface HasUsers {
-	users: User[];
+  user: User;
 }
