@@ -1,11 +1,10 @@
 import app from '../server.js';
 import supertest from 'supertest';
-import jwt from 'jsonwebtoken';
+import { SignJWT, jwtVerify } from 'jose'
 import { comparePasswords } from '../modules/auth.js';
 import { it, describe, expect } from 'vitest';
 import { deleteFileFromStorage } from '../config/gcloud.js';
-import { User } from '@prisma/client';
-import { UserStatsCount } from '@markstagram/shared-types';
+import { UserStatsCount, User } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 
@@ -383,12 +382,12 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
   });
   //
   it('should fail to delete a user due to a missing user id field within the auth token & return a 500 status', async () => {
-    const fakeToken = jwt.sign(
-      {
-        username: 'fake_user',
-      },
-      process.env.JWT_SECRET ?? '',
-    );
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? '')
+
+    const fakeToken = await new SignJWT({ username: 'fake_user' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .sign(secret);
     const response = await supertest(app)
       .delete('/api/user')
       .set('Authorization', `Bearer ${fakeToken}`);
