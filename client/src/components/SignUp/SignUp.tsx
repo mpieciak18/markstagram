@@ -1,6 +1,6 @@
 import './SignUp.css';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import Logo from '../../assets/images/ig-logo-2.png';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoaderContext';
@@ -89,7 +89,7 @@ const SignUp = () => {
 			setUser(newUser);
 			setLocalUser(newUser);
 			setLoading(false);
-			navigate('/settings', { state: { newSignUp: true } });
+			navigate({ to: '/settings', state: { newSignUp: true } });
 		} catch {
 			setLoading(false);
 			setErrorClass('active');
@@ -165,7 +165,7 @@ const SignUp = () => {
 					</button>
 					<div id="sign-up-login-section">
 						<div id="sign-up-login-message">Already Signed Up?</div>
-						<button id="sign-up-button-login" onClick={() => navigate('/login')}>
+						<button id="sign-up-button-login" onClick={() => navigate({ to: '/login' })}>
 							Login
 						</button>
 					</div>

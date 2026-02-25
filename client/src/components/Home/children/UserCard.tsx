@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { usePopUp } from '../../../contexts/PopUpContext';
 import { Follows } from '../../other/Follows';
@@ -29,13 +29,13 @@ const UserCard = () => {
 	};
 
 	// Redirect to user's profile
-	const redirectToProfile = () => navigate(`/${user?.id}`);
+	const redirectToProfile = () => navigate({ to: `/${user?.id}` });
 
 	// Redirect to sign-up
-	const redirectToSignup = () => navigate('/signup');
+	const redirectToSignup = () => navigate({ to: '/signup' });
 
 	// Redirect to login
-	const redirectToLogin = () => navigate('/login');
+	const redirectToLogin = () => navigate({ to: '/login' });
 
 	// Update user card state or user image state when user prop changes
 	useEffect(() => {

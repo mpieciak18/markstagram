@@ -16,7 +16,10 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-	const [user, setUser] = useState<UserContext | null>(null);
+	const [user, setUser] = useState<UserContext | null>(() => {
+		const stored = localStorage.getItem('markstagramUser');
+		return stored ? JSON.parse(stored) : null;
+	});
 
 	return <AuthContext.Provider value={{ user, setUser }}>{children}</AuthContext.Provider>;
 };

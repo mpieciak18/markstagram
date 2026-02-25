@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { getLikes } from '../../../services/likes';
 import { FollowButton } from '../../other/FollowButton';
 import '../styles/Likes.css';
@@ -76,7 +76,7 @@ const Likes = (props: { postId: number }) => {
 				<div id="likes-list" onScroll={loadMore}>
 					{likes.map((like) => (
 						<div className="like-row" key={like.id}>
-							<Link className="like-row-left" to={`/${like.user.id}`}>
+							<Link className="like-row-left" to="/$otherUserId" params={{ otherUserId: String(like.user.id) }}>
 								<img className="like-image" src={like.user.image ? like.user.image : undefined} />
 								<div className="like-text">
 									<div className="like-name">{like.user.name}</div>

@@ -1,60 +1,40 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useLoading } from '../../../contexts/LoaderContext';
 import { usePopUp } from '../../../contexts/PopUpContext';
-import { useProfile } from '../../../contexts/ProfileContext';
-import { findUser } from '../../../services/users';
+import { useUser } from '../../../queries/useUserQueries';
+import { useState } from 'react';
 import { Follows } from '../../other/Follows';
 
 const ProfileCard = (props: { otherUserId: number }) => {
 	const { user } = useAuth();
-	const { setLoading } = useLoading();
-	const { otherUser, setOtherUser } = useProfile();
 	const { popUpState, updatePopUp } = usePopUp();
 	const { otherUserId } = props;
 
 	const navigate = useNavigate();
 
-	// Init profile image state
-	const [img, setImg] = useState<string | undefined>(undefined);
+	const { data: otherUser } = useUser(otherUserId);
 
-	// Init state to determine if pop-up shows following or followers
 	const [followingVsFollower, setFollowingVsFollower] = useState('following');
 
-	// Open Follows pop-up (following)
 	const clickFollowing = () => {
 		if (user != null) {
 			setFollowingVsFollower('following');
 			updatePopUp('followsOn');
 		} else {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		}
 	};
 
-	// Open Follows pop-up (followers)
 	const clickFollowers = () => {
 		if (user != null) {
 			setFollowingVsFollower('followers');
 			updatePopUp('followsOn');
 		} else {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		}
 	};
 
-	// Update img, otherUser, & otherUserFollowers states on render
-	useEffect(() => {
-		setLoading(true);
-		findUser(otherUserId)
-			.then((newUser) => {
-				setImg(newUser?.image ? newUser.image : undefined);
-				setOtherUser(newUser);
-				setLoading(false);
-			})
-			.catch(() => setLoading(false));
-	}, []);
-
-	// Update follows state if followsOn state changes
 	useEffect(() => {
 		const body = document.querySelector('body');
 		if (popUpState?.followsOn && body) {
@@ -67,7 +47,7 @@ const ProfileCard = (props: { otherUserId: number }) => {
 	return otherUser ? (
 		<div id="profile-card">
 			<div id="profile-card-top">
-				<img id="profile-card-icon" src={img} />
+				<img id="profile-card-icon" src={otherUser.image ? otherUser.image : undefined} />
 				<div id="profile-card-text">
 					<div id="profile-card-name">{otherUser.name}</div>
 					<div id="profile-card-username">@{otherUser.username}</div>

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePopUp } from '../../contexts/PopUpContext';
 import { removeLocalUser } from '../../services/localstor';
@@ -12,7 +12,7 @@ const SettingsPopup = () => {
 	const logout = async () => {
 		await setUser(null);
 		removeLocalUser();
-		navigate('/');
+		navigate({ to: '/' });
 	};
 
 	// Handles click for opening / closing pop-up
@@ -26,18 +26,18 @@ const SettingsPopup = () => {
 			<div
 				id="settings-profile"
 				className="settings-popup-button"
-				onClick={() => navigate(`/${user?.id}`)}
+				onClick={() => navigate({ to: `/${user?.id}` })}
 			>
 				View Profile
 			</div>
 			<div
 				id="settings-settings"
 				className="settings-popup-button"
-				onClick={() => navigate('/settings')}
+				onClick={() => navigate({ to: '/settings' })}
 			>
 				Change Settings
 			</div>
-			<div id="settings-posts" className="settings-popup-button" onClick={() => navigate('/saved')}>
+			<div id="settings-posts" className="settings-popup-button" onClick={() => navigate({ to: '/saved' })}>
 				View Saved Posts
 			</div>
 			<div id="settings-logout" className="settings-popup-button" onClick={logout}>

@@ -1,6 +1,6 @@
 import type { User } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useLoading } from '../../contexts/LoaderContext';
 import { usePopUp } from '../../contexts/PopUpContext';
 import { searchUsers } from '../../services/users';
@@ -12,7 +12,6 @@ const SearchPopup = (props: { searchVal: string }) => {
 
 	const navigate = useNavigate();
 
-	const location = useParams();
 
 	// Init results array state
 	const [searchedUsers, setSearchedUsers] = useState<User[]>([]);
@@ -55,12 +54,7 @@ const SearchPopup = (props: { searchVal: string }) => {
 					{searchedUsers.map((searchedUser) => {
 						const redirect = () => {
 							updatePopUp();
-							if (location.otherUserId == null) {
-								navigate(`/${searchedUser.id}`);
-							} else {
-								navigate(`/${searchedUser.id}`);
-								window.location.reload();
-							}
+							navigate({ to: '/$otherUserId', params: { otherUserId: String(searchedUser.id) } });
 						};
 						return (
 							<div className="search-result" onClick={redirect} key={searchedUser.id}>

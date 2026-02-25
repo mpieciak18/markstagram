@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { getFollowers, getFollowing } from '../../services/followers';
 import { FollowButton } from './FollowButton';
 import './other.css';
@@ -16,7 +16,6 @@ const Follows = (props: { otherUserId: number; initTab: string }) => {
 
 	const navigate = useNavigate();
 
-	const location = useParams();
 
 	// Init following/follower users count
 	const [followsCount, setFollowsCount] = useState(20);
@@ -122,12 +121,7 @@ const Follows = (props: { otherUserId: number; initTab: string }) => {
 					{followsArr.map((follow) => {
 						const redirect = () => {
 							updatePopUp();
-							if (location.otherUserId == null) {
-								navigate(`/${follow.otherUser.id}`);
-							} else {
-								navigate(`/${follow.otherUser.id}`);
-								window.location.reload();
-							}
+							navigate({ to: '/$otherUserId', params: { otherUserId: String(follow.otherUser.id) } });
 						};
 						return (
 							<div className="follow-row" key={follow.id}>

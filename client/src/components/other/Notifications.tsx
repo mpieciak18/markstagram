@@ -9,7 +9,7 @@ import {
 } from '@/services/notifications';
 import type { Notification, User } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 interface NotificationRecord extends Notification {
 	otherUser: User;
@@ -144,7 +144,7 @@ const Notifications = () => {
 				<div id="notifs-list" className={buttonOne} onScroll={loadMore}>
 					{notifications.map((notif) => {
 						const redirectToProfile = () => {
-							navigate(`/${notif.otherUserId}`);
+							navigate({ to: `/${notif.otherUserId}` });
 							updatePopUp();
 						};
 						let path: string;
@@ -163,7 +163,7 @@ const Notifications = () => {
 							text = 'messaged you.';
 						}
 						const redirectToPath = () => {
-							navigate(`${path}`);
+							navigate({ to: `${path}` });
 							updatePopUp();
 						};
 						const time = timeSince(notif.createdAt);

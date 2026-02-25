@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import './Conversation.css';
 import type {
 	Conversation,
@@ -28,7 +28,7 @@ const ConvoPage = () => {
 	const [socket, setSocket] = useState<Socket>();
 
 	// Grab other user's id from url parameters
-	const otherUserId = Number(useParams().otherUserId);
+	const otherUserId = Number(useParams({ strict: false }).otherUserId);
 
 	// Init other user state
 	const [otherUser, setOtherUser] = useState<User & UserStatsCount>();
@@ -188,10 +188,10 @@ const ConvoPage = () => {
 	};
 
 	// Redirect back to messages page
-	const goBack = () => navigate('/messages');
+	const goBack = () => navigate({ to: '/messages' });
 
 	// Redirect to other user's page
-	const redirect = () => navigate(`/${otherUserId}`);
+	const redirect = () => navigate({ to: '/$otherUserId', params: { otherUserId: String(otherUserId) } });
 
 	return (
 		<div

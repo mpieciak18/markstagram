@@ -1,7 +1,7 @@
 import '../styles/PostPreview.css';
 import type { Post, PostStatsCount } from '@markstagram/shared-types';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import LikeIcon from '../../../assets/images/like.png';
 import CommentsIcon from '../../../assets/images/messages.png';
 
@@ -13,7 +13,8 @@ const PostPreview = (props: { post: Post & PostStatsCount }) => {
 	return (
 		<Link
 			className="single-post-box"
-			to={`/${post.userId}/${post.id}`}
+			to="/$postOwnerId/$postId"
+		params={{ postOwnerId: String(post.userId), postId: String(post.id) }}
 			onPointerDown={() => setOverlay('active')}
 			onPointerUp={() => setOverlay('inactive')}
 			onMouseOver={() => setOverlay('active')}

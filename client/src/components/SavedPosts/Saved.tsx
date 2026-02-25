@@ -1,52 +1,22 @@
 import './Saved.css';
-import type { Post, PostStatsCount, Save } from '@markstagram/shared-types';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLoading } from '../../contexts/LoaderContext';
-import { getSaves } from '../../services/saves';
+import { useState } from 'react';
+import { useSavedPosts } from '../../queries/useSaveQueries';
 import { PostPreview } from '../Post/children/PostPreview';
 import { Navbar } from '../other/Navbar';
 
-interface SaveRecord extends Save {
-	post: Post & PostStatsCount;
-}
-
 const Saved = () => {
-	const { user } = useAuth();
-	const { loading, setLoading } = useLoading();
-
-	// Init savesNumber state
 	const [savesNumber, setSavesNumber] = useState(21);
 
-	// Init savesArr state
-	const [savesArr, setSavesArr] = useState<SaveRecord[]>([]);
+	const { data: savesArr = [], isPending, isFetching, isSuccess } = useSavedPosts(savesNumber);
 
-	// Init all loaded state
-	const [allLoaded, setAllLoaded] = useState(false);
+	const isAllLoaded = isSuccess && savesArr.length < savesNumber;
 
-	// Update savesArr state when savesNumber or user state changes
-	useEffect(() => {
-		setLoading(true);
-		getSaves(savesNumber)
-			.then((savedArr) => {
-				setSavesArr(savedArr);
-				if (savedArr.length < savesNumber) {
-					setAllLoaded(true);
-				}
-				setLoading(false);
-			})
-			.catch(() => setLoading(false));
-	}, [savesNumber, user]);
-
-	// Load-more function that updates the saves reel
 	const loadMore = () => {
-		if (allLoaded === false) {
-			const newSavesNumber = savesNumber + 9;
-			setSavesNumber(newSavesNumber);
+		if (!isAllLoaded && !isFetching) {
+			setSavesNumber(savesNumber + 9);
 		}
 	};
 
-	// Load more content when user reaches bottom of document
 	window.addEventListener('scroll', () => {
 		if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
 			loadMore();
@@ -54,7 +24,7 @@ const Saved = () => {
 	});
 
 	return (
-		<div id="saved" className="page" style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}>
+		<div id="saved" className="page" style={{ pointerEvents: isPending ? 'none' : 'auto' }}>
 			<Navbar />
 			{savesArr?.length > 0 ? (
 				<div id="saved-posts">

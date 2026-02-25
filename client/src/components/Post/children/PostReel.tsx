@@ -1,7 +1,7 @@
 import '../styles/PostReel.css';
 import type { Post, PostStatsCount, User } from '@markstagram/shared-types';
 import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { timeSince } from '../../../other/timeSince';
 import { CommentsBar } from './Comments/CommentsBar';
 import { CommentsPreview } from './Comments/CommentsPreview';
@@ -31,7 +31,7 @@ const PostReel = (props: { post: PostRecord }) => {
 	return (
 		<div className="single-post-component">
 			<div className="post-top">
-				<Link className="post-user-link" to={`/${post.user.id}`}>
+				<Link className="post-user-link" to="/$otherUserId" params={{ otherUserId: String(post.user.id) }}>
 					<img className="post-user-link-avatar" src={post.user?.image || undefined} />
 					<div className="post-user-link-name-and-username-parent">
 						<div className="post-user-link-name">{post.user.name}</div>
@@ -42,7 +42,7 @@ const PostReel = (props: { post: PostRecord }) => {
 					<div className="post-date">{timeSince(post.createdAt)}</div>
 				</div>
 			</div>
-			<Link className="post-middle" to={`/${post.user.id}/${post.id}`}>
+			<Link className="post-middle" to="/$postOwnerId/$postId" params={{ postOwnerId: String(post.user.id), postId: String(post.id) }}>
 				<img className="post-image" src={post.image} />
 			</Link>
 			<div className="post-bottom">
@@ -55,16 +55,16 @@ const PostReel = (props: { post: PostRecord }) => {
 					setLikesNum={setLikesNum}
 					setLinkCopied={setLinkCopied}
 				/>
-				<Link className="post-likes" to={`/${post.user.id}/${post.id}`}>
+				<Link className="post-likes" to="/$postOwnerId/$postId" params={{ postOwnerId: String(post.user.id), postId: String(post.id) }}>
 					{likesNum === 0 ? '0 likes' : likesNum === 1 ? '1 like' : `${likesNum} likes`}
 				</Link>
 				<div className="post-text-parent">
-					<Link className="post-text-name" to={`/${post.user.id}`}>
+					<Link className="post-text-name" to="/$otherUserId" params={{ otherUserId: String(post.user.id) }}>
 						{post.user.name}
 					</Link>
 					<div className="post-text">{post.caption}</div>
 				</div>
-				<Link className="post-view-comments" to={`/${post.user.id}/${post.id}`}>
+				<Link className="post-view-comments" to="/$postOwnerId/$postId" params={{ postOwnerId: String(post.user.id), postId: String(post.id) }}>
 					{commentsNum === 0
 						? 'No comments yet...'
 						: commentsNum === 1

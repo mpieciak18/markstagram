@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoaderContext';
 import { usePopUp } from '../../contexts/PopUpContext';
@@ -15,9 +15,6 @@ const NewPost = () => {
 
 	// Init useNavigate function
 	const navigate = useNavigate();
-
-	// Init useParams
-	const location = useParams();
 
 	// Init ref for ImageInput component
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -65,14 +62,8 @@ const NewPost = () => {
 						setLocalUser(updatedUser);
 					}
 					updatePopUp();
-					if (location.postOwnerId == null) {
-						setLoading(false);
-						navigate(`/${user?.id}/${post.id}`);
-					} else {
-						setLoading(false);
-						navigate(`/${user?.id}/${post.id}`);
-						window.location.reload();
-					}
+					setLoading(false);
+					navigate({ to: '/$postOwnerId/$postId', params: { postOwnerId: String(user?.id), postId: String(post.id) } });
 				} else {
 					throw new Error();
 				}

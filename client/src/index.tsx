@@ -1,19 +1,39 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
+import { RouterProvider } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './index.css';
-import { App } from './App';
-import { AuthProvider } from './contexts/AuthContext';
+import { router } from './router';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoadingProvider } from './contexts/LoaderContext';
 import { PopUpProvider } from './contexts/PopUpContext';
 
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60,
+			gcTime: 1000 * 60 * 5,
+			retry: 1,
+			refetchOnWindowFocus: false,
+		},
+	},
+});
+
+const InnerApp = () => {
+	const { user } = useAuth();
+	return <RouterProvider router={router} context={{ auth: user, queryClient }} />;
+};
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
-		<LoadingProvider>
-			<AuthProvider>
-				<PopUpProvider>
-					<App />
-				</PopUpProvider>
-			</AuthProvider>
-		</LoadingProvider>
+		<QueryClientProvider client={queryClient}>
+			<LoadingProvider>
+				<AuthProvider>
+					<PopUpProvider>
+						<InnerApp />
+					</PopUpProvider>
+				</AuthProvider>
+			</LoadingProvider>
+		</QueryClientProvider>
 	</React.StrictMode>,
 );

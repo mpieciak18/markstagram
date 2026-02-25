@@ -1,10 +1,10 @@
 import './Settings.css';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoaderContext';
 import { setLocalUser } from '../../services/localstor';
-import { updateUser } from '../../services/users';
+import { useUpdateUser } from '../../queries/useUserQueries';
 import { Navbar } from '../other/Navbar';
 import { ImageInput } from './children/ImageInput';
 import { NameFooter } from './children/NameFooter';
@@ -12,17 +12,18 @@ import { NameFooter } from './children/NameFooter';
 const Settings = () => {
 	const { user, setUser } = useAuth();
 	const { loading, setLoading } = useLoading();
+	const updateUserMutation = useUpdateUser();
 
 	const location = useLocation();
 
 	// Store (potential) state from previous page to variable
-	const [prevState, setPrevState] = useState(null);
+	const [prevState, setPrevState] = useState<unknown>(null);
 
 	// Init useNavigate function
 	const navigate = useNavigate();
 
 	// Redirect to own profile page
-	const redirectToProfile = () => navigate(`/${user?.id}`);
+	const redirectToProfile = () => navigate({ to: '/$otherUserId', params: { otherUserId: String(user?.id) } });
 
 	// Init file state
 	const [file, setFile] = useState<File | null>(null);
@@ -64,23 +65,26 @@ const Settings = () => {
 	// Updates user's settings with form values
 	const updateSettings = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// Check validation first
 		if (namePasses === true) {
 			setLoading(true);
-			updateUser(name, bio, file)
-				.then((updatedUser) => {
-					setUser(updatedUser);
-					setLocalUser(updatedUser);
-					setLoading(false);
-					navigate(`/${user?.id}`);
-				})
-				.catch(() => {
-					setLoading(false);
-					setErrorClass('active');
-					setTimeout(() => {
-						setErrorClass('inactive');
-					}, 2000);
-				});
+			updateUserMutation.mutate(
+				{ name, bio, file },
+				{
+					onSuccess: (updatedUser) => {
+						setUser(updatedUser);
+						setLocalUser(updatedUser);
+						setLoading(false);
+						navigate({ to: '/$otherUserId', params: { otherUserId: String(user?.id) } });
+					},
+					onError: () => {
+						setLoading(false);
+						setErrorClass('active');
+						setTimeout(() => {
+							setErrorClass('inactive');
+						}, 2000);
+					},
+				},
+			);
 		}
 	};
 

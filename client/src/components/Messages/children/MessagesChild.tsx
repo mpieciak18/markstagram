@@ -1,8 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { timeSinceTrunc } from '@/other/timeSinceTrunc';
 import type { Conversation, HasUsers, Message, User } from '@markstagram/shared-types';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 interface ConvoRecord extends Conversation, HasUsers {
 	messages: Message[];
@@ -26,7 +26,12 @@ export const MessagesChild = (props: { convo: ConvoRecord }) => {
 	}, [convo]);
 
 	return otherUser ? (
-		<Link className="convo-row" key={convo.id} to={`/messages/${otherUser.id}`}>
+		<Link
+			className="convo-row"
+			key={convo.id}
+			to="/messages/$otherUserId"
+			params={{ otherUserId: String(otherUser.id) }}
+		>
 			<div className="convo-row-left">
 				<img className="convo-image" src={otherUser.image ? otherUser.image : undefined} />
 				<div className="convo-text">

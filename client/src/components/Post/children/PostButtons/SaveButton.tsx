@@ -1,10 +1,8 @@
-import type { Save } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
 import SaveSolid from '../../../../assets/images/save-solid.png';
 import SaveHollow from '../../../../assets/images/save.png';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { useLoading } from '../../../../contexts/LoaderContext';
-import { addSave, removeSave, saveExists } from '../../../../services/saves';
+import { useSaveExists, useAddSave, useRemoveSave } from '../../../../queries/useSaveQueries';
 
 const SaveButton = (props: {
 	postId: number;
@@ -13,52 +11,34 @@ const SaveButton = (props: {
 }) => {
 	const { user } = useAuth();
 	const { postId, redirect } = props;
-	const { setLoading } = useLoading();
 
-	// Init save record state
-	const [save, setSave] = useState<Save | null>(null);
+	const { data: save = null } = useSaveExists(postId);
+	const addSaveMutation = useAddSave(postId);
+	const removeSaveMutation = useRemoveSave(postId);
 
-	// Init isUpdating state
-	const [isUpdating, setIsUpdating] = useState(false);
+	const isUpdating = addSaveMutation.isPending || removeSaveMutation.isPending;
 
-	// Init icon image source state
 	const [img, setImg] = useState(SaveHollow);
-
-	// Add or removes save from post
-	const addRemoveSave = async () => {
-		setIsUpdating(true);
-		if (save === null) {
-			const newSave = await addSave(postId);
-			setSave(newSave);
-			setImg(SaveSolid);
-		} else {
-			await removeSave(save.id);
-			setSave(null);
-			setImg(SaveHollow);
-		}
-		setIsUpdating(false);
-	};
-
-	// Calls addRemoveSave() if not already running
-	const saveButtonFunction = () => {
-		if (user == null) redirect();
-		else if (isUpdating === false) addRemoveSave();
-	};
-
-	useEffect(() => {
-		setLoading(true);
-		saveExists(postId)
-			.then((newSave) => {
-				setSave(newSave);
-				setLoading(false);
-			})
-			.catch(() => setLoading(false));
-	}, []);
 
 	useEffect(() => {
 		if (save) setImg(SaveSolid);
 		else setImg(SaveHollow);
 	}, [save]);
+
+	const addRemoveSave = async () => {
+		if (save === null) {
+			await addSaveMutation.mutateAsync();
+			setImg(SaveSolid);
+		} else {
+			await removeSaveMutation.mutateAsync(save.id);
+			setImg(SaveHollow);
+		}
+	};
+
+	const saveButtonFunction = () => {
+		if (user == null) redirect();
+		else if (!isUpdating) addRemoveSave();
+	};
 
 	return (
 		<img

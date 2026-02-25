@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { searchUsers } from '../../services/users';
 import './other.css';
 import type { User } from '@markstagram/shared-types';
@@ -42,7 +42,7 @@ const ConvoPopup = () => {
 
 	// Redirects user to searched user's page
 	const redirect = (id: string) => {
-		navigate(`/messages/${id}`);
+		navigate({ to: `/messages/${id}` });
 		updatePopUp();
 	};
 

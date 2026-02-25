@@ -1,6 +1,6 @@
 import type { Comment, Post, PostStatsCount, User } from '@markstagram/shared-types';
 import { type SetStateAction, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useLoading } from '../../../../contexts/LoaderContext';
 import { timeSinceTrunc } from '../../../../other/timeSinceTrunc';
 import { getComments } from '../../../../services/comments';
@@ -71,11 +71,11 @@ const CommentsFull = (props: {
 		<div id="comments-grid" onScroll={loadMore}>
 			<div className="post-comment">
 				<div className="post-comment-left" key={'first-comment'}>
-					<Link to={`/${post.user.id}`} className="post-comment-icon">
+					<Link to="/$otherUserId" params={{ otherUserId: String(post.user.id) }} className="post-comment-icon">
 						<img src={post.user.image ? post.user.image : undefined} />
 					</Link>
 					<div className="post-comment-text">
-						<Link to={`/${post.user.id}`} className="post-comment-name">
+						<Link to="/$otherUserId" params={{ otherUserId: String(post.user.id) }} className="post-comment-name">
 							{post.user.name}
 						</Link>
 						<div className="post-comment-text">{post.caption}</div>
@@ -86,11 +86,11 @@ const CommentsFull = (props: {
 			{comments.map((comment) => (
 				<div className="post-comment" key={comment.id}>
 					<div className="post-comment-left">
-						<Link to={`/${comment.userId}`} className="post-comment-icon">
+						<Link to="/$otherUserId" params={{ otherUserId: String(comment.userId) }} className="post-comment-icon">
 							<img src={comment.user.image ? comment.user.image : undefined} />
 						</Link>
 						<div className="post-comment-text">
-							<Link to={`/${comment.user.id}`} className="post-comment-name">
+							<Link to="/$otherUserId" params={{ otherUserId: String(comment.user.id) }} className="post-comment-name">
 								{comment.user.name}
 							</Link>
 							<div className="post-comment-text">{comment.message}</div>

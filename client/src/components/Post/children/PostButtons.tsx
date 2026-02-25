@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { CommentButton } from './PostButtons/CommentButton';
 import { LikeButton } from './PostButtons/LikeButton';
 import { SaveButton } from './PostButtons/SaveButton';
@@ -19,7 +19,7 @@ const PostButtons = (props: {
 	const navigate = useNavigate();
 
 	const redirectToSignUp = () => {
-		navigate('/signup', { state: { path: path } });
+		navigate({ to: '/signup', state: { path: path } });
 	};
 
 	return (

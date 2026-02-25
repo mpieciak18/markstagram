@@ -1,6 +1,6 @@
 import type { Comment, User } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useLoading } from '../../../../contexts/LoaderContext';
 import { getComments } from '../../../../services/comments';
 
@@ -41,7 +41,7 @@ const CommentsPreview = (props: {
 				<div
 					className="post-comment"
 					key={comment.id}
-					onClick={() => navigate(`/${comment.user.id}`)}
+					onClick={() => navigate({ to: `/${comment.user.id}` })}
 				>
 					<div className="post-comment-name">{comment.user.name}</div>
 					<div className="post-comment-text">{comment.message}</div>

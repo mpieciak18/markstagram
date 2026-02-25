@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import MessageSolid from '../../../assets/images/dm-solid.png';
 import MessageHollow from '../../../assets/images/dm.png';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -19,20 +19,20 @@ const ProfileButtons = (props: { otherUserId: number }) => {
 	const clickLogout = async () => {
 		await setUser(null);
 		removeLocalUser();
-		navigate('/');
+		navigate({ to: '/' });
 	};
 
 	// Sends user to settings
 	const clickSettings = () => {
-		navigate('/settings');
+		navigate({ to: '/settings' });
 	};
 
 	// Sends user to messages
 	const clickMessages = () => {
 		if (user != null) {
-			navigate(`/messages/${otherUserId}`);
+			navigate({ to: `/messages/${otherUserId}` });
 		} else {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		}
 	};
 

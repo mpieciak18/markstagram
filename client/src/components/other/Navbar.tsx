@@ -11,10 +11,10 @@ import PostHollow from '@/assets/images/post.png';
 import SettingsSolid from '@/assets/images/profile-solid.png';
 import SettingsHollow from '@/assets/images/profile.png';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLoading } from '@/contexts/LoaderContext';
+import { useIsFetching } from '@tanstack/react-query';
 import { usePopUp } from '@/contexts/PopUpContext';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { Loader } from './Loader';
 import { NewPost } from './NewPost';
 import { Notifications } from './Notifications';
@@ -23,7 +23,7 @@ import { SettingsPopup } from './SettingsPopup';
 
 const Navbar = () => {
 	const { user } = useAuth();
-	const { loading } = useLoading();
+	const isFetching = useIsFetching();
 	const { popUpState, updatePopUp } = usePopUp();
 
 	const navigate = useNavigate();
@@ -48,13 +48,13 @@ const Navbar = () => {
 	// Redirect to home & update popUpState
 	const clickHome = () => {
 		updatePopUp();
-		navigate('/');
+		navigate({ to: '/' });
 	};
 
 	// Update popUpState.newPostOn (or redirect to sign-up page)
 	const clickNewPost = () => {
 		if (user == null) {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		} else if (popUpState.newPostOn) {
 			updatePopUp();
 		} else {
@@ -65,7 +65,7 @@ const Navbar = () => {
 	// Update popUpState.notifsOn (or redirect to sign-up page)
 	const clickNotifications = () => {
 		if (user == null) {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		} else if (popUpState.notifsOn) {
 			updatePopUp();
 		} else {
@@ -76,17 +76,17 @@ const Navbar = () => {
 	// Navigate to direct messages & update popUpState (or redirect to sign-up page)
 	const clickMessages = () => {
 		if (user == null) {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		} else {
 			updatePopUp();
-			navigate('/messages');
+			navigate({ to: '/messages' });
 		}
 	};
 
 	// Update viewSettings (or redirect to sign-up page)
 	const clickSettings = () => {
 		if (user == null) {
-			navigate('/signup');
+			navigate({ to: '/signup' });
 		} else if (popUpState.settingsOn) {
 			updatePopUp();
 		} else {
@@ -97,7 +97,7 @@ const Navbar = () => {
 	return (
 		<div id="navbar">
 			{/* <Loader /> */}
-			{loading ? <Loader /> : null}
+			{isFetching > 0 ? <Loader /> : null}
 			{popUpState.notifsOn ? <Notifications /> : popUpState.newPostOn ? <NewPost /> : null}
 			<div id="navbar-logo" onClick={clickHome}>
 				<img id="navbar-logo-icon" src={Logo} />

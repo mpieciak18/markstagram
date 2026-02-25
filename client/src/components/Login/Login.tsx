@@ -1,6 +1,6 @@
 import './Login.css';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Logo from '../../assets/images/ig-logo-2.png';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoaderContext';
@@ -33,7 +33,7 @@ const Login = () => {
 			setUser(signedInUser);
 			setLocalUser(signedInUser);
 			setLoading(false);
-			navigate('/');
+			navigate({ to: '/' });
 		} catch (error) {
 			setLoading(false);
 			setErrorClass('active');

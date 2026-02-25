@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import LikeSolid from '../../../../assets/images/like-solid.png';
 import LikeHollow from '../../../../assets/images/like.png';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { useLoading } from '../../../../contexts/LoaderContext';
-import { addLike, likeExists, removeLike } from '../../../../services/likes';
+import { useLikeExists, useAddLike, useRemoveLike } from '../../../../queries/useLikeQueries';
 
 const LikeButton = (props: {
 	postId: number;
@@ -13,26 +12,15 @@ const LikeButton = (props: {
 	likesNum: number | undefined;
 }) => {
 	const { user } = useAuth();
-	const { setLoading } = useLoading();
 	const { postId, postOwnerId, redirect, setLikesNum, likesNum } = props;
 
-	const [likeId, setLikeId] = useState<number | null>(null);
+	const { data: likeId = null } = useLikeExists(postId);
+	const addLikeMutation = useAddLike(postId, postOwnerId);
+	const removeLikeMutation = useRemoveLike(postId);
 
-	const [isUpdating, setIsUpdating] = useState(false);
+	const isUpdating = addLikeMutation.isPending || removeLikeMutation.isPending;
 
 	const [img, setImg] = useState(LikeHollow);
-
-	useEffect(() => {
-		if (user != null) {
-			setLoading(true);
-			likeExists(postId)
-				.then((id) => {
-					setLikeId(id);
-					setLoading(false);
-				})
-				.catch(() => setLoading(false));
-		}
-	}, [user]);
 
 	useEffect(() => {
 		if (likeId != null) {
@@ -42,33 +30,22 @@ const LikeButton = (props: {
 		}
 	}, [likeId]);
 
-	// Called on by likeButtonFunction and runs lbfIsRunning is false
 	const addRemoveLike = async () => {
-		// disable like button function while functions run
-		setIsUpdating(true);
-		// perform db updates & state changes
 		if (likeId == null) {
-			addLike(postId, postOwnerId).then((id) => {
-				setLikeId(id);
-				setImg(LikeSolid);
-				if (likesNum !== undefined) setLikesNum(likesNum + 1);
-			});
+			await addLikeMutation.mutateAsync();
+			setImg(LikeSolid);
+			if (likesNum !== undefined) setLikesNum(likesNum + 1);
 		} else {
-			removeLike(likeId).then(() => {
-				setLikeId(null);
-				setImg(LikeHollow);
-				if (likesNum !== undefined) setLikesNum(likesNum - 1);
-			});
+			await removeLikeMutation.mutateAsync(likeId);
+			setImg(LikeHollow);
+			if (likesNum !== undefined) setLikesNum(likesNum - 1);
 		}
-		// enable like button once everything is done
-		setIsUpdating(false);
 	};
 
-	// Runs when like button is clicked and calls addRemoveLike() when lbfIsrunning is false
 	const likeButtonFunction = () => {
 		if (user == null) {
 			redirect();
-		} else if (isUpdating === false && user != null) {
+		} else if (!isUpdating) {
 			addRemoveLike();
 		}
 	};

@@ -1,62 +1,30 @@
 import './Home.css';
-import type { Post, PostStatsCount, User } from '@markstagram/shared-types';
-import { useEffect, useState } from 'react';
-import { useLoading } from '../../contexts/LoaderContext';
-import { findPosts } from '../../services/posts';
+import { useState } from 'react';
+import { useFeedPosts } from '../../queries/usePostQueries';
 import { PostReel } from '../Post/children/PostReel';
 import { Navbar } from '../other/Navbar';
 import { UserCard } from './children/UserCard';
 
-interface PostRecord extends Post, PostStatsCount {
-	user: User;
-}
-
 const Home = () => {
-	const { loading, setLoading } = useLoading();
-
-	// Init postsNumber state
 	const [postsNumber, setPostsNumber] = useState(5);
 
-	// Init posts array state
-	const [posts, setPosts] = useState<PostRecord[]>([]);
+	const { data: posts = [], isPending, isFetching, isSuccess } = useFeedPosts(postsNumber);
 
-	// Init all loaded state
-	const [allLoaded, setAllLoaded] = useState(false);
+	const isAllLoaded = isSuccess && posts.length < postsNumber;
 
-	// Init isLoading state
-	const [isLoading, setIsLoading] = useState(false);
-
-	// Load more content when user reaches bottom of document
-	const loadMore = async (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+	const loadMore = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
 		const elem = e.target as HTMLDivElement;
 		if (
 			Math.ceil(elem.scrollHeight - elem.scrollTop) === elem.clientHeight &&
-			allLoaded === false &&
-			isLoading === false
+			!isAllLoaded &&
+			!isFetching
 		) {
-			setLoading(true);
-			setIsLoading(true);
 			setPostsNumber(postsNumber + 5);
 		}
 	};
 
-	// Update postsArr state when postsNumber state changes
-	useEffect(() => {
-		setLoading(true);
-		findPosts(postsNumber)
-			.then((newPosts) => {
-				if (newPosts.length < postsNumber) {
-					setAllLoaded(true);
-				}
-				setPosts(newPosts);
-				setLoading(false);
-				setIsLoading(false);
-			})
-			.catch(() => setLoading(false));
-	}, [postsNumber]);
-
 	return (
-		<div id="home" className="page" style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}>
+		<div id="home" className="page" style={{ pointerEvents: isPending ? 'none' : 'auto' }}>
 			<Navbar />
 			<div id="home-container" onScroll={(e) => loadMore(e)}>
 				<UserCard />
