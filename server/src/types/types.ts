@@ -1,11 +1,10 @@
-import type { JwtPayload } from 'jsonwebtoken';
 import type { Request } from 'express';
 import type { User } from '@markstagram/shared-types';
 import type { Field } from 'multer';
 import type { Socket } from 'socket.io';
 
 export interface PreAuth {
-  user: string | JwtPayload;
+  user: { id: number; username: string };
 }
 
 export interface AuthReq extends Request {

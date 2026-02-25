@@ -1,14 +1,19 @@
 import { Message } from '@prisma/client';
 import prisma from '../db.js';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 import { SocketMessage, SocketMessageErr } from '@markstagram/shared-types';
 import { Socket } from 'socket.io';
+
+interface TokenPayload {
+  id: number;
+  username: string;
+}
 
 // Middleware for creating new messages from websocket
 export const createMessage = async (
   data: SocketMessage,
   socket: Socket,
-  user: JwtPayload,
+  user: TokenPayload,
 ): Promise<Message | Error | undefined> => {
   try {
     const message: Message = await prisma.message.create({
@@ -54,20 +59,19 @@ export const handleInputErrors = (
 };
 
 // Middleware for validating JWT token from websocket
-export const retrieveUserFromToken = (
+export const retrieveUserFromToken = async (
   token: string,
-): string | JwtPayload | Error => {
+): Promise<TokenPayload> => {
   if (!token) {
-    return new Error('Authentication error');
+    throw new Error('Authentication error');
   }
 
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? '');
+
   try {
-    const user: string | JwtPayload = jwt.verify(
-      token,
-      process.env.JWT_SECRET ?? '',
-    );
-    return user;
+    const { payload } = await jwtVerify(token, secret);
+    return payload as unknown as TokenPayload;
   } catch (e) {
-    return new Error('Authentication error');
+    throw new Error('Authentication error');
   }
 };

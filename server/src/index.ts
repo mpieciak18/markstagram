@@ -23,17 +23,15 @@ const io = new SocketIOServer(httpServer, {
 });
 
 // validates an incoming message from a websocket
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   const token = socket.handshake.auth.token;
 
-  // Verify token
   try {
-    const user = retrieveUserFromToken(token);
+    const user = await retrieveUserFromToken(token);
     (socket as any).user = user;
     next();
   } catch (e) {
-    //@ts-ignore
-    next(e);
+    next(e instanceof Error ? e : new Error('Authentication error'));
   }
 });
 
