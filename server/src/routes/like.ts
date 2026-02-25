@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
+import { publicUserSelect } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
@@ -24,7 +25,7 @@ likeRoutes.post('/post', zValidator('json', idLimitSchema), async (c) => {
     where: { postId: id },
     take: limit,
     orderBy: { createdAt: 'desc' },
-    include: { user: true },
+    include: { user: { select: publicUserSelect } },
   });
   return c.json({ likes });
 });
@@ -40,6 +41,14 @@ likeRoutes.post('/user', zValidator('json', idSchema), async (c) => {
 
 likeRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
+  const user = c.get('user');
+  const existingLike = await prisma.like.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingLike) return c.json({ message: 'Like not found' }, 404);
+  if (existingLike.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const like = await prisma.like.delete({ where: { id } });
   return c.json({ like });
 });

@@ -8,6 +8,10 @@ import { uploadImage } from '../middleware/upload.js';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import type { AppEnv } from '../app.js';
 import type { UserUpdateData } from '@markstagram/shared-types';
+import {
+  publicUserSelect,
+  publicUserWithCountsSelect,
+} from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const searchSchema = z.object({ name: z.string() });
@@ -45,11 +49,7 @@ userRoutes.put('/', uploadImage, async (c) => {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data,
-      include: {
-        _count: {
-          select: { givenFollows: true, receivedFollows: true, posts: true },
-        },
-      },
+      select: publicUserWithCountsSelect,
     });
 
     if (oldImage && oldImage !== process.env.DEFAULT_IMG) {
@@ -75,11 +75,7 @@ userRoutes.post('/single', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
   const user = await prisma.user.findUnique({
     where: { id },
-    include: {
-      _count: {
-        select: { givenFollows: true, receivedFollows: true, posts: true },
-      },
-    },
+    select: publicUserWithCountsSelect,
   });
   if (!user) return c.json({ message: 'User not found' }, 404);
   return c.json({ user });
@@ -90,10 +86,11 @@ userRoutes.post('/search', zValidator('json', searchSchema), async (c) => {
   const users = await prisma.user.findMany({
     where: {
       OR: [
-        { name: { contains: `%${name}%`, mode: 'insensitive' } },
-        { username: { contains: `%${name}%`, mode: 'insensitive' } },
+        { name: { contains: name, mode: 'insensitive' } },
+        { username: { contains: name, mode: 'insensitive' } },
       ],
     },
+    select: publicUserSelect,
   });
   return c.json({ users });
 });
@@ -112,6 +109,9 @@ userRoutes.post('/is-username-unique', zValidator('json', usernameSchema), async
 
 userRoutes.delete('/', async (c) => {
   const user = c.get('user');
-  const deletedUser = await prisma.user.delete({ where: { id: user.id } });
+  const deletedUser = await prisma.user.delete({
+    where: { id: user.id },
+    select: publicUserSelect,
+  });
   return c.json({ user: deletedUser });
 });

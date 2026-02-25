@@ -2,6 +2,7 @@ import { createMiddleware } from 'hono/factory';
 import { jwtVerify } from 'jose';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
+import { publicUserSelect } from '../modules/publicUser.js';
 
 export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   if (!process.env.JWT_SECRET) {
@@ -24,7 +25,10 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
     const { payload } = await jwtVerify(token, secret);
     const { id } = payload as { id: number; username: string };
 
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: publicUserSelect,
+    });
     if (!user) {
       return c.json({ message: 'User not found' }, 401);
     }

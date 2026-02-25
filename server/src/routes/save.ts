@@ -47,6 +47,14 @@ saveRoutes.post('/post', zValidator('json', idSchema), async (c) => {
 
 saveRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
+  const user = c.get('user');
+  const existingSave = await prisma.save.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingSave) return c.json({ message: 'Save not found' }, 404);
+  if (existingSave.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const save = await prisma.save.delete({ where: { id } });
   return c.json({ save });
 });

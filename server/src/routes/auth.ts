@@ -4,7 +4,10 @@ import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import { comparePasswords, createJwt, hashPassword } from '../modules/auth.js';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
-import type { User, UserStatsCount } from '@markstagram/shared-types';
+import {
+  publicUserWithCountsSelect,
+  withoutPassword,
+} from '../modules/publicUser.js';
 
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -25,14 +28,11 @@ authRoutes.post('/create_new_user', zValidator('json', createUserSchema), async 
   const hashedPassword = await hashPassword(data.password);
 
   try {
-    const userData = await prisma.user.create({
+    const user = await prisma.user.create({
       data: { ...data, password: hashedPassword },
+      select: publicUserWithCountsSelect,
     });
-    const token = await createJwt(userData);
-    const user: User & UserStatsCount = {
-      ...userData,
-      _count: { posts: 0, receivedFollows: 0, givenFollows: 0 },
-    };
+    const token = await createJwt(user);
     return c.json({ token, user });
   } catch (e) {
     const err = e as PrismaClientKnownRequestError;
@@ -52,10 +52,9 @@ authRoutes.post('/sign_in', zValidator('json', signInSchema), async (c) => {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    include: {
-      _count: {
-        select: { givenFollows: true, receivedFollows: true, posts: true },
-      },
+    select: {
+      ...publicUserWithCountsSelect,
+      password: true,
     },
   });
 
@@ -69,5 +68,5 @@ authRoutes.post('/sign_in', zValidator('json', signInSchema), async (c) => {
   }
 
   const token = await createJwt(user);
-  return c.json({ token, user });
+  return c.json({ token, user: withoutPassword(user) });
 });

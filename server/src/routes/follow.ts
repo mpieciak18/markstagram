@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
+import { publicUserSelect } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
@@ -24,6 +25,14 @@ followRoutes.post('/', zValidator('json', idSchema), async (c) => {
 
 followRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
+  const user = c.get('user');
+  const existingFollow = await prisma.follow.findUnique({
+    where: { id },
+    select: { id: true, giverId: true },
+  });
+  if (!existingFollow) return c.json({ message: 'Follow not found' }, 404);
+  if (existingFollow.giverId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const follow = await prisma.follow.delete({ where: { id } });
   return c.json({ follow });
 });
@@ -52,7 +61,7 @@ followRoutes.post('/given', zValidator('json', idLimitSchema), async (c) => {
   const givenFollows = await prisma.follow.findMany({
     where: { giverId: id },
     take: limit,
-    include: { receiver: true },
+    include: { receiver: { select: publicUserSelect } },
   });
 
   const follows = givenFollows.map(({ receiver, ...rest }) => ({
@@ -71,7 +80,7 @@ followRoutes.post('/received', zValidator('json', idLimitSchema), async (c) => {
   const receivedFollows = await prisma.follow.findMany({
     where: { receiverId: id },
     take: limit,
-    include: { giver: {} },
+    include: { giver: { select: publicUserSelect } },
   });
 
   const follows = receivedFollows.map(({ giver, ...rest }) => ({

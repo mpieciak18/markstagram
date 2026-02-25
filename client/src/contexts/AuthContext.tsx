@@ -1,7 +1,7 @@
 import type { User, UserStatsCount } from '@markstagram/shared-types';
 import { type PropsWithChildren, createContext, useContext, useState } from 'react';
 
-export interface UserContext extends User, UserStatsCount {
+export interface UserContext extends Omit<User, 'password'>, UserStatsCount {
 	token: string;
 }
 

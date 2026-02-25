@@ -4,6 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
 import type { NewNotificationData } from '@markstagram/shared-types';
+import { publicUserSelect } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const limitSchema = z.object({ limit: z.number().int() });
@@ -41,7 +42,7 @@ notificationRoutes.post('/read', zValidator('json', limitSchema), async (c) => {
     where: { userId: user.id, read: true },
     orderBy: { createdAt: 'desc' },
     take: limit,
-    include: { otherUser: true },
+    include: { otherUser: { select: publicUserSelect } },
   });
   return c.json({ notifications });
 });
@@ -53,13 +54,15 @@ notificationRoutes.post('/unread', zValidator('json', limitSchema), async (c) =>
     where: { userId: user.id, read: false },
     orderBy: { createdAt: 'desc' },
     take: limit,
-    include: { otherUser: true },
+    include: { otherUser: { select: publicUserSelect } },
   });
   return c.json({ notifications });
 });
 
 notificationRoutes.put('/read', async (c) => {
+  const user = c.get('user');
   const response = await prisma.notification.updateMany({
+    where: { userId: user.id, read: false },
     data: { read: true },
   });
   return c.json({ count: response.count });
@@ -67,6 +70,14 @@ notificationRoutes.put('/read', async (c) => {
 
 notificationRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
+  const user = c.get('user');
+  const existingNotification = await prisma.notification.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingNotification) return c.json({ message: 'Notification not found' }, 404);
+  if (existingNotification.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const notification = await prisma.notification.delete({ where: { id } });
   return c.json({ notification });
 });

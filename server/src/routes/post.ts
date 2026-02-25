@@ -5,6 +5,7 @@ import prisma from '../db.js';
 import { deleteFileFromStorage } from '../config/gcloud.js';
 import { uploadImage } from '../middleware/upload.js';
 import type { AppEnv } from '../app.js';
+import { publicUserSelect } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const limitSchema = z.object({ limit: z.number().int() });
@@ -34,7 +35,7 @@ postRoutes.post('/all', zValidator('json', limitSchema), async (c) => {
     orderBy: { createdAt: 'desc' },
     include: {
       _count: { select: { comments: true, likes: true } },
-      user: true,
+      user: { select: publicUserSelect },
     },
   });
   return c.json({ posts });
@@ -46,7 +47,7 @@ postRoutes.post('/single', zValidator('json', idSchema), async (c) => {
     where: { id },
     include: {
       _count: { select: { comments: true, likes: true } },
-      user: true,
+      user: { select: publicUserSelect },
     },
   });
   if (!post) return c.json({ message: 'Post not found' }, 404);
@@ -72,6 +73,14 @@ postRoutes.post('/user', zValidator('json', idLimitSchema), async (c) => {
 
 postRoutes.put('/', zValidator('json', updateSchema), async (c) => {
   const { id, caption } = c.req.valid('json');
+  const user = c.get('user');
+  const existingPost = await prisma.post.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingPost) return c.json({ message: 'Post not found' }, 404);
+  if (existingPost.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const post = await prisma.post.update({
     where: { id },
     data: { caption },
@@ -81,6 +90,14 @@ postRoutes.put('/', zValidator('json', updateSchema), async (c) => {
 
 postRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
+  const user = c.get('user');
+  const existingPost = await prisma.post.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingPost) return c.json({ message: 'Post not found' }, 404);
+  if (existingPost.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const post = await prisma.post.delete({ where: { id } });
   await deleteFileFromStorage(post.image);
   return c.json({ post });

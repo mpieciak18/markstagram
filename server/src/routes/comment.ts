@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
+import { publicUserSelect } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
@@ -15,7 +16,7 @@ commentRoutes.post('/', zValidator('json', createSchema), async (c) => {
   const user = c.get('user');
   const comment = await prisma.comment.create({
     data: { message, postId: id, userId: user.id },
-    include: { user: true },
+    include: { user: { select: publicUserSelect } },
   });
   return c.json({ comment });
 });
@@ -25,7 +26,7 @@ commentRoutes.post('/post', zValidator('json', idLimitSchema), async (c) => {
   const comments = await prisma.comment.findMany({
     where: { postId: id },
     take: limit,
-    include: { user: true },
+    include: { user: { select: publicUserSelect } },
     orderBy: { createdAt: 'desc' },
   });
   return c.json({ comments });
@@ -40,6 +41,14 @@ commentRoutes.post('/single', zValidator('json', idSchema), async (c) => {
 
 commentRoutes.put('/', zValidator('json', createSchema), async (c) => {
   const { id, message } = c.req.valid('json');
+  const user = c.get('user');
+  const existingComment = await prisma.comment.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingComment) return c.json({ message: 'Comment not found' }, 404);
+  if (existingComment.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const comment = await prisma.comment.update({
     where: { id },
     data: { message },
@@ -49,6 +58,14 @@ commentRoutes.put('/', zValidator('json', createSchema), async (c) => {
 
 commentRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
+  const user = c.get('user');
+  const existingComment = await prisma.comment.findUnique({
+    where: { id },
+    select: { id: true, userId: true },
+  });
+  if (!existingComment) return c.json({ message: 'Comment not found' }, 404);
+  if (existingComment.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
   const comment = await prisma.comment.delete({ where: { id } });
   return c.json({ comment });
 });

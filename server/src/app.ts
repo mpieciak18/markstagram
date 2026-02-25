@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import type { User } from '@markstagram/shared-types';
+import type { SafeUser } from './modules/publicUser.js';
 import { authMiddleware } from './middleware/auth.js';
 import { authRoutes } from './routes/auth.js';
 import { userRoutes } from './routes/user.js';
@@ -16,7 +16,7 @@ import { messageRoutes } from './routes/message.js';
 
 export type AppEnv = {
   Variables: {
-    user: User;
+    user: SafeUser;
   };
 };
 
