@@ -1,7 +1,6 @@
 import { localConfig } from './local.js';
 import { testingConfig } from './testing.js';
 import { prodConfig } from './prod.js';
-import merge from 'lodash.merge';
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const stage = process.env.STAGE || 'local';
@@ -25,4 +24,7 @@ const defaultConfig = {
   },
 };
 
-export const config = merge(defaultConfig, envConfig);
+export const config = {
+  ...defaultConfig,
+  ...envConfig,
+};

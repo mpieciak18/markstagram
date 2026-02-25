@@ -30,3 +30,5 @@ yarn-error.log*
 #packages built from other folders
 **/types/.prisma/
 **/types/@prisma/
+
+pnpm-lock.yaml
