@@ -45,15 +45,15 @@ describe('comments', () => {
     expect(post?.image).toMatch(urlPattern);
   });
   //
-  it('should fail to create a comment due to a non-existent post id & return a 500 code', async () => {
+  it('should fail to create a comment due to a non-existent post id & return a 404 code', async () => {
     const response = await supertest(app)
       .post('/api/comment')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
         message,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to create a comment due to an invalid inputs & return a 400 code', async () => {
     const response = await supertest(app)
@@ -91,14 +91,14 @@ describe('comments', () => {
     comment = response.body.comment;
   });
   //
-  it('should get a comment by id due to a non-existent id & return a 500 code', async () => {
+  it('should get a comment by id due to a non-existent id & return a 404 code', async () => {
     const response = await supertest(app)
       .post('/api/comment/single')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to get get a comment by id due to an invalid inputs & return a 400 code', async () => {
     const response = await supertest(app)
@@ -170,15 +170,15 @@ describe('comments', () => {
     expect(response.body.comments[0].user.id).toBe(user.id);
   });
   //
-  it('should fail to update a comment due to a non-existent comment id & return a 500 code', async () => {
+  it('should fail to update a comment due to a non-existent comment id & return a 404 code', async () => {
     const response = await supertest(app)
       .put('/api/comment')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
         message: updatedMessage,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to update a comment due to an invalid inputs & return a 400 code', async () => {
     const response = await supertest(app)
@@ -223,14 +223,14 @@ describe('comments', () => {
     expect(response.body.comment.id).toBe(comment.id);
   });
   //
-  it('should fail to delete a comment due to a non-existent comment id & return a 500 code', async () => {
+  it('should fail to delete a comment due to a non-existent comment id & return a 404 code', async () => {
     const response = await supertest(app)
       .delete('/api/comment')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to delete a comment due to an invalid comment id & return a 400 code', async () => {
     const response = await supertest(app)

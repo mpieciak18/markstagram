@@ -60,14 +60,14 @@ describe('POST /api/follow & DELETE /api/follow', () => {
       });
     expect(response.status).toBe(401);
   });
-  it('should fail to create a follow due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to create a follow due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/follow')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should create a follow & return a 200 error + correct follow info', async () => {
     const response = await supertest(app)
@@ -96,12 +96,12 @@ describe('POST /api/follow & DELETE /api/follow', () => {
       .send({ id: otherUser.id });
     expect(response.status).toBe(401);
   });
-  it('should fail to find follow data due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to find follow data due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/follow/user')
       .set('Authorization', `Bearer ${token}`)
-      .send({ id: 1 });
-    expect(response.status).toBe(500);
+      .send({ id: -1 });
+    expect(response.status).toBe(404);
   });
   it('should find follow data & return a 200 error + correct follow info', async () => {
     const response = await supertest(app)
@@ -128,12 +128,12 @@ describe('POST /api/follow & DELETE /api/follow', () => {
       .send({ id: user.id, limit: 10 });
     expect(response.status).toBe(401);
   });
-  it('should fail to find given follows due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to find given follows due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/follow/given')
       .set('Authorization', `Bearer ${token}`)
-      .send({ id: 1, limit: 10 });
-    expect(response.status).toBe(500);
+      .send({ id: -1, limit: 10 });
+    expect(response.status).toBe(404);
   });
   it('should find given follows for both users & return a 200 error + correct follows data', async () => {
     const response = await supertest(app)
@@ -167,12 +167,12 @@ describe('POST /api/follow & DELETE /api/follow', () => {
       .send({ id: otherUser.id, limit: 10 });
     expect(response.status).toBe(401);
   });
-  it('should fail to find given follows due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to find given follows due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/follow/received')
       .set('Authorization', `Bearer ${token}`)
-      .send({ id: 1, limit: 10 });
-    expect(response.status).toBe(500);
+      .send({ id: -1, limit: 10 });
+    expect(response.status).toBe(404);
   });
   it('should find given follows for both users & return a 200 error + correct follows data', async () => {
     const response = await supertest(app)
@@ -205,14 +205,14 @@ describe('POST /api/follow & DELETE /api/follow', () => {
     });
     expect(response.status).toBe(401);
   });
-  it('should fail to delete a follow due to a non-existent follow id & return a 500 error', async () => {
+  it('should fail to delete a follow due to a non-existent follow id & return a 404 error', async () => {
     const response = await supertest(app)
       .delete('/api/follow')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should delete a follow & return a 200 error + correct follow info', async () => {
     const response = await supertest(app)

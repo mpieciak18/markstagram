@@ -61,14 +61,14 @@ describe('likes', () => {
     expect(post?.image).toMatch(urlPattern);
   });
   //
-  it('should fail to create a like due to a non-existent post id & return a 500 code', async () => {
+  it('should fail to create a like due to a non-existent post id & return a 404 code', async () => {
     const response = await supertest(app)
       .post('/api/like')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to create a like due to an invalid inputs & return a 400 code', async () => {
     const response = await supertest(app)
@@ -104,14 +104,14 @@ describe('likes', () => {
     like = response.body.like;
   });
   //
-  it("should fail to get user's like from a post due to an invalid inputs & return a 500 code", async () => {
+  it("should fail to get user's like from a post due to an invalid inputs & return a 400 code", async () => {
     const response = await supertest(app)
       .post('/api/like/user')
       .set('Authorization', `Bearer ${token}`)
       .send({
         id: '1',
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
   });
   it("should fail to get user's like from a post due to a missing inputs & return a 400 code", async () => {
     const response = await supertest(app)
@@ -180,14 +180,14 @@ describe('likes', () => {
     expect(response.body.likes[0].userId).toBe(user.id);
   });
   //
-  it('should fail to delete a like due to a non-existent like id & return a 500 code', async () => {
+  it('should fail to delete a like due to a non-existent like id & return a 404 code', async () => {
     const response = await supertest(app)
       .delete('/api/like')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to delete a like due to an invalid like id & return a 400 code', async () => {
     const response = await supertest(app)

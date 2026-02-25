@@ -14,6 +14,12 @@ export const commentRoutes = new Hono<AppEnv>();
 commentRoutes.post('/', zValidator('json', createSchema), async (c) => {
   const { id, message } = c.req.valid('json');
   const user = c.get('user');
+  const post = await prisma.post.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!post) return c.json({ message: 'Post not found' }, 404);
+
   const comment = await prisma.comment.create({
     data: { message, postId: id, userId: user.id },
     include: { user: { select: publicUserSelect } },

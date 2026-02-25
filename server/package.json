@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
+    "test:local": "if [ -f .env ]; then set -a; . ./.env; set +a; fi; vitest run --threads false",
     "dev": "node --import tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "startdev": "CLIENT_URL=http://localhost:5173 node dist/index.js",

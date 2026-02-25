@@ -59,12 +59,12 @@ describe('messages', () => {
     expect(idTwo == user.id || idTwo == otherUser.id).toBeTruthy();
   });
   //
-  it('should fail to create a message due to a non-existent conversation id & return a 500 code', async () => {
+  it('should fail to create a message due to a non-existent conversation id & return a 404 code', async () => {
     const response = await supertest(app)
       .post('/api/message')
       .set('Authorization', `Bearer ${token}`)
-      .send({ id: 1, message: messageText });
-    expect(response.status).toBe(500);
+      .send({ id: -1, message: messageText });
+    expect(response.status).toBe(404);
   });
   it('should fail to create a message due to an invalid inputs & return a 400 code', async () => {
     const response = await supertest(app)
@@ -137,14 +137,14 @@ describe('messages', () => {
     expect(response.body.messages[0].message).toBe(message.message);
   });
   //
-  it('should fail to delete a message due to a non-existent message id & return a 500 code', async () => {
+  it('should fail to delete a message due to a non-existent message id & return a 404 code', async () => {
     const response = await supertest(app)
       .delete('/api/message')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to delete a message due to an invalid message id & return a 400 code', async () => {
     const response = await supertest(app)

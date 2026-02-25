@@ -76,16 +76,16 @@ describe('/api/notification', () => {
       });
     expect(response.status).toBe(401);
   });
-  it('should fail to create a notification due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to create a notification due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/notification')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
         type: 'post',
         postId: post.id,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should create a notification & return a 200 code + correct notification info', async () => {
     const response = await supertest(app)
@@ -195,14 +195,14 @@ describe('/api/notification', () => {
     });
     expect(response.status).toBe(401);
   });
-  it('should fail to delete a follow notification to a non-existent notification id & return a 500 error', async () => {
+  it('should fail to delete a follow notification to a non-existent notification id & return a 404 error', async () => {
     const response = await supertest(app)
       .delete('/api/notification')
       .set('Authorization', `Bearer ${otherToken}`)
       .send({
         id: 0,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should delete a notification & return a 200 error + correct notification info', async () => {
     const response = await supertest(app)

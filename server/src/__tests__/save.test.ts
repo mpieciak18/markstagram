@@ -43,14 +43,14 @@ describe('saves', () => {
     expect(post?.image).toMatch(urlPattern);
   });
   //
-  it('should fail to create a save due to a non-existent post id & return a 500 code', async () => {
+  it('should fail to create a save due to a non-existent post id & return a 404 code', async () => {
     const response = await supertest(app)
       .post('/api/save')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to create a save due to an invalid inputs & return a 400 code', async () => {
     const response = await supertest(app)
@@ -86,14 +86,14 @@ describe('saves', () => {
     save = response.body.save;
   });
   //
-  it("should fail to get user's save from a post due to an invalid inputs & return a 500 code", async () => {
+  it("should fail to get user's save from a post due to an invalid inputs & return a 400 code", async () => {
     const response = await supertest(app)
       .post('/api/save/post')
       .set('Authorization', `Bearer ${token}`)
       .send({
         id: '1',
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
   });
   it("should fail to get user's save from a post due to a missing inputs & return a 400 code", async () => {
     const response = await supertest(app)
@@ -154,14 +154,14 @@ describe('saves', () => {
     expect(response.body.saves[0].userId).toBe(user.id);
   });
   //
-  it('should fail to delete a save due to a non-existent save id & return a 500 code', async () => {
+  it('should fail to delete a save due to a non-existent save id & return a 404 code', async () => {
     const response = await supertest(app)
       .delete('/api/save')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to delete a save due to an invalid save id & return a 400 code', async () => {
     const response = await supertest(app)

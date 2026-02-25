@@ -1,4 +1,4 @@
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getDownloadURL, getStorage } from 'firebase-admin/storage';
 
 type FileRef = {
@@ -19,10 +19,12 @@ if (hasStorageConfig) {
     Buffer.from(process.env.GCLOUD_KEY || '', 'base64').toString('ascii'),
   );
 
-  initializeApp({
-    credential: cert(serviceAccount),
-    storageBucket: process.env.APP_URL,
-  });
+  if (getApps().length === 0) {
+    initializeApp({
+      credential: cert(serviceAccount),
+      storageBucket: process.env.APP_URL,
+    });
+  }
 
   bucket = getStorage().bucket() as unknown as Bucket;
 } else {

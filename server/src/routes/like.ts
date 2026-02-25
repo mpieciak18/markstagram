@@ -13,6 +13,12 @@ export const likeRoutes = new Hono<AppEnv>();
 likeRoutes.post('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
   const user = c.get('user');
+  const post = await prisma.post.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!post) return c.json({ message: 'Post not found' }, 404);
+
   const like = await prisma.like.create({
     data: { postId: id, userId: user.id },
   });

@@ -29,7 +29,14 @@ notificationRoutes.post('/', zValidator('json', createSchema), async (c) => {
     type,
     read: false,
   };
-  if (postId) data.postId = postId;
+  if (typeof postId === 'number') {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { id: true },
+    });
+    if (!post) return c.json({ message: 'Post not found' }, 404);
+    data.postId = postId;
+  }
 
   const notification = await prisma.notification.create({ data });
   return c.json({ notification });

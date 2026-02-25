@@ -68,14 +68,14 @@ describe('conversations', () => {
       });
     expect(response.status).toBe(401);
   });
-  it('should fail to create a conversation due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to create a conversation due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/conversation')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should create a conversation & return a 200 error + correct conversation info', async () => {
     const response = await supertest(app)
@@ -113,12 +113,12 @@ describe('conversations', () => {
       .send({ id: otherUser.id, limit: 10 });
     expect(response.status).toBe(401);
   });
-  it('should fail to get a conversation due to a non-existent other user & return a 500 error', async () => {
+  it('should fail to get a conversation due to a non-existent other user & return a 404 error', async () => {
     const response = await supertest(app)
       .post('/api/conversation/otherUser')
       .set('Authorization', `Bearer ${token}`)
-      .send({ id: 1, limit: 10 });
-    expect(response.status).toBe(500);
+      .send({ id: -1, limit: 10 });
+    expect(response.status).toBe(404);
   });
   it('should get a conversation & return a 200 error + correct conversation info', async () => {
     const response = await supertest(app)
@@ -181,14 +181,14 @@ describe('conversations', () => {
     });
     expect(response.status).toBe(401);
   });
-  it('should fail to delete a conversation due to a non-existent conversation id & return a 500 error', async () => {
+  it('should fail to delete a conversation due to a non-existent conversation id & return a 404 error', async () => {
     const response = await supertest(app)
       .delete('/api/conversation')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 1,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should delete a conversation & return a 200 error + correct conversation info', async () => {
     const response = await supertest(app)

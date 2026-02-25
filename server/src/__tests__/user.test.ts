@@ -1,7 +1,6 @@
 import app from '../server.js';
 import supertest from 'supertest';
-import { SignJWT, jwtVerify } from 'jose'
-import { comparePasswords } from '../modules/auth.js';
+import { SignJWT } from 'jose';
 import { it, describe, expect } from 'vitest';
 import { deleteFileFromStorage } from '../config/gcloud.js';
 import { UserStatsCount, User } from '@markstagram/shared-types';
@@ -9,6 +8,8 @@ import { UserStatsCount, User } from '@markstagram/shared-types';
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 
 describe('/create_new_user, /sign_in, & /api/user', () => {
+  const jwtSecret = process.env.JWT_SECRET ?? 'test-jwt-secret';
+  process.env.JWT_SECRET = jwtSecret;
   let token: string;
   let otherToken: string;
   const initUser = {
@@ -65,7 +66,6 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
     });
     token = response.body.token;
     user = response.body.user;
-    user.password = initUser.password;
     otherToken = response2.body.token;
     otherUser = response2.body.user;
     expect(response.status).toBe(200);
@@ -107,7 +107,7 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
   it('should fail to login with fake email & return a 401 status', async () => {
     const response = await supertest(app).post('/sign_in').send({
       email: 'fake_email@email.com',
-      password: user.password,
+      password: initUser.password,
     });
     expect(response.status).toBe(401);
   });
@@ -120,7 +120,7 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
   });
   it('should fail to login with invalid inputs (ie, no username) & return a 400 status', async () => {
     const response = await supertest(app).post('/sign_in').send({
-      password: user.password,
+      password: initUser.password,
     });
     expect(response.status).toBe(400);
   });
@@ -133,7 +133,7 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
   it('should login & return a 200 status + correct user info + token', async () => {
     const response = await supertest(app).post('/sign_in').send({
       email: user.email,
-      password: user.password,
+      password: initUser.password,
     });
     expect(response.status).toBe(200);
     expect(response.body.token).toBeDefined();
@@ -143,16 +143,17 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
     expect(response.body.user._count.posts).toBeDefined();
     expect(response.body.user._count.givenFollows).toBeDefined();
     expect(response.body.user._count.receivedFollows).toBeDefined();
+    expect(response.body.user).not.toHaveProperty('password');
   });
   //
-  it('should fail to find a user due to a non-existent id & return a 500 status', async () => {
+  it('should fail to find a user due to a non-existent id & return a 404 status', async () => {
     const response = await supertest(app)
       .post('/api/user/single')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        id: 2,
+        id: -1,
       });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
   });
   it('should fail to find a user due to a invalid inputs & return a 400 status', async () => {
     const response = await supertest(app)
@@ -180,20 +181,16 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
         id: user.id,
       });
     const foundUser = response.body.user;
-    const passwordsMatch = await comparePasswords(
-      user.password,
-      foundUser.password,
-    );
     expect(response.status).toBe(200);
     expect(foundUser.email == user.email).toBeTruthy();
     expect(foundUser.username == user.username).toBeTruthy();
-    expect(passwordsMatch).toBeTruthy();
     expect(foundUser.name == user.name).toBeTruthy();
     expect(foundUser.image == user.image).toBeTruthy();
     expect(foundUser.bio == user.bio).toBeTruthy();
     expect(foundUser._count.posts).toBeDefined();
     expect(foundUser._count.givenFollows).toBeDefined();
     expect(foundUser._count.receivedFollows).toBeDefined();
+    expect(foundUser).not.toHaveProperty('password');
   });
   //
   it('should fail to search for users due to a invalid inputs & return a 400 status', async () => {
@@ -365,24 +362,20 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
       .attach('file', './src/__tests__/test2.png');
     const updatedUser = response.body.user;
     user = updatedUser;
-    const passwordsMatch = await comparePasswords(
-      newUser.password,
-      updatedUser.password,
-    );
     expect(response.status).toBe(200);
     expect(updatedUser.email == newUser.email).toBeTruthy();
     expect(updatedUser.username == newUser.username).toBeTruthy();
-    expect(passwordsMatch).toBeTruthy();
     expect(updatedUser.name == newUser.name).toBeTruthy();
     expect(updatedUser.image).toMatch(urlPattern);
     expect(updatedUser.bio == newUser.bio).toBeTruthy();
     expect(updatedUser._count.posts).toBeDefined();
     expect(updatedUser._count.givenFollows).toBeDefined();
     expect(updatedUser._count.receivedFollows).toBeDefined();
+    expect(updatedUser).not.toHaveProperty('password');
   });
   //
-  it('should fail to delete a user due to a missing user id field within the auth token & return a 500 status', async () => {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? '')
+  it('should fail to delete a user due to a missing user id field within the auth token & return a 401 status', async () => {
+    const secret = new TextEncoder().encode(jwtSecret);
 
     const fakeToken = await new SignJWT({ username: 'fake_user' })
       .setProtectedHeader({ alg: 'HS256' })
@@ -391,7 +384,7 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
     const response = await supertest(app)
       .delete('/api/user')
       .set('Authorization', `Bearer ${fakeToken}`);
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(401);
   });
   it('should fail to delete a user due to a lack of auth token & return a 401 status', async () => {
     const response = await supertest(app)

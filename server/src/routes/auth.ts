@@ -36,12 +36,41 @@ authRoutes.post('/create_new_user', zValidator('json', createUserSchema), async 
     return c.json({ token, user });
   } catch (e) {
     const err = e as PrismaClientKnownRequestError;
-    if (err.code === 'P2002' && err.meta?.target) {
-      const notUnique: string[] = [];
-      if (Array.isArray(err.meta.target)) {
-        err.meta.target.forEach((field: string) => notUnique.push(field));
+    if (err.code === 'P2002') {
+      const notUnique = new Set<string>();
+      if (Array.isArray(err.meta?.target)) {
+        err.meta.target.forEach((field) => {
+          if (field === 'email' || field === 'username') notUnique.add(field);
+        });
       }
-      return c.json({ notUnique }, 400);
+
+      if (notUnique.size === 0) {
+        const existingUsers = await prisma.user.findMany({
+          where: {
+            OR: [{ email: data.email }, { username: data.username }],
+          },
+          select: { email: true, username: true },
+        });
+
+        if (existingUsers.some((user) => user.email === data.email)) {
+          notUnique.add('email');
+        }
+        if (existingUsers.some((user) => user.username === data.username)) {
+          notUnique.add('username');
+        }
+      }
+
+      // Fallback for adapters that omit `meta.target`
+      const message = String(err.message).toLowerCase();
+      if (message.includes('email')) notUnique.add('email');
+      if (message.includes('username')) notUnique.add('username');
+
+      if (notUnique.size === 0) notUnique.add('email');
+
+      const orderedFields = ['email', 'username'].filter((field) =>
+        notUnique.has(field),
+      );
+      return c.json({ notUnique: orderedFields }, 400);
     }
     throw e;
   }
