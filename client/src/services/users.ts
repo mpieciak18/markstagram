@@ -2,6 +2,7 @@ import type { User, UserStatsCount } from '@markstagram/shared-types';
 import type { UserContext } from '../contexts/AuthContext';
 import { compressFile } from './compress';
 import { getToken } from './localstor';
+import { apiUrl } from './api';
 
 interface NotUnique {
 	notUnique: string[];
@@ -22,7 +23,7 @@ export const createUser = async (
 		bio: '',
 		image: import.meta.env.VITE_DEFAULT_IMG,
 	});
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/create_new_user`, {
+	const response = await fetch(apiUrl('/create_new_user'), {
 		body,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -60,7 +61,7 @@ export const signInUser = async (email: string, password: string): Promise<UserC
 		email,
 		password,
 	});
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/sign_in`, {
+	const response = await fetch(apiUrl('/sign_in'), {
 		body,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -76,7 +77,7 @@ export const signInUser = async (email: string, password: string): Promise<UserC
 
 // Retrieve user
 export const findUser = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/single`, {
+	const response = await fetch(apiUrl('/api/user/single'), {
 		body: JSON.stringify({ id: Number(id) }),
 		method: 'POST',
 		headers: {
@@ -93,7 +94,7 @@ export const findUser = async (id: number) => {
 
 // Searches users by name
 export const searchUsers = async (name: string) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/search`, {
+	const response = await fetch(apiUrl('/api/user/search'), {
 		body: JSON.stringify({ name }),
 		method: 'POST',
 		headers: {
@@ -122,7 +123,7 @@ export const updateUser = async (
 			body.append('file', newImage);
 		});
 	}
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user`, {
+	const response = await fetch(apiUrl('/api/user'), {
 		body,
 		method: 'PUT',
 		headers: {

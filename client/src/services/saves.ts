@@ -1,9 +1,10 @@
 import type { Post, PostStatsCount, Save } from '@markstagram/shared-types';
 import { getToken } from './localstor';
+import { apiUrl } from './api';
 
 // Add post to a new "save"
 export const addSave = async (id: number): Promise<Save | null> => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/save`, {
+	const response = await fetch(apiUrl('/api/save'), {
 		method: 'POST',
 		body: JSON.stringify({ id }),
 		headers: {
@@ -20,7 +21,7 @@ export const addSave = async (id: number): Promise<Save | null> => {
 
 // Remove saved post
 export const removeSave = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/save`, {
+	const response = await fetch(apiUrl('/api/save'), {
 		method: 'DELETE',
 		body: JSON.stringify({ id }),
 		headers: {
@@ -41,7 +42,7 @@ interface SaveRecord extends Save {
 
 // Retrieves saved posts
 export const getSaves = async (limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/save/user`, {
+	const response = await fetch(apiUrl('/api/save/user'), {
 		method: 'POST',
 		body: JSON.stringify({ limit }),
 		headers: {
@@ -58,7 +59,7 @@ export const getSaves = async (limit: number) => {
 
 // Check if user saved a certain post
 export const saveExists = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/save/post`, {
+	const response = await fetch(apiUrl('/api/save/post'), {
 		method: 'POST',
 		body: JSON.stringify({ id }),
 		headers: {

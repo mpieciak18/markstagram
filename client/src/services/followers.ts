@@ -1,10 +1,11 @@
 import type { Follow, HasOtherUser } from '@markstagram/shared-types';
 import { getToken } from './localstor';
 import { addNotification } from './notifications';
+import { apiUrl } from './api';
 
 // Add new follow
 export const addFollow = async (id: number): Promise<Follow> => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/follow`, {
+	const response = await fetch(apiUrl('/api/follow'), {
 		method: 'POST',
 		body: JSON.stringify({ id }),
 		headers: {
@@ -23,7 +24,7 @@ export const addFollow = async (id: number): Promise<Follow> => {
 
 // Remove follow from other user and self
 export const removeFollow = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/follow`, {
+	const response = await fetch(apiUrl('/api/follow'), {
 		method: 'DELETE',
 		body: JSON.stringify({ id }),
 		headers: {
@@ -41,7 +42,7 @@ export const removeFollow = async (id: number) => {
 
 // Check if the signed-in user is following another user (& return follow id)
 export const checkForFollow = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/follow/user`, {
+	const response = await fetch(apiUrl('/api/follow/user'), {
 		method: 'POST',
 		body: JSON.stringify({ id }),
 		headers: {
@@ -60,7 +61,7 @@ interface FollowRecord extends Follow, HasOtherUser {}
 
 // Return array of users that signed-in user follows
 export const getFollowing = async (id: number, limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/follow/given`, {
+	const response = await fetch(apiUrl('/api/follow/given'), {
 		method: 'POST',
 		body: JSON.stringify({ id: Number(id), limit: Number(limit) }),
 		headers: {
@@ -77,7 +78,7 @@ export const getFollowing = async (id: number, limit: number) => {
 
 // Return array of users that signed-in user is followed by
 export const getFollowers = async (id: number, limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/follow/received`, {
+	const response = await fetch(apiUrl('/api/follow/received'), {
 		method: 'POST',
 		body: JSON.stringify({ id: Number(id), limit: Number(limit) }),
 		headers: {

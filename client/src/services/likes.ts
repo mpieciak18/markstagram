@@ -1,10 +1,11 @@
 import type { Like, User } from '@markstagram/shared-types';
 import { getToken } from './localstor';
 import { addNotification } from './notifications';
+import { apiUrl } from './api';
 
 // Add like to post and return the like id
 export const addLike = async (postId: number, postOwnerId: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like`, {
+	const response = await fetch(apiUrl('/api/like'), {
 		method: 'POST',
 		body: JSON.stringify({ id: postId }),
 		headers: {
@@ -26,7 +27,7 @@ export const addLike = async (postId: number, postOwnerId: number) => {
 
 // Remove like from post
 export const removeLike = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like`, {
+	const response = await fetch(apiUrl('/api/like'), {
 		method: 'DELETE',
 		body: JSON.stringify({ id: Number(id) }),
 		headers: {
@@ -42,7 +43,7 @@ export const removeLike = async (id: number) => {
 
 // Check if user already liked post
 export const likeExists = async (id: number): Promise<number | null> => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like/user`, {
+	const response = await fetch(apiUrl('/api/like/user'), {
 		method: 'POST',
 		body: JSON.stringify({ id: Number(id) }),
 		headers: {
@@ -63,7 +64,7 @@ interface LikeRecord extends Like {
 
 // Retrieve all likes from a post
 export const getLikes = async (id: number, limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/like/post`, {
+	const response = await fetch(apiUrl('/api/like/post'), {
 		method: 'POST',
 		body: JSON.stringify({
 			id,

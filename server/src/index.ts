@@ -1,16 +1,17 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { config } from './config/index.js';
 import { serve } from '@hono/node-server';
-import app from './app.js';
 // imports for websockets
 import { Server as SocketIOServer } from 'socket.io';
-import {
-  handleInputErrors,
-  retrieveUserFromToken,
-  createMessage,
-} from './modules/websocket.js';
 import { SocketMessage } from '@markstagram/shared-types';
+
+const [{ config }, { default: app }, websocket] = await Promise.all([
+  import('./config/index.js'),
+  import('./app.js'),
+  import('./modules/websocket.js'),
+]);
+
+const { handleInputErrors, retrieveUserFromToken, createMessage } = websocket;
 
 // Start the Hono server via @hono/node-server
 const port = Number(process.env.PORT || config.port);

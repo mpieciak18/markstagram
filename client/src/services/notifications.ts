@@ -1,5 +1,6 @@
 import type { Notification, User } from '@markstagram/shared-types';
 import { getToken } from './localstor';
+import { apiUrl } from './api';
 
 interface newNotifBody {
 	type: string;
@@ -16,7 +17,7 @@ export const addNotification = async (
 ) => {
 	const body: newNotifBody = { id: userId, type };
 	if (postId !== null) body.postId = postId;
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notification`, {
+	const response = await fetch(apiUrl('/api/notification'), {
 		body: JSON.stringify(body),
 		method: 'POST',
 		headers: {
@@ -37,7 +38,7 @@ interface NotificationRecord extends Notification {
 
 // Retrieve logged-in user's unread notifcations
 export const getUnreadNotifications = async (limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notification/unread`, {
+	const response = await fetch(apiUrl('/api/notification/unread'), {
 		method: 'POST',
 		body: JSON.stringify({ limit }),
 		headers: {
@@ -54,7 +55,7 @@ export const getUnreadNotifications = async (limit: number) => {
 
 // Retrieve logged-in user's read notifcations
 export const getReadNotifications = async (limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notification/read`, {
+	const response = await fetch(apiUrl('/api/notification/read'), {
 		method: 'POST',
 		body: JSON.stringify({ limit }),
 		headers: {
@@ -71,7 +72,7 @@ export const getReadNotifications = async (limit: number) => {
 
 // Update logged-in user's notifications as read
 export const readNotifications = async () => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notification/read`, {
+	const response = await fetch(apiUrl('/api/notification/read'), {
 		method: 'PUT',
 		headers: {
 			Authorization: `Bearer ${getToken()}`,

@@ -8,6 +8,7 @@ import type {
 import { useEffect, useState } from 'react';
 import { type Socket, io } from 'socket.io-client';
 import { getToken } from '../../services/localstor';
+import { API_BASE_URL } from '../../services/api';
 import { createConvo, getSingleConvo } from '../../services/messages';
 import { useUser } from '../../queries/useUserQueries';
 import { Navbar } from '../other/Navbar';
@@ -66,7 +67,7 @@ const ConvoPage = () => {
 
 	const initSocket = async (): Promise<Socket> => {
 		return new Promise((resolve, reject) => {
-			const socket = io(import.meta.env.VITE_API_URL, {
+			const socket = io(API_BASE_URL, {
 				auth: {
 					token: getToken(),
 				},

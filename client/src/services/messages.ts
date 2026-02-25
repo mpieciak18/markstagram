@@ -1,6 +1,7 @@
 import type { Conversation, HasUsers, Message } from '@markstagram/shared-types';
 // import { addNotification } from './notifications';
 import { getToken } from './localstor';
+import { apiUrl } from './api';
 
 interface ConvoRecord extends Conversation, HasUsers {
 	messages: Message[];
@@ -32,7 +33,7 @@ interface ConvoRecord extends Conversation, HasUsers {
 
 // Create a new convo between signed-in user and other user
 export const createConvo = async (id: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/conversation`, {
+	const response = await fetch(apiUrl('/api/conversation'), {
 		method: 'POST',
 		body: JSON.stringify({ id: Number(id) }),
 		headers: {
@@ -49,7 +50,7 @@ export const createConvo = async (id: number) => {
 
 // Attempt to get single conversation between to users
 export const getSingleConvo = async (id: number, limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/conversation/otherUser`, {
+	const response = await fetch(apiUrl('/api/conversation/otherUser'), {
 		method: 'POST',
 		body: JSON.stringify({ id, limit }),
 		headers: {
@@ -66,7 +67,7 @@ export const getSingleConvo = async (id: number, limit: number) => {
 
 // Get all of user's conversations
 export const getConvos = async (limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/conversation/user`, {
+	const response = await fetch(apiUrl('/api/conversation/user'), {
 		method: 'POST',
 		body: JSON.stringify({ limit }),
 		headers: {

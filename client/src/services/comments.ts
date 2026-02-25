@@ -1,6 +1,7 @@
 import type { Comment, User } from '@markstagram/shared-types';
 import { getToken } from './localstor';
 import { addNotification } from './notifications';
+import { apiUrl } from './api';
 
 interface CommentRecord extends Comment {
 	user: User;
@@ -8,7 +9,7 @@ interface CommentRecord extends Comment {
 
 // Create new comment & return comment ID
 export const addComment = async (postOwnerId: number, postId: number, message: string) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comment`, {
+	const response = await fetch(apiUrl('/api/comment'), {
 		method: 'POST',
 		body: JSON.stringify({
 			id: Number(postId),
@@ -53,7 +54,7 @@ export const addComment = async (postOwnerId: number, postId: number, message: s
 
 // Get comments
 export const getComments = async (id: number, limit: number) => {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comment/post`, {
+	const response = await fetch(apiUrl('/api/comment/post'), {
 		method: 'POST',
 		body: JSON.stringify({
 			id: Number(id),
