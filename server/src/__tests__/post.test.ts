@@ -4,7 +4,7 @@ import app from '../server.js';
 // import fs from 'fs/promises';
 // import FormData from 'form-data';
 import { it, describe, expect } from 'vitest';
-import { Post } from '@prisma/client';
+import type { Post } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 

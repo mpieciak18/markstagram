@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
-import { Conversation, Message } from '@prisma/client';
+import type { Conversation, Message } from '@markstagram/shared-types';
 import { HasUsers } from '@markstagram/shared-types';
 
 describe('messages', () => {

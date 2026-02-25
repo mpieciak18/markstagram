@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
-import { Notification, Post } from '@prisma/client';
+import type { Notification, Post } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 

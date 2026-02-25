@@ -1,7 +1,7 @@
 import { NextFunction, Response, Request } from 'express';
 import prisma from '../db.js';
 import { AuthReq } from '@/types/types.js';
-import { Conversation } from '@prisma/client';
+import type { Conversation } from '@markstagram/shared-types';
 
 // Creates a conversation
 export const createConversation = async (

@@ -16,9 +16,6 @@ importers:
       '@saschazar/wasm-webp':
         specifier: ^3.0.1
         version: 3.0.1
-      '@types/react-router':
-        specifier: ^5.1.20
-        version: 5.1.20
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -38,12 +35,6 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.17
         version: 18.3.7(@types/react@18.3.28)
-      '@types/react-router-dom':
-        specifier: ^5.3.3
-        version: 5.3.3
-      '@types/socket.io-client':
-        specifier: ^3.0.0
-        version: 3.0.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.10.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
@@ -69,20 +60,16 @@ importers:
         specifier: ^0.4.4
         version: 0.4.26(eslint@8.57.1)
       typescript:
-        specifier: ^5.3.3
+        specifier: ^5.7.0
         version: 5.9.3
       vite:
         specifier: ^5.0.0
         version: 5.4.21(@types/node@22.19.11)
 
   packages/shared-types:
-    dependencies:
-      '@prisma/client':
-        specifier: ^7.4.0
-        version: 7.4.0(prisma@7.4.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(typescript@5.9.3)
     devDependencies:
       typescript:
-        specifier: ^5.4.0
+        specifier: ^5.7.0
         version: 5.9.3
 
   server:
@@ -99,33 +86,6 @@ importers:
       '@prisma/client':
         specifier: ^7.4.0
         version: 7.4.0(prisma@7.4.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(typescript@5.9.3)
-      '@types/bcrypt':
-        specifier: ^5.0.0
-        version: 5.0.2
-      '@types/cors':
-        specifier: ^2.8.13
-        version: 2.8.19
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.25
-      '@types/lodash.merge':
-        specifier: ^4.6.7
-        version: 4.6.9
-      '@types/morgan':
-        specifier: ^1.9.4
-        version: 1.9.10
-      '@types/multer':
-        specifier: ^1.4.7
-        version: 1.4.13
-      '@types/node':
-        specifier: ^20.10.4
-        version: 20.19.33
-      '@types/supertest':
-        specifier: ^2.0.12
-        version: 2.0.16
-      '@vitest/coverage-v8':
-        specifier: ^0.34.2
-        version: 0.34.6(vitest@0.34.6)
       bcrypt:
         specifier: ^5.1.0
         version: 5.1.1
@@ -156,17 +116,45 @@ importers:
       multer:
         specifier: ^1.4.5-lts.1
         version: 1.4.5-lts.2
-      prisma:
-        specifier: ^7.4.0
-        version: 7.4.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       socket.io:
         specifier: ^4.7.2
         version: 4.8.3
+    devDependencies:
+      '@types/bcrypt':
+        specifier: ^5.0.0
+        version: 5.0.2
+      '@types/cors':
+        specifier: ^2.8.13
+        version: 2.8.19
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.25
+      '@types/lodash.merge':
+        specifier: ^4.6.7
+        version: 4.6.9
+      '@types/morgan':
+        specifier: ^1.9.4
+        version: 1.9.10
+      '@types/multer':
+        specifier: ^1.4.7
+        version: 1.4.13
+      '@types/node':
+        specifier: ^20.10.4
+        version: 20.19.33
+      '@types/supertest':
+        specifier: ^2.0.12
+        version: 2.0.16
+      '@vitest/coverage-v8':
+        specifier: ^0.34.2
+        version: 0.34.6(vitest@0.34.6)
+      prisma:
+        specifier: ^7.4.0
+        version: 7.4.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       supertest:
         specifier: ^6.3.3
         version: 6.3.4
       typescript:
-        specifier: ^5.3.3
+        specifier: ^5.7.0
         version: 5.9.3
       vite:
         specifier: ^4.4.9
@@ -1035,9 +1023,6 @@ packages:
     resolution: {integrity: sha512-00UxlRaIUvYm4R4W9WYkN8/J+kV8fmOQ7okeH6YFtGWFMt3odD45tpG5yA5wnL7HE6lLgjaTW5n14ju2hl2NNA==}
     deprecated: This is a stub types definition. glob provides its own type definitions, so you do not need this installed.
 
-  '@types/history@4.7.11':
-    resolution: {integrity: sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==}
-
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
 
@@ -1109,12 +1094,6 @@ packages:
     peerDependencies:
       '@types/react': ^18.0.0
 
-  '@types/react-router-dom@5.3.3':
-    resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
-
-  '@types/react-router@5.1.20':
-    resolution: {integrity: sha512-jGjmu/ZqS7FjSH6owMcD5qpq19+1RS9DeVRqfl1FeBMxTDQAGwlMWOcs52NDoXaNKyG3d1cYQFMs9rCrb88o9Q==}
-
   '@types/react@18.3.28':
     resolution: {integrity: sha512-z9VXpC7MWrhfWipitjNdgCauoMLRdIILQsAEV+ZesIzBq/oUlxk0m3ApZuMFCXdnS4U7KrI+l3WRUEGQ8K1QKw==}
 
@@ -1135,10 +1114,6 @@ packages:
 
   '@types/serve-static@1.15.10':
     resolution: {integrity: sha512-tRs1dB+g8Itk72rlSI2ZrW6vZg0YrLI81iQSTkMmOqnqCaNr/8Ek4VwWcN5vZgCYWbg/JJSGBlUaYGAOP73qBw==}
-
-  '@types/socket.io-client@3.0.0':
-    resolution: {integrity: sha512-s+IPvFoEIjKA3RdJz/Z2dGR4gLgysKi8owcnrVwNjgvc01Lk68LJDDsG2GRqegFITcxmvCMYM7bhMpwEMlHmDg==}
-    deprecated: This is a stub types definition. socket.io-client provides its own type definitions, so you do not need this installed.
 
   '@types/superagent@8.1.9':
     resolution: {integrity: sha512-pTVjI73witn+9ILmoJdajHGW2jkSaOzhiFYF1Rd3EQ94kymLqB9PjD9ISg7WaALC7+dCHT0FGe9T2LktLq/3GQ==}
@@ -4576,8 +4551,6 @@ snapshots:
       glob: 13.0.3
     optional: true
 
-  '@types/history@4.7.11': {}
-
   '@types/http-errors@2.0.5': {}
 
   '@types/istanbul-lib-coverage@2.0.6': {}
@@ -4650,17 +4623,6 @@ snapshots:
     dependencies:
       '@types/react': 18.3.28
 
-  '@types/react-router-dom@5.3.3':
-    dependencies:
-      '@types/history': 4.7.11
-      '@types/react': 18.3.28
-      '@types/react-router': 5.1.20
-
-  '@types/react-router@5.1.20':
-    dependencies:
-      '@types/history': 4.7.11
-      '@types/react': 18.3.28
-
   '@types/react@18.3.28':
     dependencies:
       '@types/prop-types': 15.7.15
@@ -4695,14 +4657,6 @@ snapshots:
       '@types/http-errors': 2.0.5
       '@types/node': 20.19.33
       '@types/send': 0.17.6
-
-  '@types/socket.io-client@3.0.0':
-    dependencies:
-      socket.io-client: 4.8.3
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
 
   '@types/superagent@8.1.9':
     dependencies:

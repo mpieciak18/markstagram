@@ -1,5 +1,65 @@
-import type { Comment, Conversation, Like, Message, Notification, Post, Save, User } from '@prisma/client';
-export type { Comment, Conversation, Like, Message, Notification, Post, Save, User, Follow, } from '@prisma/client';
+export interface User {
+    id: number;
+    createdAt: Date;
+    email: string;
+    username: string;
+    password: string;
+    name: string;
+    bio: string | null;
+    image: string | null;
+}
+export interface Follow {
+    id: number;
+    createdAt: Date;
+    giverId: number;
+    receiverId: number;
+}
+export interface Post {
+    id: number;
+    createdAt: Date;
+    image: string;
+    caption: string;
+    userId: number;
+}
+export interface Comment {
+    id: number;
+    createdAt: Date;
+    message: string;
+    userId: number;
+    postId: number;
+}
+export interface Like {
+    id: number;
+    createdAt: Date;
+    userId: number;
+    postId: number;
+}
+export interface Save {
+    id: number;
+    createdAt: Date;
+    userId: number;
+    postId: number;
+}
+export interface Conversation {
+    id: number;
+    createdAt: Date;
+}
+export interface Message {
+    id: number;
+    createdAt: Date;
+    message: string;
+    senderId: number;
+    conversationId: number;
+}
+export interface Notification {
+    id: number;
+    createdAt: Date;
+    userId: number;
+    otherUserId: number;
+    postId: number | null;
+    type: string;
+    read: boolean;
+}
 export interface NewUserBody {
     email: string;
     username: string;
@@ -69,9 +129,6 @@ export interface SocketMessageErr {
 }
 export interface SyncErr extends Error {
     type?: string;
-}
-export interface HasUsers {
-    users: User[];
 }
 export interface HasOtherUser {
     otherUser: User;

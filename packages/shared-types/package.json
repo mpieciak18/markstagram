@@ -8,10 +8,7 @@
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@prisma/client": "^7.4.0"
-  },
   "devDependencies": {
-    "typescript": "^5.4.0"
+    "typescript": "^5.7.0"
   }
 }

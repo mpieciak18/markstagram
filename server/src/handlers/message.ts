@@ -1,7 +1,7 @@
 import { NextFunction, Response, Request } from 'express';
 import prisma from '../db.js';
 import { AuthReq, HasId, HasMessage } from '@/types/types.js';
-import { Message } from '@prisma/client';
+import type { Message } from '@markstagram/shared-types';
 
 // Creates a message
 export const createMessage = async (

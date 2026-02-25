@@ -1,4 +1,4 @@
-import { Message } from '@prisma/client';
+import type { Message } from '@markstagram/shared-types';
 import prisma from '../db.js';
 import { jwtVerify } from 'jose';
 import { SocketMessage, SocketMessageErr } from '@markstagram/shared-types';

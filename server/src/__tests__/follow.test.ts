@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
-import { Follow } from '@prisma/client';
+import type { Follow } from '@markstagram/shared-types';
 
 describe('POST /api/follow & DELETE /api/follow', () => {
   let token: string;
