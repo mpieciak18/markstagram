@@ -3,14 +3,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import Logo from '../../assets/images/ig-logo-2.png';
 import { useAuth } from '../../contexts/AuthContext';
-import { useLoading } from '../../contexts/LoaderContext';
 import { setLocalUser } from '../../services/localstor';
 import { signInUser } from '../../services/users';
 import { Loader } from '../other/Loader';
 
 const Login = () => {
 	const { setUser } = useAuth();
-	const { loading, setLoading } = useLoading();
+	const [loading, setLoading] = useState(false);
 
 	const navigate = useNavigate();
 

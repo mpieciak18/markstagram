@@ -1,5 +1,5 @@
 import './Saved.css';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSavedPosts } from '../../queries/useSaveQueries';
 import { PostPreview } from '../Post/children/PostPreview';
 import { Navbar } from '../other/Navbar';
@@ -11,17 +11,21 @@ const Saved = () => {
 
 	const isAllLoaded = isSuccess && savesArr.length < savesNumber;
 
-	const loadMore = () => {
+	const loadMore = useCallback(() => {
 		if (!isAllLoaded && !isFetching) {
-			setSavesNumber(savesNumber + 9);
+			setSavesNumber((prev) => prev + 9);
 		}
-	};
+	}, [isAllLoaded, isFetching]);
 
-	window.addEventListener('scroll', () => {
-		if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
-			loadMore();
-		}
-	});
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
+				loadMore();
+			}
+		};
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, [loadMore]);
 
 	return (
 		<div id="saved" className="page" style={{ pointerEvents: isPending ? 'none' : 'auto' }}>

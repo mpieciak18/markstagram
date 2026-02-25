@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './index.css';
 import { router } from './router';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LoadingProvider } from './contexts/LoaderContext';
 import { PopUpProvider } from './contexts/PopUpContext';
 
 const queryClient = new QueryClient({
@@ -27,13 +26,11 @@ const InnerApp = () => {
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
 		<QueryClientProvider client={queryClient}>
-			<LoadingProvider>
-				<AuthProvider>
-					<PopUpProvider>
-						<InnerApp />
-					</PopUpProvider>
-				</AuthProvider>
-			</LoadingProvider>
+			<AuthProvider>
+				<PopUpProvider>
+					<InnerApp />
+				</PopUpProvider>
+			</AuthProvider>
 		</QueryClientProvider>
 	</React.StrictMode>,
 );

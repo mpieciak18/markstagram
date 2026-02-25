@@ -1,44 +1,22 @@
-import type { Comment, Post, PostStatsCount, User } from '@markstagram/shared-types';
-import { type SetStateAction, useEffect, useState } from 'react';
+import type { Post, PostStatsCount, User } from '@markstagram/shared-types';
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { useLoading } from '../../../../contexts/LoaderContext';
+import { usePostComments } from '../../../../queries/useCommentQueries';
 import { timeSinceTrunc } from '../../../../other/timeSinceTrunc';
-import { getComments } from '../../../../services/comments';
 
 interface PostRecord extends Post, PostStatsCount {
 	user: User;
 }
-interface CommentRecord extends Comment {
-	user: User;
-}
 
-const CommentsFull = (props: {
-	post: PostRecord;
-	commentsNum: number;
-	comments: CommentRecord[];
-	setComments: React.Dispatch<SetStateAction<CommentRecord[]>>;
-}) => {
-	const { post, commentsNum, comments, setComments } = props;
-	const { setLoading } = useLoading();
+const CommentsFull = (props: { post: PostRecord }) => {
+	const { post } = props;
 
 	// Init comment quantity (ie, how many comments are rendered) state
 	const [commentQuantity, setCommentQuantity] = useState(10);
 
-	// Init all loaded state
-	const [allLoaded, setAllLoaded] = useState(false);
+	const { data: comments = [] } = usePostComments(post.id, commentQuantity);
 
-	// Update commentsArr when commentsNum (total comments on a post) or commentQuantity (how many are rendered) changes
-	// E.g., user submits new comment on a post OR scrolls to load more
-	useEffect(() => {
-		getComments(post.id, commentQuantity)
-			.then((array) => {
-				setComments(array);
-				if (array.length < commentQuantity) {
-					setAllLoaded(true);
-				}
-			})
-			.catch(() => setComments([]));
-	}, [commentsNum, commentQuantity]);
+	const allLoaded = comments.length < commentQuantity;
 
 	// Load more comments on scroll
 	const loadMore = (e: React.UIEvent<HTMLDivElement>) => {
@@ -47,24 +25,9 @@ const CommentsFull = (props: {
 			Math.ceil(elem.scrollHeight - elem.scrollTop) === elem.clientHeight &&
 			allLoaded === false
 		) {
-			const newCommentQuantity = commentQuantity + 10;
-			setCommentQuantity(newCommentQuantity);
+			setCommentQuantity(commentQuantity + 10);
 		}
 	};
-
-	// Update comments arr state on init render
-	useEffect(() => {
-		setLoading(true);
-		getComments(post.id, 10)
-			.then((results) => {
-				setComments(results);
-				setLoading(false);
-			})
-			.catch(() => {
-				setComments([]);
-				setLoading(false);
-			});
-	}, []);
 
 	// Return component
 	return (

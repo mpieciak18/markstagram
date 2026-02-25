@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import Logo from '../../assets/images/ig-logo-2.png';
 import { useAuth } from '../../contexts/AuthContext';
-import { useLoading } from '../../contexts/LoaderContext';
 import { setLocalUser } from '../../services/localstor';
 import { createUser } from '../../services/users';
 import { Loader } from '../other/Loader';
@@ -13,7 +12,7 @@ import { PasswordFooter } from './children/PasswordFooter';
 import { UsernameFooter } from './children/UsernameFooter';
 
 const SignUp = () => {
-	const { loading, setLoading } = useLoading();
+	const [loading, setLoading] = useState(false);
 	const { setUser } = useAuth();
 
 	const navigate = useNavigate();
@@ -69,7 +68,7 @@ const SignUp = () => {
 		}
 	}, [allPass]);
 
-	// Hanldes any fields failed due to duplicates during sign-up
+	// Handles any fields failed due to duplicates during sign-up
 	const handleDups = (dups: string[]) => {
 		setEmailUnique(dups.includes('email'));
 		setUsernameUnique(dups.includes('username'));
@@ -81,7 +80,6 @@ const SignUp = () => {
 		setLoading(true);
 		try {
 			const newUser = await createUser(username, name, email, password);
-			// if (newUser.notUnique) {
 			if ('notUnique' in newUser) {
 				handleDups(newUser.notUnique);
 				throw new Error();

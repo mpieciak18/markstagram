@@ -4,15 +4,12 @@ import type {
 	Conversation,
 	HasUsers,
 	Message,
-	User,
-	UserStatsCount,
 } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
 import { type Socket, io } from 'socket.io-client';
-import { useLoading } from '../../contexts/LoaderContext';
 import { getToken } from '../../services/localstor';
 import { createConvo, getSingleConvo } from '../../services/messages';
-import { findUser } from '../../services/users';
+import { useUser } from '../../queries/useUserQueries';
 import { Navbar } from '../other/Navbar';
 import { ConvoMessages } from './children/ConvoMessages';
 
@@ -22,7 +19,7 @@ interface ConvoRecord extends Conversation, HasUsers {
 
 const ConvoPage = () => {
 	const navigate = useNavigate();
-	const { loading, setLoading } = useLoading();
+	const [isFetching, setIsFetching] = useState(false);
 
 	// Socket state
 	const [socket, setSocket] = useState<Socket>();
@@ -30,8 +27,8 @@ const ConvoPage = () => {
 	// Grab other user's id from url parameters
 	const otherUserId = Number(useParams({ strict: false }).otherUserId);
 
-	// Init other user state
-	const [otherUser, setOtherUser] = useState<User & UserStatsCount>();
+	// Fetch other user via TanStack Query
+	const { data: otherUser } = useUser(otherUserId);
 
 	// Init messages number state
 	const [messagesNumber, setMessagesNumber] = useState<number>();
@@ -84,21 +81,10 @@ const ConvoPage = () => {
 		});
 	};
 
-	// Update otherUser state upon init render
+	// Init socket upon mount
 	useEffect(() => {
 		initSocket().then((newSocket) => {
 			setSocket(newSocket);
-			if (otherUserId && !otherUser) {
-				setLoading(true);
-				findUser(otherUserId)
-					.then((newUser) => {
-						setOtherUser(newUser);
-						if (!newUser) {
-							setLoading(false);
-						}
-					})
-					.catch(() => setLoading(false));
-			}
 		});
 	}, []);
 
@@ -114,13 +100,13 @@ const ConvoPage = () => {
 			setDiffMessNumber(0);
 			setMessagesNumber(newNum);
 		} else if (otherUser && messagesNumber) {
-			setLoading(true);
+			setIsFetching(true);
 			getSingleConvo(otherUserId, messagesNumber)
 				.then((newConvo) => {
 					setConvo(newConvo);
-					setLoading(false);
+					setIsFetching(false);
 				})
-				.catch(() => setLoading(false));
+				.catch(() => setIsFetching(false));
 		}
 	}, [otherUser, messagesNumber]);
 
@@ -197,7 +183,7 @@ const ConvoPage = () => {
 		<div
 			id="conversation"
 			className="page"
-			style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
+			style={{ pointerEvents: `${isFetching ? 'none' : 'auto'}` }}
 		>
 			<Navbar />
 			<div id="conversation-container">

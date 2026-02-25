@@ -1,17 +1,14 @@
 import type { User } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useLoading } from '../../contexts/LoaderContext';
 import { usePopUp } from '../../contexts/PopUpContext';
 import { searchUsers } from '../../services/users';
 
 const SearchPopup = (props: { searchVal: string }) => {
 	const { updatePopUp } = usePopUp();
-	const { setLoading } = useLoading();
 	const { searchVal } = props;
 
 	const navigate = useNavigate();
-
 
 	// Init results array state
 	const [searchedUsers, setSearchedUsers] = useState<User[]>([]);
@@ -21,18 +18,14 @@ const SearchPopup = (props: { searchVal: string }) => {
 		updatePopUp();
 	};
 
-	// Update results when value changes
+	// Update results when value changes (debounced 2s)
 	useEffect(() => {
 		if (searchVal != null) {
-			setLoading(true);
 			const doSearch = setTimeout(
 				() =>
-					searchUsers(searchVal)
-						.then((results) => {
-							setSearchedUsers(results);
-							setLoading(false);
-						})
-						.catch(() => setLoading(false)),
+					searchUsers(searchVal).then((results) => {
+						setSearchedUsers(results);
+					}),
 				2000,
 			);
 			return () => clearTimeout(doSearch);

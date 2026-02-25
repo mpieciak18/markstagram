@@ -2,7 +2,6 @@ import './styles/Post.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePopUp } from '@/contexts/PopUpContext';
 import { timeSince } from '@/other/timeSince';
-import type { Comment, User } from '@markstagram/shared-types';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useSinglePost } from '../../queries/usePostQueries';
@@ -12,10 +11,6 @@ import { CommentsFull } from './children/Comments/CommentsFull';
 import { Likes } from './children/Likes';
 import { LinkCopied } from './children/LinkCopied';
 import { PostButtons } from './children/PostButtons';
-
-interface CommentRecord extends Comment {
-	user: User;
-}
 
 const PostPage = () => {
 	const { user } = useAuth();
@@ -28,7 +23,6 @@ const PostPage = () => {
 	const { data: post, isPending } = useSinglePost(postId);
 
 	const [commentsNum, setCommentsNum] = useState<number>();
-	const [comments, setComments] = useState<CommentRecord[]>([]);
 	const [likesNum, setLikesNum] = useState<number>();
 
 	// Sync commentsNum and likesNum from query data
@@ -47,11 +41,6 @@ const PostPage = () => {
 		} else {
 			updatePopUp('likesOn');
 		}
-	};
-
-	const addCommentToPostState = (comment: CommentRecord) => {
-		if (!post) return;
-		setComments([comment, ...comments]);
 	};
 
 	return (
@@ -76,12 +65,7 @@ const PostPage = () => {
 							<div id="date">{timeSince(post.createdAt)}</div>
 						</div>
 					</div>
-					<CommentsFull
-						post={post}
-						commentsNum={commentsNum}
-						comments={comments}
-						setComments={setComments}
-					/>
+					<CommentsFull post={post} />
 					<div id="buttons-grid">
 						<PostButtons
 							postId={postId}
@@ -103,7 +87,6 @@ const PostPage = () => {
 							postOwnerId={postOwnerId}
 							commentsNum={commentsNum}
 							setCommentsNum={setCommentsNum}
-							addCommentToPostState={addCommentToPostState}
 							inputRef={inputRef}
 						/>
 					</div>

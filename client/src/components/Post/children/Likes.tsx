@@ -1,48 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { getLikes } from '../../../services/likes';
 import { FollowButton } from '../../other/FollowButton';
 import '../styles/Likes.css';
-import type { Like, User } from '@markstagram/shared-types';
-import { useLoading } from '../../../contexts/LoaderContext';
+import { usePostLikes } from '../../../queries/useLikeQueries';
 import { usePopUp } from '../../../contexts/PopUpContext';
 
-interface LikeRecord extends Like {
-	user: User;
-}
-
 const Likes = (props: { postId: number }) => {
-	const { setLoading } = useLoading();
 	const { updatePopUp } = usePopUp();
 	const { postId } = props;
 
 	// Init likesNumber state
 	const [likesNumber, setLikesNumber] = useState(10);
 
-	// Init likes array state
-	const [likes, setLikes] = useState<LikeRecord[]>([]);
+	const { data: likes = [] } = usePostLikes(postId, likesNumber);
 
-	// Init all likes loaded state
-	const [allLoaded, setAllLoaded] = useState(false);
-
-	// Update likesNumber upon render
-	useEffect(() => {
-		setLikesNumber(10);
-	}, []);
-
-	// Update likes when likesNumber changes (ie, upon render or upon scroll-to-bottom)
-	useEffect(() => {
-		setLoading(true);
-		getLikes(postId, likesNumber)
-			.then((newLikes) => {
-				setLikes(newLikes);
-				if (newLikes.length < likesNumber) {
-					setAllLoaded(true);
-				}
-				setLoading(false);
-			})
-			.catch(() => setLoading(false));
-	}, [likesNumber]);
+	const allLoaded = likes.length < likesNumber;
 
 	// Load more likes when user reaches bottom of pop-up
 	const loadMore = (e: React.UIEvent<HTMLDivElement>) => {
@@ -51,8 +23,7 @@ const Likes = (props: { postId: number }) => {
 			Math.ceil(elem.scrollHeight - elem.scrollTop) === elem.clientHeight &&
 			allLoaded === false
 		) {
-			const newLikesNumber = likesNumber + 20;
-			setLikesNumber(newLikesNumber);
+			setLikesNumber(likesNumber + 20);
 		}
 	};
 

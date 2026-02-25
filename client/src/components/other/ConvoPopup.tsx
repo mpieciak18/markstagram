@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { searchUsers } from '../../services/users';
 import './other.css';
-import type { User } from '@markstagram/shared-types';
-import { useLoading } from '../../contexts/LoaderContext';
+import { useSearchUsers } from '../../queries/useUserQueries';
 import { usePopUp } from '../../contexts/PopUpContext';
 
 const ConvoPopup = () => {
-	const { setLoading } = useLoading();
 	const { updatePopUp } = usePopUp();
 
 	const navigate = useNavigate();
@@ -20,29 +17,15 @@ const ConvoPopup = () => {
 		setValue(e.target.value);
 	};
 
-	// Init results array state
-	const [results, setResults] = useState<User[]>([]);
+	const { data: allResults = [] } = useSearchUsers(value);
+	const results = value === '' ? [] : allResults;
 
 	// Closes search
 	const hideSearch = () => updatePopUp();
 
-	// Update results when value changes
-	useEffect(() => {
-		if (value === '') setResults([]);
-		else {
-			setLoading(true);
-			searchUsers(value)
-				.then((newResults) => {
-					setResults(newResults);
-					setLoading(false);
-				})
-				.catch(() => setLoading(false));
-		}
-	}, [value]);
-
-	// Redirects user to searched user's page
+	// Redirects user to searched user's message page
 	const redirect = (id: string) => {
-		navigate({ to: `/messages/${id}` });
+		navigate({ to: '/messages/$otherUserId', params: { otherUserId: id } });
 		updatePopUp();
 	};
 

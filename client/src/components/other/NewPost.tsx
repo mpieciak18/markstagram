@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../contexts/AuthContext';
-import { useLoading } from '../../contexts/LoaderContext';
 import { usePopUp } from '../../contexts/PopUpContext';
 import { setLocalUser } from '../../services/localstor';
-import { newPost } from '../../services/posts';
+import { useCreatePost } from '../../queries/usePostQueries';
 import { CaptionFooter } from './CaptionFooter';
 import { ImageInput } from './ImageInput';
 
 const NewPost = () => {
 	const { user, setUser } = useAuth();
 	const { updatePopUp } = usePopUp();
-	const { setLoading } = useLoading();
+	const createPostMutation = useCreatePost();
 
 	// Init useNavigate function
 	const navigate = useNavigate();
@@ -37,7 +36,7 @@ const NewPost = () => {
 	// Init form button type state
 	const [button, setButton] = useState<'submit' | 'button'>('submit');
 
-	// Init form buttonc class state
+	// Init form button class state
 	const [buttonClass, setButtonClass] = useState('active');
 
 	// Upload file to storage & add new post to firebase
@@ -45,10 +44,8 @@ const NewPost = () => {
 		e.preventDefault();
 		// Check validation first
 		if (captionPasses && file) {
-			setLoading(true);
-			// Check for possible error with adding post to DB
 			try {
-				const post = await newPost(caption, file);
+				const post = await createPostMutation.mutateAsync({ caption, file });
 				if (post?.id) {
 					if (user) {
 						const updatedUser = {
@@ -62,13 +59,11 @@ const NewPost = () => {
 						setLocalUser(updatedUser);
 					}
 					updatePopUp();
-					setLoading(false);
 					navigate({ to: '/$postOwnerId/$postId', params: { postOwnerId: String(user?.id), postId: String(post.id) } });
 				} else {
 					throw new Error();
 				}
-			} catch (e) {
-				setLoading(false);
+			} catch {
 				setErrorClass('active');
 				setTimeout(() => {
 					setErrorClass('inactive');

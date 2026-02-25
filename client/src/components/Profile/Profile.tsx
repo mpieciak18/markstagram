@@ -1,5 +1,5 @@
 import './Profile.css';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { useUserPosts } from '../../queries/usePostQueries';
 import { PostPreview } from '../Post/children/PostPreview';
@@ -21,17 +21,21 @@ const Profile = () => {
 
 	const isAllLoaded = isSuccess && posts.length < postsNumber;
 
-	const loadMore = () => {
+	const loadMore = useCallback(() => {
 		if (!isAllLoaded && !isFetching) {
-			setPostsNumber(postsNumber + 9);
+			setPostsNumber((prev) => prev + 9);
 		}
-	};
+	}, [isAllLoaded, isFetching]);
 
-	window.addEventListener('scroll', () => {
-		if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
-			loadMore();
-		}
-	});
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
+				loadMore();
+			}
+		};
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, [loadMore]);
 
 	return (
 		<div id="profile" className="page" style={{ pointerEvents: isPending ? 'none' : 'auto' }}>

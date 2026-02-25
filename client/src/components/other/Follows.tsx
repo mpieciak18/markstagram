@@ -1,94 +1,58 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { getFollowers, getFollowing } from '../../services/followers';
 import { FollowButton } from './FollowButton';
 import './other.css';
 import type { Follow, HasOtherUser } from '@markstagram/shared-types';
-import { useEffect, useState } from 'react';
-import { useLoading } from '../../contexts/LoaderContext';
+import { useFollowers, useFollowing } from '../../queries/useFollowQueries';
 import { usePopUp } from '../../contexts/PopUpContext';
 
 interface FollowRecord extends Follow, HasOtherUser {}
 
 const Follows = (props: { otherUserId: number; initTab: string }) => {
 	const { otherUserId, initTab } = props;
-	const { setLoading } = useLoading();
 	const { updatePopUp } = usePopUp();
 
 	const navigate = useNavigate();
 
-
 	// Init following/follower users count
 	const [followsCount, setFollowsCount] = useState(20);
-
-	// Init following/follower users arr state
-	const [followsArr, setFollowsArr] = useState<FollowRecord[]>([]);
-
-	// Init all loaded state
-	const [allLoaded, setAllLoaded] = useState(false);
-
-	// Init loading state
-	const [isLoading, setIsLoading] = useState(false);
 
 	// Init whichTab state
 	const [whichTab, setWhichTab] = useState(initTab);
 
-	// Init followers & following buttons classes
-	const [buttonOne, setButtonOne] = useState(whichTab === 'following' ? 'active' : 'inactive');
-	const [buttonTwo, setButtonTwo] = useState(whichTab !== 'following' ? 'active' : 'inactive');
+	const buttonOne = whichTab === 'following' ? 'active' : 'inactive';
+	const buttonTwo = whichTab !== 'following' ? 'active' : 'inactive';
 
 	// Change whichTab upon render & initTab prop change
 	useEffect(() => {
 		setWhichTab(initTab);
 	}, [initTab]);
 
-	// Change followsArr, allLoaded, and button states when whichTab changes
-	useEffect(() => {
-		setAllLoaded(false);
-		setLoading(true);
-		if (whichTab === 'following') {
-			setButtonOne('active');
-			setButtonTwo('inactive');
-			getFollowing(otherUserId, followsCount)
-				.then((newArr) => {
-					setFollowsArr(newArr);
-					setLoading(false);
-				})
-				.catch(() => setLoading(false));
-		} else {
-			setButtonOne('inactive');
-			setButtonTwo('active');
-			getFollowers(otherUserId, followsCount)
-				.then((newArr) => {
-					setFollowsArr(newArr);
-					setLoading(false);
-				})
-				.catch(() => setLoading(false));
-		}
-	}, [whichTab]);
+	const { data: followingData = [], isFetching: isFetchingFollowing } = useFollowing(
+		otherUserId,
+		followsCount,
+	);
+	const { data: followersData = [], isFetching: isFetchingFollowers } = useFollowers(
+		otherUserId,
+		followsCount,
+	);
+
+	const followsArr: FollowRecord[] = whichTab === 'following' ? followingData : followersData;
+	const isFetching = isFetchingFollowing || isFetchingFollowers;
+	const allLoaded =
+		whichTab === 'following'
+			? followingData.length < followsCount
+			: followersData.length < followsCount;
 
 	// Load more follows/followers when user reaches bottom of pop-up
-	const loadMore = async (e: React.UIEvent<HTMLDivElement>) => {
-		if (allLoaded === false && isLoading === false) {
-			const elem = e.target as HTMLDivElement;
-			if (Math.ceil(elem.scrollHeight - elem.scrollTop) === elem.clientHeight) {
-				setIsLoading(true);
-				setLoading(true);
-				const newCount = followsCount + 20;
-				setFollowsCount(newCount);
-				let newFollowsArr;
-				if (whichTab === 'following') {
-					newFollowsArr = await getFollowing(otherUserId, newCount);
-					setFollowsArr(newFollowsArr);
-				} else {
-					newFollowsArr = await getFollowers(otherUserId, newCount);
-					setFollowsArr(newFollowsArr);
-				}
-				if (newFollowsArr.length < newCount) {
-					setAllLoaded(true);
-				}
-				setIsLoading(false);
-				setLoading(false);
-			}
+	const loadMore = (e: React.UIEvent<HTMLDivElement>) => {
+		const elem = e.target as HTMLDivElement;
+		if (
+			Math.ceil(elem.scrollHeight - elem.scrollTop) === elem.clientHeight &&
+			allLoaded === false &&
+			isFetching === false
+		) {
+			setFollowsCount(followsCount + 20);
 		}
 	};
 

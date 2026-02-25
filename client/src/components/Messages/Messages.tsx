@@ -1,5 +1,5 @@
 import './Messages.css';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import MessageSolid from '../../assets/images/dm.png';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePopUp } from '../../contexts/PopUpContext';
@@ -25,17 +25,21 @@ const Messages = () => {
 
 	const openPopup = () => updatePopUp('convosOn');
 
-	const loadMore = () => {
+	const loadMore = useCallback(() => {
 		if (!isAllLoaded && !isFetching) {
-			setConvosCount(convosCount + 10);
+			setConvosCount((prev) => prev + 10);
 		}
-	};
+	}, [isAllLoaded, isFetching]);
 
-	window.addEventListener('scroll', () => {
-		if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
-			loadMore();
-		}
-	});
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
+				loadMore();
+			}
+		};
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, [loadMore]);
 
 	return (
 		<div id="messages" className="page" style={{ pointerEvents: isPending ? 'none' : 'auto' }}>

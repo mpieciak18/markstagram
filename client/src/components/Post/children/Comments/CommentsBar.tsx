@@ -1,11 +1,5 @@
-import type { Comment, User } from '@markstagram/shared-types';
 import { useState } from 'react';
-import { useLoading } from '../../../../contexts/LoaderContext';
-import { addComment } from '../../../../services/comments';
-
-interface CommentRecord extends Comment {
-	user: User;
-}
+import { useAddComment } from '../../../../queries/useCommentQueries';
 
 const CommentsBar = (props: {
 	postId: number;
@@ -13,12 +7,10 @@ const CommentsBar = (props: {
 	commentsNum: number | undefined;
 	setCommentsNum: React.Dispatch<React.SetStateAction<number | undefined>>;
 	inputRef: React.MutableRefObject<HTMLInputElement | null>;
-	addCommentToPostState: ((comment: CommentRecord) => void) | null;
 }) => {
-	const { postId, postOwnerId, commentsNum, setCommentsNum, inputRef, addCommentToPostState } =
-		props;
+	const { postId, postOwnerId, commentsNum, setCommentsNum, inputRef } = props;
 
-	const { setLoading } = useLoading();
+	const addCommentMutation = useAddComment(postId, postOwnerId);
 
 	// Set initial comment input value & reset it on submission
 	const [commentValue, setCommentValue] = useState('');
@@ -33,15 +25,13 @@ const CommentsBar = (props: {
 	const addNewComment = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (commentValue.length > 0) {
-			setLoading(true);
-			addComment(postOwnerId, postId, commentValue)
-				.then((newComment) => {
-					if (addCommentToPostState) addCommentToPostState(newComment);
-					setCommentValue('');
-					if (commentsNum) setCommentsNum(commentsNum + 1);
-					setLoading(false);
-				})
-				.catch(() => setLoading(false));
+			try {
+				await addCommentMutation.mutateAsync(commentValue);
+				setCommentValue('');
+				if (commentsNum !== undefined) setCommentsNum(commentsNum + 1);
+			} catch {
+				// error is handled by query state
+			}
 		}
 	};
 

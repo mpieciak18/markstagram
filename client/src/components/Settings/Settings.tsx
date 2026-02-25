@@ -2,7 +2,6 @@ import './Settings.css';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../contexts/AuthContext';
-import { useLoading } from '../../contexts/LoaderContext';
 import { setLocalUser } from '../../services/localstor';
 import { useUpdateUser } from '../../queries/useUserQueries';
 import { Navbar } from '../other/Navbar';
@@ -11,8 +10,8 @@ import { NameFooter } from './children/NameFooter';
 
 const Settings = () => {
 	const { user, setUser } = useAuth();
-	const { loading, setLoading } = useLoading();
 	const updateUserMutation = useUpdateUser();
+	const loading = updateUserMutation.isPending;
 
 	const location = useLocation();
 
@@ -63,21 +62,18 @@ const Settings = () => {
 	const [buttonClass, setButtonClass] = useState<'active' | 'inactive'>('active');
 
 	// Updates user's settings with form values
-	const updateSettings = async (e: React.FormEvent<HTMLFormElement>) => {
+	const updateSettings = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (namePasses === true) {
-			setLoading(true);
 			updateUserMutation.mutate(
 				{ name, bio, file },
 				{
 					onSuccess: (updatedUser) => {
 						setUser(updatedUser);
 						setLocalUser(updatedUser);
-						setLoading(false);
 						navigate({ to: '/$otherUserId', params: { otherUserId: String(user?.id) } });
 					},
 					onError: () => {
-						setLoading(false);
 						setErrorClass('active');
 						setTimeout(() => {
 							setErrorClass('inactive');
