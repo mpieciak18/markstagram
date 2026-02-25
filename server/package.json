@@ -19,7 +19,7 @@
   "dependencies": {
     "@hono/node-server": "^1.19.9",
     "@hono/zod-validator": "^0.7.6",
-    "@markstagram/shared-types": "workspace:*",
+    "@markstagram/shared-types": "file:../packages/shared-types",
     "@prisma/adapter-neon": "^7.4.0",
     "@prisma/client": "^7.4.0",
     "bcryptjs": "^3.0.3",
