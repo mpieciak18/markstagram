@@ -1,318 +1,318 @@
 /* Post Page Styling */
 
 #post {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 @media (max-width: 800px) {
-  #single-post-page {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    max-width: 100vw;
-    padding-bottom: 50px;
-    margin: 60px auto 10px auto;
-  }
-  #post-image {
-    max-width: 600px;
-    width: 100vw;
-    max-height: 600px;
-    aspect-ratio: 1 / 1;
-    height: auto;
-    object-fit: cover;
-  }
-  #user-grid {
-    grid-row-start: 1;
-    grid-row-end: 2;
-  }
-  #content-grid {
-    max-height: 600px;
-    height: auto;
-    max-width: 600px;
-    width: 100vw;
-    grid-row-start: 2;
-    grid-row-end: 3;
-  }
-  #buttons-grid {
-    grid-row-start: 3;
-    grid-row-end: 4;
-  }
-  #comments-grid {
-    grid-row-start: 4;
-    grid-row-end: 5;
-    max-height: 400px;
-    overflow-y: scroll;
-  }
-  #comment-bar-grid {
-    grid-row-start: 5;
-    grid-row-end: 6;
-  }
-  #likes {
-    border-color: rgb(212, 212, 212);
-    border-width: 0 0 1px 0;
-    border-style: solid;
-    padding-bottom: 5px;
-  }
+	#single-post-page {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		max-width: 100vw;
+		padding-bottom: 50px;
+		margin: 60px auto 10px auto;
+	}
+	#post-image {
+		max-width: 600px;
+		width: 100vw;
+		max-height: 600px;
+		aspect-ratio: 1 / 1;
+		height: auto;
+		object-fit: cover;
+	}
+	#user-grid {
+		grid-row-start: 1;
+		grid-row-end: 2;
+	}
+	#content-grid {
+		max-height: 600px;
+		height: auto;
+		max-width: 600px;
+		width: 100vw;
+		grid-row-start: 2;
+		grid-row-end: 3;
+	}
+	#buttons-grid {
+		grid-row-start: 3;
+		grid-row-end: 4;
+	}
+	#comments-grid {
+		grid-row-start: 4;
+		grid-row-end: 5;
+		max-height: 400px;
+		overflow-y: scroll;
+	}
+	#comment-bar-grid {
+		grid-row-start: 5;
+		grid-row-end: 6;
+	}
+	#likes {
+		border-color: rgb(212, 212, 212);
+		border-width: 0 0 1px 0;
+		border-style: solid;
+		padding-bottom: 5px;
+	}
 }
 
 @media (min-width: 800px) {
-  #single-post-page {
-    display: grid;
-    grid-template-columns: minmax(0, 600px) minmax(0, 600px);
-    grid-template-rows: 75px auto 65px 60px;
-    max-width: 1200px;
-    max-height: 600px;
-    height: auto;
-    width: auto;
-    aspect-ratio: 2 / 1;
-    margin: 80px auto 0 auto;
-    border-radius: 10px;
-    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.1);
-  }
-  #post-image {
-    display: block;
-    max-width: 600px;
-    max-height: 600px;
-    width: 50vw;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 10px 0 0 10px;
-  }
-  #content-grid {
-    max-height: 600px;
-    max-width: 600px;
-    width: auto;
-    grid-row-start: 1;
-    grid-row-end: 5;
-    grid-column-start: 1;
-    grid-column-end: 2;
-  }
-  #user-grid {
-    grid-row-start: 1;
-    grid-row-end: 2;
-    grid-column-start: 2;
-    grid-column-end: 3;
-    height: min-content;
-    width: auto;
-  }
-  #user-grid-child {
-    border-color: rgb(212, 212, 212);
-    border-width: 0 0 1px 0;
-    border-style: solid;
-  }
-  #comments-grid {
-    grid-row-start: 2;
-    grid-row-end: 3;
-    grid-column-start: 2;
-    grid-column-end: 3;
-    overflow-y: scroll;
-    max-height: 400px;
-    height: auto;
-  }
-  #buttons-grid {
-    grid-row-start: 3;
-    grid-row-end: 4;
-    grid-column-start: 2;
-    grid-column-end: 3;
-    height: min-content;
-    align-self: flex-end;
-  }
-  #comment-bar-grid {
-    grid-row-start: 4;
-    grid-row-end: 5;
-    grid-column-start: 2;
-    grid-column-end: 3;
-    height: min-content;
-    align-self: flex-end;
-  }
+	#single-post-page {
+		display: grid;
+		grid-template-columns: minmax(0, 600px) minmax(0, 600px);
+		grid-template-rows: 75px auto 65px 60px;
+		max-width: 1200px;
+		max-height: 600px;
+		height: auto;
+		width: auto;
+		aspect-ratio: 2 / 1;
+		margin: 80px auto 0 auto;
+		border-radius: 10px;
+		box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.1);
+	}
+	#post-image {
+		display: block;
+		max-width: 600px;
+		max-height: 600px;
+		width: 50vw;
+		height: auto;
+		aspect-ratio: 1 / 1;
+		object-fit: cover;
+		border-radius: 10px 0 0 10px;
+	}
+	#content-grid {
+		max-height: 600px;
+		max-width: 600px;
+		width: auto;
+		grid-row-start: 1;
+		grid-row-end: 5;
+		grid-column-start: 1;
+		grid-column-end: 2;
+	}
+	#user-grid {
+		grid-row-start: 1;
+		grid-row-end: 2;
+		grid-column-start: 2;
+		grid-column-end: 3;
+		height: min-content;
+		width: auto;
+	}
+	#user-grid-child {
+		border-color: rgb(212, 212, 212);
+		border-width: 0 0 1px 0;
+		border-style: solid;
+	}
+	#comments-grid {
+		grid-row-start: 2;
+		grid-row-end: 3;
+		grid-column-start: 2;
+		grid-column-end: 3;
+		overflow-y: scroll;
+		max-height: 400px;
+		height: auto;
+	}
+	#buttons-grid {
+		grid-row-start: 3;
+		grid-row-end: 4;
+		grid-column-start: 2;
+		grid-column-end: 3;
+		height: min-content;
+		align-self: flex-end;
+	}
+	#comment-bar-grid {
+		grid-row-start: 4;
+		grid-row-end: 5;
+		grid-column-start: 2;
+		grid-column-end: 3;
+		height: min-content;
+		align-self: flex-end;
+	}
 }
 
 #single-post-page {
-  font-size: small;
-  position: relative;
+	font-size: small;
+	position: relative;
 }
 
 #user-grid {
-  padding: 0 12px;
+	padding: 0 12px;
 }
 
 #user-grid-child {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 12px 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-end;
+	padding: 12px 0;
 }
 
 #user-link {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: left;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: left;
 }
 
 #user-link:link,
 #user-link:visited,
 #user-link:active,
 #user-link:hover {
-  text-decoration: none;
+	text-decoration: none;
 }
 
 #user-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
-  object-fit: cover;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-right: 10px;
+	object-fit: cover;
 }
 
 #user-name {
-  font-weight: bold;
-  color: black;
-  text-decoration: none;
+	font-weight: bold;
+	color: black;
+	text-decoration: none;
 }
 
 #user-username {
-  color: black;
-  text-decoration: none;
+	color: black;
+	text-decoration: none;
 }
 
 #likes-count {
-  padding-top: 6px;
-  display: inline-block;
-  font-weight: bold;
+	padding-top: 6px;
+	display: inline-block;
+	font-weight: bold;
 }
 
 #likes-count:hover {
-  cursor: pointer;
-  color: gray;
+	cursor: pointer;
+	color: gray;
 }
 
 #date {
-  color: rgb(150, 150, 150);
-  padding-bottom: 8px;
+	color: rgb(150, 150, 150);
+	padding-bottom: 8px;
 }
 
 #comments-grid {
-  padding: 0 12px;
+	padding: 0 12px;
 }
 
 #buttons-grid {
-  padding: 6px 12px;
+	padding: 6px 12px;
 }
 
 #comment-bar-grid {
-  padding: 0px 12px;
+	padding: 0px 12px;
 }
 
 /* Comments Styling */
 
 #single-post-page .post-comment {
-  padding-bottom: 5px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin: 5px 0;
+	padding-bottom: 5px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	margin: 5px 0;
 }
 
 #single-post-page .post-comment-left {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
 #single-post-page .post-comment-icon > * {
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  object-fit: cover;
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	object-fit: cover;
 }
 
 #single-post-page .post-comment-text {
-  display: flex;
-  flex-direction: row;
+	display: flex;
+	flex-direction: row;
 }
 
 #single-post-page .post-comment-name {
-  padding: 0 5px 0 10px;
-  font-weight: bold;
+	padding: 0 5px 0 10px;
+	font-weight: bold;
 }
 
 #single-post-page .post-comment-name:link,
 #single-post-page .post-comment-name:visited,
 #single-post-page .post-comment-name:active,
 #single-post-page .post-comment-name:hover {
-  text-decoration: none;
-  color: rgb(24, 24, 24);
+	text-decoration: none;
+	color: rgb(24, 24, 24);
 }
 
 /* Comment Bar Styling */
 
 .post-comment-bar {
-  padding: 12px 0;
-  border-color: rgb(212, 212, 212);
-  border-width: 1px 0 0 0;
-  border-style: solid;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+	padding: 12px 0;
+	border-color: rgb(212, 212, 212);
+	border-width: 1px 0 0 0;
+	border-style: solid;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
 .post-comment-bar-input {
-  border: none;
-  width: 100%;
-  padding: 0;
+	border: none;
+	width: 100%;
+	padding: 0;
 }
 
 .post-comment-bar-input:focus {
-  outline: none;
+	outline: none;
 }
 
 .post-comment-bar-button {
-  border: none;
-  background-color: white;
-  padding: 0;
-  display: flex;
-  font-weight: bold;
+	border: none;
+	background-color: white;
+	padding: 0;
+	display: flex;
+	font-weight: bold;
 }
 
 .post-comment-bar-button.active {
-  cursor: pointer;
-  color: rgb(100, 100, 100);
+	cursor: pointer;
+	color: rgb(100, 100, 100);
 }
 
 .post-comment-bar-button.inactive {
-  cursor: default;
-  color: rgb(200, 200, 200);
+	cursor: default;
+	color: rgb(200, 200, 200);
 }
 
 /* Post Reel Link Copied Styling  */
 
 #single-post-page .post-bottom-link-copied {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  justify-content: center;
-  align-items: center;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.75);
-  transition: all 0.3s ease-in-out;
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	justify-content: center;
+	align-items: center;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255, 255, 255, 0.75);
+	transition: all 0.3s ease-in-out;
 }
 #single-post-page .post-bottom-link-copied > div {
-  font-size: xx-large;
-  color: black;
+	font-size: xx-large;
+	color: black;
 }
 #single-post-page .post-bottom-link-copied.active {
-  opacity: 1;
-  z-index: 1;
+	opacity: 1;
+	z-index: 1;
 }
 #single-post-page .post-bottom-link-copied.inactive {
-  opacity: 0;
-  z-index: -1;
+	opacity: 0;
+	z-index: -1;
 }

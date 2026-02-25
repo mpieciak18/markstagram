@@ -1,198 +1,198 @@
 @media (max-width: 800px) {
-  #conversation-container {
-    height: calc(100vh - 100px);
-    bottom: 50px;
-  }
-  .message-block {
-    padding: 5px 0px;
-  }
-  .message-block-bubble {
-    max-width: 500px;
-  }
-  #convo-message-bar-input {
-    width: 70%;
-  }
-  #convo-message-bar {
-    padding: 20px 0px 100px 0px;
-  }
+	#conversation-container {
+		height: calc(100vh - 100px);
+		bottom: 50px;
+	}
+	.message-block {
+		padding: 5px 0px;
+	}
+	.message-block-bubble {
+		max-width: 500px;
+	}
+	#convo-message-bar-input {
+		width: 70%;
+	}
+	#convo-message-bar {
+		padding: 20px 0px 100px 0px;
+	}
 }
 
 @media (min-width: 800px) {
-  #conversation-container {
-    height: calc(100vh - 50px);
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .message-block {
-    padding: 10px 0px;
-  }
-  .message-block-bubble {
-    max-width: 500px;
-  }
-  #convo-message-bar {
-    padding: 20px 0px;
-  }
+	#conversation-container {
+		height: calc(100vh - 50px);
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.message-block {
+		padding: 10px 0px;
+	}
+	.message-block-bubble {
+		max-width: 500px;
+	}
+	#convo-message-bar {
+		padding: 20px 0px;
+	}
 }
 
 #conversation-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  top: 50px;
-  width: max-content;
-  max-width: 800px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+	top: 50px;
+	width: max-content;
+	max-width: 800px;
 }
 
 #conversation-container > * {
-  width: 100vw;
-  max-width: 100%;
+	width: 100vw;
+	max-width: 100%;
 }
 
 #convo-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30px 0px 20px 0px;
-  border-bottom: 1px lightgray solid;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 30px 0px 20px 0px;
+	border-bottom: 1px lightgray solid;
 }
 
 #title {
-  font-size: x-large;
-  font-weight: bold;
+	font-size: x-large;
+	font-weight: bold;
 }
 
 #subtitle:hover {
-  cursor: pointer;
-  color: grey;
+	cursor: pointer;
+	color: grey;
 }
 
 #convo-back-arrow {
-  font-size: small;
-  padding-left: 30px;
+	font-size: small;
+	padding-left: 30px;
 }
 
 #convo-back-arrow:hover {
-  cursor: pointer;
-  color: rgb(0, 0, 0, 0.25);
+	cursor: pointer;
+	color: rgb(0, 0, 0, 0.25);
 }
 
 #convo-back-arrow-hidden {
-  visibility: hidden;
-  font-size: small;
-  padding-right: 30px;
+	visibility: hidden;
+	font-size: small;
+	padding-right: 30px;
 }
 
 #convo-messages {
-  height: 100%;
-  overflow-y: scroll;
+	height: 100%;
+	overflow-y: scroll;
 }
 
 .message-block-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding: 0px 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	padding: 0px 20px;
 }
 
 .message-block-container.self {
-  align-items: flex-end;
+	align-items: flex-end;
 }
 
 .message-block-container.other {
-  align-items: flex-start;
+	align-items: flex-start;
 }
 
 .message-name {
-  font-style: italic;
-  padding: 5px 5px 2.5px 5px;
-  color: gray;
+	font-style: italic;
+	padding: 5px 5px 2.5px 5px;
+	color: gray;
 }
 
 .message-block {
-  display: flex;
-  align-items: flex-start;
-  font-size: 15px;
-  padding: 2.5px 0px;
+	display: flex;
+	align-items: flex-start;
+	font-size: 15px;
+	padding: 2.5px 0px;
 }
 
 .self .message-block {
-  flex-direction: row-reverse;
+	flex-direction: row-reverse;
 }
 
 .other .message-block {
-  flex-direction: row;
-  justify-content: flex-start;
+	flex-direction: row;
+	justify-content: flex-start;
 }
 
 .message-block-bubble {
-  padding: 10px;
-  border-radius: 25px;
-  min-height: 20px;
-  word-break: break-all;
+	padding: 10px;
+	border-radius: 25px;
+	min-height: 20px;
+	word-break: break-all;
 }
 
 .self .message-block-bubble {
-  background-color: rgb(0, 153, 255);
-  color: white;
+	background-color: rgb(0, 153, 255);
+	color: white;
 }
 
 .other .message-block-bubble {
-  background-color: lightgrey;
-  color: inherit;
+	background-color: lightgrey;
+	color: inherit;
 }
 
 .other .message-block-icon-container {
-  display: flex;
-  justify-content: center;
-  height: 40px;
-  width: 60px;
+	display: flex;
+	justify-content: center;
+	height: 40px;
+	width: 60px;
 }
 
 .other .message-block-icon {
-  object-fit: cover;
-  border-radius: 50%;
-  height: 40px;
-  width: 40px;
+	object-fit: cover;
+	border-radius: 50%;
+	height: 40px;
+	width: 40px;
 }
 
 #convo-message-bar {
-  border-top: 1px solid lightgray;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+	border-top: 1px solid lightgray;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 }
 
 #convo-message-bar-input {
-  outline: none;
-  background-color: rgb(234, 234, 234);
-  border-radius: 10px;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-width: 0px;
-  border-style: solid;
-  padding: 5px;
-  max-width: 400px;
+	outline: none;
+	background-color: rgb(234, 234, 234);
+	border-radius: 10px;
+	border-color: rgba(0, 0, 0, 0.2);
+	border-width: 0px;
+	border-style: solid;
+	padding: 5px;
+	max-width: 400px;
 }
 
 #convo-message-bar-input::placeholder {
-  color: rgb(100, 100, 100);
+	color: rgb(100, 100, 100);
 }
 
 #convo-message-button {
-  border: none;
-  background-color: white;
-  padding: 0;
-  display: flex;
-  font-weight: bold;
-  padding-left: 10px;
+	border: none;
+	background-color: white;
+	padding: 0;
+	display: flex;
+	font-weight: bold;
+	padding-left: 10px;
 }
 
 #convo-message-button.active {
-  color: rgb(100, 100, 100);
+	color: rgb(100, 100, 100);
 }
 
 #convo-message-button.inactive {
-  color: rgb(200, 200, 200);
+	color: rgb(200, 200, 200);
 }

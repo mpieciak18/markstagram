@@ -1,96 +1,89 @@
 import './Profile.css';
-import { Navbar } from '../other/Navbar';
-import { PostPreview } from '../Post/children/PostPreview';
-import { ProfileCard } from './children/ProfileCard';
-import { ProfileButtons } from './children/ProfileButtons';
-import { findPostsFromUser } from '../../services/posts';
+import type { Post, PostStatsCount } from '@markstagram/shared-types';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { ProfileProvider } from '../../contexts/ProfileContext';
-import { Post, PostStatsCount } from '@markstagram/shared-types';
 import { useLoading } from '../../contexts/LoaderContext';
+import { ProfileProvider } from '../../contexts/ProfileContext';
+import { findPostsFromUser } from '../../services/posts';
+import { PostPreview } from '../Post/children/PostPreview';
+import { Navbar } from '../other/Navbar';
+import { ProfileButtons } from './children/ProfileButtons';
+import { ProfileCard } from './children/ProfileCard';
 
 interface PostRecord extends Post, PostStatsCount {}
 
 const Profile = () => {
-  const { loading, setLoading } = useLoading();
+	const { loading, setLoading } = useLoading();
 
-  // Get other user id from url parameters
-  const otherUserId = Number(useParams().otherUserId);
+	// Get other user id from url parameters
+	const otherUserId = Number(useParams().otherUserId);
 
-  // Init postsNumber state
-  const [postsNumber, setPostsNumber] = useState(21);
+	// Init postsNumber state
+	const [postsNumber, setPostsNumber] = useState(21);
 
-  // Init posts component state
-  const [posts, setPosts] = useState<PostRecord[]>([]);
+	// Init posts component state
+	const [posts, setPosts] = useState<PostRecord[]>([]);
 
-  // Init all loaded state
-  const [allLoaded, setAllLoaded] = useState(false);
+	// Init all loaded state
+	const [allLoaded, setAllLoaded] = useState(false);
 
-  // Update posts state when postsNumber state changes
-  useEffect(() => {
-    setLoading(true);
-    findPostsFromUser(otherUserId, postsNumber)
-      .then((newPosts) => {
-        if (newPosts.length > 0) {
-          setPosts(newPosts);
-          if (newPosts.length < postsNumber) {
-            setAllLoaded(true);
-          }
-        } else {
-          setPosts([]);
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [postsNumber]);
+	// Update posts state when postsNumber state changes
+	useEffect(() => {
+		setLoading(true);
+		findPostsFromUser(otherUserId, postsNumber)
+			.then((newPosts) => {
+				if (newPosts.length > 0) {
+					setPosts(newPosts);
+					if (newPosts.length < postsNumber) {
+						setAllLoaded(true);
+					}
+				} else {
+					setPosts([]);
+				}
+				setLoading(false);
+			})
+			.catch(() => setLoading(false));
+	}, [postsNumber]);
 
-  // Load-more function that updates the posts reel
-  const loadMore = () => {
-    if (allLoaded == false) {
-      const newPostsNumber = postsNumber + 9;
-      setPostsNumber(newPostsNumber);
-    }
-  };
+	// Load-more function that updates the posts reel
+	const loadMore = () => {
+		if (allLoaded === false) {
+			const newPostsNumber = postsNumber + 9;
+			setPostsNumber(newPostsNumber);
+		}
+	};
 
-  // Load more content when user reaches bottom of document
-  window.addEventListener('scroll', () => {
-    if (
-      window.innerHeight + Math.ceil(window.pageYOffset) >=
-      document.body.offsetHeight - 2
-    ) {
-      loadMore();
-    }
-  });
+	// Load more content when user reaches bottom of document
+	window.addEventListener('scroll', () => {
+		if (window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight - 2) {
+			loadMore();
+		}
+	});
 
-  return (
-    <div
-      id='profile'
-      className='page'
-      style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}
-    >
-      <Navbar />
-      <ProfileProvider>
-        <div id='profile-contents'>
-          <div id='profile-contents-left'>
-            <ProfileCard otherUserId={otherUserId} />
-          </div>
-          <div id='profile-contents-right'>
-            <ProfileButtons otherUserId={otherUserId} />
-            {posts.length > 0 ? (
-              <div id='user-posts'>
-                {posts.map((post) => {
-                  return <PostPreview key={post.id} post={post} />;
-                })}
-              </div>
-            ) : (
-              <div id='user-posts-empty'>This user has no posts.</div>
-            )}
-          </div>
-        </div>
-      </ProfileProvider>
-    </div>
-  );
+	return (
+		<div id="profile" className="page" style={{ pointerEvents: `${loading ? 'none' : 'auto'}` }}>
+			<Navbar />
+			<ProfileProvider>
+				<div id="profile-contents">
+					<div id="profile-contents-left">
+						<ProfileCard otherUserId={otherUserId} />
+					</div>
+					<div id="profile-contents-right">
+						<ProfileButtons otherUserId={otherUserId} />
+						{posts.length > 0 ? (
+							<div id="user-posts">
+								{posts.map((post) => {
+									return <PostPreview key={post.id} post={post} />;
+								})}
+							</div>
+						) : (
+							<div id="user-posts-empty">This user has no posts.</div>
+						)}
+					</div>
+				</div>
+			</ProfileProvider>
+		</div>
+	);
 };
 
 export { Profile };
