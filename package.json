@@ -4,7 +4,7 @@
   "scripts": {
     "dev:app": "pnpm --filter @markstagram/client dev",
     "dev:server": "pnpm --filter @markstagram/server dev",
-    "dev": "pnpm run --parallel dev:app dev:server",
+    "dev": "pnpm -r --parallel --filter @markstagram/client --filter @markstagram/server run dev",
     "db:generate": "pnpm --filter @markstagram/server prisma:generate && pnpm --filter @markstagram/shared-types build",
     "typecheck": "pnpm --filter @markstagram/shared-types build && pnpm -r run typecheck"
   }
