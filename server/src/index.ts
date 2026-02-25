@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { config } from './config/index.js';
-import app from './server.js';
+import { serve } from '@hono/node-server';
+import app from './app.js';
 // imports for websockets
-import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import {
   handleInputErrors,
@@ -12,9 +12,15 @@ import {
 } from './modules/websocket.js';
 import { SocketMessage } from '@markstagram/shared-types';
 
+// Start the Hono server via @hono/node-server
+const port = Number(process.env.PORT || config.port);
+const server = serve({
+  fetch: app.fetch,
+  port,
+});
+
 // configure websockets
-const httpServer = createServer(app);
-const io = new SocketIOServer(httpServer, {
+const io = new SocketIOServer(server, {
   cors: {
     origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
@@ -48,7 +54,6 @@ io.on('connection', (socket) => {
       socket.emit('inputError', errors);
       return;
     }
-    // const newSocket = socket as SocketWithUser;
     const dbEntry = await createMessage(message, socket, (socket as any).user);
     io.to(message.id).emit('receiveNewMessage', dbEntry);
   });
@@ -58,10 +63,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const port = process.env.PORT || config.port; // Fallback to config.port if PORT is not set
-httpServer.listen(port, () => {
-  console.log('succesfully running on port ' + port);
-});
+console.log('successfully running on port ' + port);
 
 // error handling
 process.on('uncaughtException', () => {
