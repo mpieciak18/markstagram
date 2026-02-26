@@ -4,12 +4,13 @@ import { it, describe, expect } from 'vitest';
 import type { Like, Post } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
+const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 describe('likes', () => {
   let token: string;
   const user = {
-    email: 'test66@test66.com',
-    username: 'test66',
+    email: `test66-${runId}@test66.com`,
+    username: `t66${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
     bio: "I'm a test account.",
@@ -19,8 +20,8 @@ describe('likes', () => {
   };
   let token2: string;
   const user2 = {
-    email: 'test654@test654.com',
-    username: 'test654',
+    email: `test654-${runId}@test654.com`,
+    username: `t65${runId.slice(-4)}`,
     password: '123_abc',
     name: 'Tester',
     bio: "I'm a test account.",

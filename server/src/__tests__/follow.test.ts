@@ -3,13 +3,15 @@ import app from '../server.js';
 import { it, describe, expect } from 'vitest';
 import type { Follow } from '@markstagram/shared-types';
 
+const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
 describe('POST /api/follow & DELETE /api/follow', () => {
   let token: string;
   let otherToken: string;
   let follow: Follow;
   const user = {
-    email: 'test33@test33.com',
-    username: 'test33',
+    email: `test33-${runId}@test33.com`,
+    username: `t33${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
     bio: "I'm a test account.",
@@ -18,8 +20,8 @@ describe('POST /api/follow & DELETE /api/follow', () => {
     id: undefined,
   };
   const otherUser = {
-    email: 'test23456@test23456.com',
-    username: 'test23456',
+    email: `test23456-${runId}@test23456.com`,
+    username: `t23${runId.slice(-4)}`,
     password: '456_dfe',
     name: 'TESTER',
     image:

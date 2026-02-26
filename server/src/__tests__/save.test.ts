@@ -4,12 +4,13 @@ import { it, describe, expect } from 'vitest';
 import type { Post, Save } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
+const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 describe('saves', () => {
   let token: string;
   const user = {
-    email: 'test77@test77.com',
-    username: 'test77',
+    email: `test77-${runId}@test77.com`,
+    username: `t77${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
     bio: "I'm a test account.",
