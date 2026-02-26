@@ -56,7 +56,60 @@ Goal: remove Node-only runtime overhead after Bun is stable.
 - [x] Remove `tsx` (Bun runs TS directly).
 - [x] Remove `dotenv` from runtime path; use Bun env loading and Node native env loader fallback.
 - [x] Remove `@hono/node-server` from runtime dependencies (kept as dev/test-only for `supertest` harness).
-- [x] Evaluate replacing `supertest` with fetch-style tests for runtime-agnostic coverage (deferred; keep `supertest` for now).
+- [x] Evaluate replacing `supertest` with fetch-style tests for runtime-agnostic coverage (promoted to Stage 4).
+
+## Stage 4: Runtime-Agnostic Test Harness
+
+Goal: replace `supertest` and remove the Node test shim.
+
+- [ ] Migrate HTTP tests from `supertest` to Hono in-process requests (`app.request` / `app.fetch`).
+- [ ] Add test helpers for JSON requests, auth headers, and response parsing to reduce duplication.
+- [ ] Migrate multipart upload tests from `.attach()` to `FormData`.
+- [ ] Remove `server/src/server.ts` shim once all tests no longer require Node `http.Server`.
+- [ ] Remove `supertest`, `@types/supertest`, and `@hono/node-server` from dev dependencies.
+- [ ] Re-run full server test suite and ensure Bun parity remains `14/14` files and `227/227` tests.
+
+## Stage 5: Bun-Native Password Hashing
+
+Goal: replace `bcryptjs` with Bun-native hashing after rollback is retired.
+
+- [ ] Implement Bun-native hashing/verification (`Bun.password`) for auth module.
+- [ ] Validate compatibility strategy for existing stored bcrypt hashes.
+- [ ] Remove `bcryptjs` dependency.
+- [ ] Re-run auth-focused tests and full suite under Bun.
+
+## Stage 6: Retire Node Rollback Path
+
+Goal: remove Node fallback after stability criteria are met.
+
+- [ ] Wait for two stable Bun deploy cycles (per exit criteria).
+- [ ] Remove `server/src/index.ts` and Bun compat script variants once no longer needed.
+- [ ] Remove remaining Bun/Node branching that only exists for rollback support.
+- [ ] Confirm deployment docs and runtime defaults are Bun-only.
+
+## Stage 7: Test Runner Modernization
+
+Goal: upgrade test tooling independently of runtime migration.
+
+- [ ] Upgrade Vitest from `0.34.x` to current major.
+- [ ] Address config/runtime differences introduced by the upgrade.
+- [ ] Re-run full suite and validate no regressions.
+
+## Separate Scope Backlog (Lower Priority)
+
+- [ ] Investigate single-port Socket.IO on Bun:
+  - run a targeted spike to see if Socket.IO can share Bun-native API port
+  - keep dual-port (`PORT` + `SOCKET_PORT`) as default until proven reliable
+- [ ] Optional runtime-agnostic cleanup:
+  - replace `import { randomUUID } from 'crypto'` with `globalThis.crypto.randomUUID()`
+
+## Recommended Execution Order
+
+- [ ] Stage 4 (test harness migration)
+- [ ] Stage 7 (Vitest upgrade)
+- [ ] Stage 6 (retire rollback path)
+- [ ] Stage 5 (Bun-native password hashing)
+- [ ] Separate-scope Socket.IO single-port spike (optional)
 
 ## Known Pitfalls / Incompatibilities
 
@@ -66,6 +119,7 @@ Goal: remove Node-only runtime overhead after Bun is stable.
 - `supertest` is Node-centric; Bun test parity may require alternative testing patterns.
 - Shell PATH mismatch (zsh vs sh) can make Bun appear installed interactively but unavailable to `pnpm` scripts.
 - Stale processes on `3001` / `5173` can produce false startup failures during Bun parity checks.
+- Shared test DB state can introduce flakiness when tests reuse static identities; keep per-run unique IDs.
 
 ## Package Strategy (Planned)
 
@@ -79,7 +133,9 @@ Goal: remove Node-only runtime overhead after Bun is stable.
 
 - `tsx`
 - `dotenv` (runtime dependency removed)
-- `@hono/node-server` (runtime dependency removed; dev/test-only)
+- `@hono/node-server` (currently dev/test-only; remove fully after Stage 4)
+- `supertest` + `@types/supertest` (after Stage 4)
+- `bcryptjs` (after Stage 5)
 
 ### Potential replacement
 
@@ -114,3 +170,4 @@ Goal: remove Node-only runtime overhead after Bun is stable.
   - Moved `@hono/node-server` from runtime dependencies to dev dependencies.
   - Hardened flaky tests for shared DB environments by increasing Vitest timeout and adding unique IDs in user/notification tests.
   - Re-validated Stage 3 with workspace typecheck + full Bun test suite (`14/14 files`, `227/227 tests`) + Bun native dev startup.
+  - Added Stage 4/5/6/7 roadmap plus separate-scope backlog items to preserve deferred work.
