@@ -20,28 +20,36 @@ Last updated: 2026-02-26
 
 ## Baseline
 
-- [ ] Record baseline timings (3 runs each, median):
-  - `cd server && pnpm test:local`
-  - `cd server && pnpm test:bun`
-- [ ] Capture slowest files to prioritize first-pass fixes.
+- [-] Record baseline timings (3 runs each, median):
+  - [x] Captured 1-run snapshots before and after Stage A.
+  - [ ] Expand to 3-run medians for stricter comparison.
+- [x] Capture slowest files to prioritize first-pass fixes.
+  - Slowest files are consistently:
+    - `delete-integrity.test.ts`
+    - `user.test.ts`
+    - `like.test.ts`
+    - `notification.test.ts`
+    - `comment.test.ts`
 
 ## Stage A: Low-Risk Quick Wins
 
-- [ ] Add a dedicated fast-test profile (local only) that permits lower bcrypt cost for tests (for example `4`).
-- [ ] Add parallel test scripts (keep current serial scripts intact for fallback):
+- [x] Add a dedicated fast-test profile (local only) that permits lower bcrypt cost for tests (for example `4`).
+- [x] Add parallel test scripts (keep current serial scripts intact for fallback):
   - `test:local:parallel`
   - `test:bun:parallel`
-- [ ] Disable HTTP request logging during tests to reduce noise and overhead.
-- [ ] Re-run baseline commands and record delta.
+- [x] Disable HTTP request logging during tests to reduce noise and overhead.
+- [x] Re-run baseline commands and record delta.
 
 ## Stage B: Medium-Risk, High-Impact
 
 - [ ] Remove avoidable network work from tests (stub/mock upload/storage paths where possible).
 - [ ] Consolidate repeated setup helpers (shared user factory/token helper) to reduce duplicated per-file setup costs.
-- [-] Evaluate local dedicated test DB path (if current DB is remote/high-latency).
+- [x] Evaluate local dedicated test DB path (if current DB is remote/high-latency).
   - [x] Added local Docker Postgres plan + implementation track.
-  - [ ] Capture before/after timing against remote DB setup.
-- [ ] Re-measure and compare against Stage A.
+  - [x] Captured before/after timing against remote DB setup.
+- [-] Re-measure and compare against Stage A.
+  - [x] Captured local docker timing snapshot.
+  - [ ] Re-measure after Stage B code-level optimizations.
 
 ## Stage C: Structural Optimization
 
@@ -57,9 +65,24 @@ Last updated: 2026-02-26
 
 ## Success Criteria
 
-- [ ] Noticeable local speedup for full server suite (target: at least 30% faster wall time).
-- [ ] No test behavior regressions.
-- [ ] Keep one deterministic serial path available for debugging.
+- [x] Noticeable local speedup for full server suite (target: at least 30% faster wall time).
+- [x] No test behavior regressions.
+- [x] Keep one deterministic serial path available for debugging.
+
+## Timing Snapshots
+
+- Pre-Stage A (serial):
+  - `pnpm --filter @markstagram/server test:local`: `42.54s`
+  - `pnpm --filter @markstagram/server test:bun:codex`: `42.25s`
+- Post-Stage A (serial):
+  - `pnpm --filter @markstagram/server test:local`: `41.16s` (about `3.2%` faster)
+  - `pnpm --filter @markstagram/server test:bun:codex`: `39.45s` (about `6.6%` faster)
+- Post-Stage A (fast + parallel):
+  - `pnpm --filter @markstagram/server test:local:fast:parallel`: `7.36s` (about `82.7%` faster vs pre-local serial)
+  - `pnpm --filter @markstagram/server test:bun:fast:parallel:codex`: `7.03s` (about `83.4%` faster vs pre-bun serial)
+- Local Docker Postgres path:
+  - `pnpm test:server:docker` end-to-end (container + migrations + tests): `6.66s`
+  - Vitest phase within docker run: about `2.07s`
 
 ## Local Docker Test DB Track (Implemented Scope)
 
@@ -87,3 +110,10 @@ Last updated: 2026-02-26
   - Aligned this plan with Bun migration stages so performance work can proceed independently.
   - Added local Docker Postgres test-track requirements and execution strategy.
   - Added CI/CD approach notes while deferring workflow implementation.
+  - Implemented Stage A scripts for fast bcrypt and parallel execution (Node + Bun).
+  - Disabled request logging under test to reduce overhead/noise.
+  - Captured before/after timing snapshots for local and Bun serial runs.
+  - Validated fast parallel profiles for local and Bun with `227/227` passing.
+  - Captured local Docker Postgres timing and validated full suite in docker.
+  - Fixed `websocket-auth.test.ts` to satisfy password hash integrity constraints under fresh local migrations.
+  - Fixed env restoration in `upload-hardening.test.ts` to prevent cross-test pollution when running against fresh local databases.

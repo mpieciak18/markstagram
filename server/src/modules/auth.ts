@@ -3,15 +3,28 @@ import { SignJWT } from 'jose';
 
 const DEFAULT_BCRYPT_SALT_ROUNDS = 12;
 const MIN_BCRYPT_SALT_ROUNDS = 8;
+const TEST_MIN_BCRYPT_SALT_ROUNDS = 4;
 const MAX_BCRYPT_SALT_ROUNDS = 15;
 
+const getMinBcryptSaltRounds = (): number => {
+  if (
+    process.env.NODE_ENV === 'test' &&
+    process.env.ENABLE_FAST_BCRYPT_FOR_TESTS === '1'
+  ) {
+    return TEST_MIN_BCRYPT_SALT_ROUNDS;
+  }
+
+  return MIN_BCRYPT_SALT_ROUNDS;
+};
+
 const getBcryptSaltRounds = (): number => {
+  const minRounds = getMinBcryptSaltRounds();
   const parsed = Number.parseInt(process.env.BCRYPT_SALT_ROUNDS ?? '', 10);
   if (!Number.isFinite(parsed)) {
     return DEFAULT_BCRYPT_SALT_ROUNDS;
   }
-  if (parsed < MIN_BCRYPT_SALT_ROUNDS) {
-    return MIN_BCRYPT_SALT_ROUNDS;
+  if (parsed < minRounds) {
+    return minRounds;
   }
   if (parsed > MAX_BCRYPT_SALT_ROUNDS) {
     return MAX_BCRYPT_SALT_ROUNDS;

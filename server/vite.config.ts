@@ -9,6 +9,7 @@ export default defineConfig({
     env: {
       // Keep local test runtime reasonable while production uses a higher default.
       BCRYPT_SALT_ROUNDS: '8',
+      DISABLE_REQUEST_LOGGING: '1',
     },
   },
 });

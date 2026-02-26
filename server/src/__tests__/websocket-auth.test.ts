@@ -11,6 +11,8 @@ import {
 } from '../modules/websocket.js';
 
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+const BCRYPT_TEST_PASSWORD_HASH =
+  '$2b$10$7EqJtq98hPqEX7fNZaFWoOHiA6f6S4WQ5lHppZArYrusS4x2QV/pW';
 
 type TestFixture = {
   allowedUser: TokenPayload;
@@ -49,7 +51,7 @@ beforeEach(async () => {
     data: {
       email: `ws-a-${unique}@test.com`,
       username: `wsa${unique.slice(0, 6)}`,
-      password: 'pw',
+      password: BCRYPT_TEST_PASSWORD_HASH,
       name: 'Websocket A',
     },
     select: { id: true, username: true },
@@ -58,7 +60,7 @@ beforeEach(async () => {
     data: {
       email: `ws-b-${unique}@test.com`,
       username: `wsb${unique.slice(0, 6)}`,
-      password: 'pw',
+      password: BCRYPT_TEST_PASSWORD_HASH,
       name: 'Websocket B',
     },
     select: { id: true, username: true },
@@ -67,7 +69,7 @@ beforeEach(async () => {
     data: {
       email: `ws-c-${unique}@test.com`,
       username: `wsc${unique.slice(0, 6)}`,
-      password: 'pw',
+      password: BCRYPT_TEST_PASSWORD_HASH,
       name: 'Websocket C',
     },
     select: { id: true, username: true },

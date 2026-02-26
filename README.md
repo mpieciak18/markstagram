@@ -41,6 +41,18 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Optional: run `pnpm test:server:docker:keepdb` to keep the test DB up after tests finish.
 - Env defaults come from [`server/.env.test.sample`](./server/.env.test.sample). Create `server/.env.test` to override.
 
+## Test Performance Scripts
+
+- Standard serial:
+  - `pnpm --filter @markstagram/server test:local`
+  - `pnpm --filter @markstagram/server test:bun`
+- Parallel:
+  - `pnpm --filter @markstagram/server test:local:parallel`
+  - `pnpm --filter @markstagram/server test:bun:parallel`
+- Fast + parallel (test-only lower bcrypt cost):
+  - `pnpm --filter @markstagram/server test:local:fast:parallel`
+  - `pnpm --filter @markstagram/server test:bun:fast:parallel`
+
 ## Project Objectives
 
 1. To recreate a fully-functional clone of Instagram that any external user can sign up for and start using.

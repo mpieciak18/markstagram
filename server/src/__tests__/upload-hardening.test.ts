@@ -9,6 +9,18 @@ const originalAllowedMimeTypes = process.env.UPLOAD_ALLOWED_MIME_TYPES;
 const tokensToCleanup: string[] = [];
 const userIdsToCleanup: number[] = [];
 
+const restoreEnvVar = (
+  key: 'UPLOAD_MAX_BYTES' | 'UPLOAD_ALLOWED_MIME_TYPES',
+  value: string | undefined,
+) => {
+  if (value === undefined) {
+    delete process.env[key];
+    return;
+  }
+
+  process.env[key] = value;
+};
+
 const createUserAndToken = async (suffix: string) => {
   const response = await supertest(app).post('/create_new_user').send({
     email: `upload-hardening-${suffix}-${runId}@test.com`,
@@ -28,8 +40,8 @@ const createUserAndToken = async (suffix: string) => {
 };
 
 afterEach(async () => {
-  process.env.UPLOAD_MAX_BYTES = originalUploadMaxBytes;
-  process.env.UPLOAD_ALLOWED_MIME_TYPES = originalAllowedMimeTypes;
+  restoreEnvVar('UPLOAD_MAX_BYTES', originalUploadMaxBytes);
+  restoreEnvVar('UPLOAD_ALLOWED_MIME_TYPES', originalAllowedMimeTypes);
 
   while (tokensToCleanup.length > 0) {
     const token = tokensToCleanup.pop();

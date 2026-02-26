@@ -23,6 +23,7 @@ export type AppEnv = {
 
 const app = new Hono<AppEnv>();
 const allowedOrigins = getAllowedOrigins();
+const shouldUseRequestLogger = process.env.DISABLE_REQUEST_LOGGING !== '1';
 
 // Global middleware
 app.use(
@@ -39,7 +40,9 @@ app.use(
     credentials: true,
   }),
 );
-app.use('*', logger());
+if (shouldUseRequestLogger) {
+  app.use('*', logger());
+}
 app.use('*', async (c, next) => {
   c.header('X-Content-Type-Options', 'nosniff');
   c.header('X-Frame-Options', 'DENY');
