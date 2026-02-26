@@ -49,6 +49,7 @@ const getBunPasswordApi = (): BunPasswordApi | null => {
   return bunGlobal.password;
 };
 
+
 export const createJwt = async (user: {
   id: number;
   username: string;
@@ -80,8 +81,7 @@ export const comparePasswords = async (
     return bunPassword.verify(password, hash);
   }
 
-  const result = await bcrypt.compare(password, hash);
-  return result;
+  return bcrypt.compare(password, hash);
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
@@ -93,6 +93,5 @@ export const hashPassword = async (password: string): Promise<string> => {
     });
   }
 
-  const result = await bcrypt.hash(password, getBcryptSaltRounds());
-  return result;
+  return bcrypt.hash(password, getBcryptSaltRounds());
 };

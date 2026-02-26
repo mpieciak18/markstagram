@@ -123,6 +123,16 @@ Last updated: 2026-02-26
   - Run `pnpm --filter @markstagram/server prisma:migrate:test` then `pnpm --filter @markstagram/server test:docker`.
 - [ ] Implement CI workflow file (deferred by request).
 
+## Future Scope: Bun Test Rewrite
+
+- [ ] Plan full migration from Vitest to Bun's built-in test runner (`bun test`).
+- [ ] Before rewriting, audit all current `227` server tests:
+  - identify duplicates and overlap,
+  - consolidate repetitive cases and setup patterns,
+  - eliminate low-value or redundant tests.
+- [ ] Rewrite only the retained/optimized suite to `bun test`.
+- [ ] Re-benchmark and compare against current Vitest + Bun-runtime execution.
+
 ## Progress Log
 
 - 2026-02-26:
@@ -146,3 +156,4 @@ Last updated: 2026-02-26
   - Removed `server/src/server.ts` supertest shim and removed `supertest` + `@types/supertest` from server dev dependencies.
   - Re-ran docker-backed server suite with `227/227` passing after migration.
   - Pruned temporary and duplicate test/dev scripts across root/server/client package manifests to reduce command sprawl.
+  - Added future-scope Bun test rewrite track with a required pre-migration audit of all `227` tests for consolidation/elimination.
