@@ -98,10 +98,12 @@ io.on('connection', (socket) => {
 console.log('successfully running on port ' + port);
 
 // error handling
-process.on('uncaughtException', () => {
-  console.log('uncaught exception (sync) at top level of node process');
+process.on('uncaughtException', (error) => {
+  console.error('uncaught exception (sync) at top level of node process');
+  console.error(error);
 });
 
-process.on('unhandledRejection', () => {
-  console.log('unhandled rejection (async) at top level of node process');
+process.on('unhandledRejection', (reason) => {
+  console.error('unhandled rejection (async) at top level of node process');
+  console.error(reason);
 });

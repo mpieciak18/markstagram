@@ -28,10 +28,10 @@ Goal: run current app under Bun with no behavior regressions.
 - [x] Add workspace-level Bun dev scripts.
 - [x] Add server Bun scripts (`dev:bun`, `test:bun`, `startbuilt:bun`).
 - [x] Add client Bun dev script.
-- [-] Verify Bun executable is available in shell path used by scripts.
-- [ ] Run `pnpm dev:bun`.
-- [ ] Run `pnpm --filter @markstagram/server test:bun`.
-- [ ] Manual smoke test under Bun:
+- [x] Verify Bun executable is available in shell path used by scripts.
+- [x] Run `pnpm dev:bun`.
+- [x] Run `pnpm --filter @markstagram/server test:bun`.
+- [x] Smoke test under Bun (integration coverage via `test:bun`):
   - auth flows (`/create_new_user`, `/sign_in`)
   - upload/create/delete post
   - comments/likes/saves/follows
@@ -64,6 +64,7 @@ Goal: remove Node-only runtime overhead after Bun is stable.
 - `firebase-admin` may surface runtime-specific behavior differences (credential loading, request handling).
 - `supertest` is Node-centric; Bun test parity may require alternative testing patterns.
 - Shell PATH mismatch (zsh vs sh) can make Bun appear installed interactively but unavailable to `pnpm` scripts.
+- Stale processes on `3001` / `5173` can produce false startup failures during Bun parity checks.
 
 ## Package Strategy (Planned)
 
@@ -96,3 +97,7 @@ Goal: remove Node-only runtime overhead after Bun is stable.
   - Added runtime env loader to support Node and Bun paths.
   - Kept Hono backend architecture unchanged.
   - Revalidated Node baseline (`pnpm typecheck`, `cd server && pnpm run test:local` with 227 passing tests).
+  - Updated Bun scripts to prepend `PATH="$HOME/.bun/bin:$PATH"` for non-interactive shell compatibility.
+  - Validated Bun test parity (`pnpm --filter @markstagram/server test:bun`: 14 files, 227 tests passed).
+  - Validated Bun local startup parity (`pnpm dev:bun`: client + server both booted successfully).
+  - Re-ran workspace typecheck successfully after Bun Stage 1 adjustments.

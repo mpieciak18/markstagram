@@ -5,8 +5,11 @@
     "dev:app": "pnpm --filter @markstagram/client dev",
     "dev:server": "pnpm --filter @markstagram/server dev",
     "dev:server:bun": "pnpm --filter @markstagram/server dev:bun",
+    "dev:server:bun:codex": "pnpm --filter @markstagram/server dev:bun:codex",
     "dev": "pnpm -r --parallel --filter @markstagram/client --filter @markstagram/server run dev",
     "dev:bun": "pnpm -r --parallel --filter @markstagram/client --filter @markstagram/server run dev:bun",
+    "dev:bun:codex": "pnpm -r --parallel --filter @markstagram/client --filter @markstagram/server run dev:bun:codex",
+    "test:server:bun:codex": "pnpm --filter @markstagram/server test:bun:codex",
     "db:generate": "pnpm --filter @markstagram/server prisma:generate && pnpm --filter @markstagram/shared-types build",
     "typecheck": "pnpm --filter @markstagram/shared-types build && pnpm -r run typecheck"
   }
