@@ -2,25 +2,96 @@ import type { Message } from '@markstagram/shared-types';
 import prisma from '../db.js';
 import { jwtVerify } from 'jose';
 import { SocketMessage, SocketMessageErr } from '@markstagram/shared-types';
-import { Socket } from 'socket.io';
+import type { Socket } from 'socket.io';
 
-interface TokenPayload {
+export interface TokenPayload {
   id: number;
   username: string;
 }
 
+export interface SocketEventClient {
+  emit(event: string, ...args: unknown[]): boolean;
+}
+
+export interface SocketRoomClient extends SocketEventClient {
+  join(room: string): void | Promise<void>;
+}
+
+const parseConversationId = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim();
+    if (!/^\d+$/.test(normalized)) {
+      return null;
+    }
+    const parsed = Number(normalized);
+    if (Number.isSafeInteger(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+
+  return null;
+};
+
+const normalizeSocketToken = (tokenInput: unknown): string => {
+  if (typeof tokenInput !== 'string') return '';
+  const raw = tokenInput.trim();
+  if (!raw) return '';
+
+  if (raw.toLowerCase().startsWith('bearer ')) {
+    return raw.slice(7).trim();
+  }
+
+  return raw;
+};
+
+const isConversationParticipant = async (
+  userId: number,
+  conversationId: number,
+): Promise<boolean> => {
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id: conversationId,
+      users: { some: { id: userId } },
+    },
+    select: { id: true },
+  });
+  return Boolean(conversation);
+};
+
 // Middleware for creating new messages from websocket
 export const createMessage = async (
-  data: SocketMessage,
-  socket: Socket,
+  data: SocketMessage | { id: unknown; message: unknown },
+  socket: SocketEventClient,
   user: TokenPayload,
-): Promise<Message | Error | undefined> => {
+): Promise<Message | undefined> => {
+  const errors = handleInputErrors(data as SocketMessage);
+  if (errors) {
+    socket.emit('inputError', errors);
+    return;
+  }
+
+  const conversationId = parseConversationId(data.id);
+  if (!conversationId) {
+    socket.emit('inputError', [{ message: 'Invalid conversation id, must be an integer.' }]);
+    return;
+  }
+
   try {
+    const hasAccess = await isConversationParticipant(user.id, conversationId);
+    if (!hasAccess) {
+      socket.emit('authError', { message: 'Not authorized for this conversation.' });
+      return;
+    }
+
     const message: Message = await prisma.message.create({
       data: {
-        conversationId: Number(data.id),
+        conversationId,
         senderId: user.id,
-        message: data.message,
+        message: data.message as string,
       },
     });
 
@@ -37,22 +108,43 @@ export const createMessage = async (
   }
 };
 
+export const joinConversationRoom = async (
+  socket: SocketRoomClient,
+  user: TokenPayload,
+  conversationIdInput: unknown,
+): Promise<boolean> => {
+  const conversationId = parseConversationId(conversationIdInput);
+  if (!conversationId) {
+    socket.emit('inputError', [{ message: 'Invalid conversation id, must be an integer.' }]);
+    return false;
+  }
+
+  const hasAccess = await isConversationParticipant(user.id, conversationId);
+  if (!hasAccess) {
+    socket.emit('authError', { message: 'Not authorized for this conversation.' });
+    return false;
+  }
+
+  await socket.join(String(conversationId));
+  return true;
+};
+
 // Middleware for validating inputs within websocket
-const isInt = (value: any) => typeof value === 'number' && value % 1 === 0;
-
-const isString = (value: any) => typeof value === 'string';
-
 export const handleInputErrors = (
-  message: SocketMessage,
+  message: SocketMessage | { id: unknown; message: unknown },
 ): SocketMessageErr[] | null => {
   const errors: SocketMessageErr[] = [];
 
-  if (!isInt(message.id)) {
+  if (!parseConversationId(message.id)) {
     errors.push({ message: 'Invalid id, must be an integer.' });
   }
 
-  if (!isString(message.message)) {
+  if (typeof message.message !== 'string') {
     errors.push({ message: 'Invalid message, must be a string.' });
+  } else if (message.message.trim().length === 0) {
+    errors.push({ message: 'Invalid message, must not be empty.' });
+  } else if (message.message.length > 2000) {
+    errors.push({ message: 'Invalid message, must be at most 2000 characters.' });
   }
 
   return errors.length > 0 ? errors : null;
@@ -60,17 +152,36 @@ export const handleInputErrors = (
 
 // Middleware for validating JWT token from websocket
 export const retrieveUserFromToken = async (
-  token: string,
+  tokenInput: unknown,
 ): Promise<TokenPayload> => {
+  const token = normalizeSocketToken(tokenInput);
   if (!token) {
     throw new Error('Authentication error');
   }
 
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? '');
+  if (!process.env.JWT_SECRET) {
+    throw new Error('Authentication error');
+  }
+
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
   try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload as unknown as TokenPayload;
+    const { payload } = await jwtVerify(token, secret, { algorithms: ['HS256'] });
+    const id = Number(payload.id);
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      throw new Error('Authentication error');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, username: true },
+    });
+
+    if (!user) {
+      throw new Error('Authentication error');
+    }
+
+    return user;
   } catch (e) {
     throw new Error('Authentication error');
   }
