@@ -10,7 +10,9 @@ import { publicUserSelect } from '../modules/publicUser.js';
 const idSchema = z.object({ id: z.number().int() });
 const limitSchema = z.object({ limit: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
-const updateSchema = z.object({ id: z.number().int(), caption: z.string() });
+const captionSchema = z.string().trim().min(1).max(2200);
+const createSchema = z.object({ caption: captionSchema });
+const updateSchema = z.object({ id: z.number().int(), caption: captionSchema });
 
 export const postRoutes = new Hono<AppEnv>();
 
@@ -18,12 +20,13 @@ postRoutes.post('/', uploadImage, async (c) => {
   const user = c.get('user');
   const image = c.get('image' as never) as string;
   const body = await c.req.parseBody();
-  const caption = body['caption'] as string;
+  const parsed = createSchema.safeParse({ caption: body['caption'] });
 
   if (!image) return c.json({ message: 'Image upload failed' }, 500);
+  if (!parsed.success) return c.json({ message: 'Invalid input' }, 400);
 
   const post = await prisma.post.create({
-    data: { image, caption, userId: user.id },
+    data: { image, caption: parsed.data.caption, userId: user.id },
   });
   return c.json({ post });
 });

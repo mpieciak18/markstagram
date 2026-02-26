@@ -14,11 +14,11 @@ model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  email    String  @unique
-  username String  @unique
-  password String
-  name     String
-  bio      String?
+  email    String  @unique @db.VarChar(254)
+  username String  @unique @db.VarChar(15)
+  password String  @db.VarChar(60)
+  name     String  @db.VarChar(30)
+  bio      String? @db.VarChar(160)
   image    String?
 
   posts           Post[]
@@ -50,7 +50,7 @@ model Post {
   createdAt DateTime @default(now())
 
   image   String @unique
-  caption String
+  caption String @db.VarChar(2200)
 
   userId   Int
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -63,7 +63,7 @@ model Comment {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  message String
+  message String @db.VarChar(2200)
 
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -107,7 +107,7 @@ model Message {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  message   String
+  message   String @db.VarChar(2000)
 
   senderId       Int
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
@@ -128,6 +128,6 @@ model Notification {
   // Pseudo-relational, optional field for post id
   postId Int?
 
-  type    String
+  type    String @db.VarChar(30)
   read    Boolean
 }

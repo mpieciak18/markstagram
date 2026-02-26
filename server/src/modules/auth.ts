@@ -1,6 +1,24 @@
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
+const DEFAULT_BCRYPT_SALT_ROUNDS = 12;
+const MIN_BCRYPT_SALT_ROUNDS = 8;
+const MAX_BCRYPT_SALT_ROUNDS = 15;
+
+const getBcryptSaltRounds = (): number => {
+  const parsed = Number.parseInt(process.env.BCRYPT_SALT_ROUNDS ?? '', 10);
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_BCRYPT_SALT_ROUNDS;
+  }
+  if (parsed < MIN_BCRYPT_SALT_ROUNDS) {
+    return MIN_BCRYPT_SALT_ROUNDS;
+  }
+  if (parsed > MAX_BCRYPT_SALT_ROUNDS) {
+    return MAX_BCRYPT_SALT_ROUNDS;
+  }
+  return parsed;
+};
+
 export const createJwt = async (user: {
   id: number;
   username: string;
@@ -32,6 +50,6 @@ export const comparePasswords = async (
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
-  const result = await bcrypt.hash(password, 5);
+  const result = await bcrypt.hash(password, getBcryptSaltRounds());
   return result;
 };

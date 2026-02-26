@@ -10,7 +10,7 @@ const idSchema = z.object({ id: z.number().int() });
 const limitSchema = z.object({ limit: z.number().int() });
 const createSchema = z.object({
   id: z.number().int(),
-  type: z.string(),
+  type: z.string().trim().min(1).max(30),
   postId: z.number().int().optional(),
 });
 

@@ -23,6 +23,17 @@ const MIME_TO_EXTENSION: Record<string, string> = {
   'image/gif': 'gif',
 };
 
+const isBodyTooLargeError = (error: unknown): boolean => {
+  const message = String((error as { message?: unknown })?.message ?? error).toLowerCase();
+  return (
+    message.includes('maxfilesize') ||
+    message.includes('limit_file_size') ||
+    message.includes('entity too large') ||
+    message.includes('request entity too large') ||
+    message.includes('file too large')
+  );
+};
+
 const parsePositiveInt = (value: string | undefined, fallback: number): number => {
   const parsed = Number.parseInt(value ?? '', 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -71,7 +82,16 @@ const hasAllowedImageSignature = (buffer: Buffer, mimeType: string): boolean => 
 };
 
 export const uploadImage = createMiddleware<UploadEnv>(async (c, next) => {
-  const body = await c.req.parseBody();
+  let body: Record<string, string | File>;
+  try {
+    body = (await c.req.parseBody()) as Record<string, string | File>;
+  } catch (error) {
+    if (isBodyTooLargeError(error)) {
+      return c.json({ message: 'File is too large' }, 400);
+    }
+    return c.json({ message: 'Invalid upload payload' }, 400);
+  }
+
   const file = body['file'];
 
   if (!(file instanceof File)) {

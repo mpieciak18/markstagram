@@ -7,7 +7,10 @@ import { publicUserSelect } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
-const createSchema = z.object({ id: z.number().int(), message: z.string() });
+const createSchema = z.object({
+  id: z.number().int(),
+  message: z.string().trim().min(1).max(2200),
+});
 
 export const commentRoutes = new Hono<AppEnv>();
 

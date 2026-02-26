@@ -5,7 +5,10 @@ import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
 
 const idSchema = z.object({ id: z.number().int() });
-const createSchema = z.object({ id: z.number().int(), message: z.string() });
+const createSchema = z.object({
+  id: z.number().int(),
+  message: z.string().trim().min(1).max(2000),
+});
 
 export const messageRoutes = new Hono<AppEnv>();
 
