@@ -6,7 +6,9 @@
 	"scripts": {
 		"dev": "vite",
 		"dev:bun": "bunx vite",
+		"dev:bun:native": "bunx vite",
 		"dev:bun:codex": "PATH=\"$HOME/.bun/bin:$PATH\" bunx vite",
+		"dev:bun:native:codex": "PATH=\"$HOME/.bun/bin:$PATH\" bunx vite",
 		"build": "tsc && vite build",
 		"lint": "biome check .",
 		"format": "biome check --write .",

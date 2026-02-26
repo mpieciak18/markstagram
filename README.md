@@ -22,7 +22,10 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Bun migration is staged. See [BUN_MIGRATION_PLAN.md](./BUN_MIGRATION_PLAN.md).
 - Local Bun commands:
   - `pnpm dev:bun`
+  - `pnpm dev:bun:native` (Bun-native API + Socket.IO compatibility server)
   - `pnpm --filter @markstagram/server test:bun`
+- For `dev:bun:native`, configure client websocket URL:
+  - `VITE_SOCKET_URL=http://localhost:3002`
 
 ## Project Objectives
 

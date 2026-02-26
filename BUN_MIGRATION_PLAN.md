@@ -42,12 +42,12 @@ Goal: run current app under Bun with no behavior regressions.
 
 Goal: move from Node server adapter to Bun-native serving while keeping Hono.
 
-- [ ] Create `server/src/index.bun.ts` using `Bun.serve({ fetch: app.fetch })`.
-- [ ] Keep Node entrypoint (`index.ts`) until Bun-native path is proven stable.
-- [ ] Decide realtime strategy:
-  - keep Socket.IO on compatible adapter path, or
-  - migrate to native WebSocket protocol.
-- [ ] Re-run full regression suite + websocket-specific validation.
+- [x] Create `server/src/index.bun.ts` using `Bun.serve({ fetch: app.fetch })`.
+- [x] Keep Node entrypoint (`index.ts`) until Bun-native path is proven stable.
+- [x] Decide realtime strategy:
+  - keep Socket.IO on compatible adapter path via a dedicated compatibility port (`SOCKET_PORT`),
+  - keep native WebSocket migration as a later optional step.
+- [x] Re-run full regression suite + websocket-specific validation.
 
 ## Stage 3: Cleanup + Consolidation
 
@@ -61,6 +61,7 @@ Goal: remove Node-only runtime overhead after Bun is stable.
 ## Known Pitfalls / Incompatibilities
 
 - Socket.IO behavior can vary under Bun depending on Node-compat mode and HTTP upgrade handling.
+- Bun-native API mode currently uses a dedicated Socket.IO compatibility server (`SOCKET_PORT`, default `PORT + 1`).
 - `firebase-admin` may surface runtime-specific behavior differences (credential loading, request handling).
 - `supertest` is Node-centric; Bun test parity may require alternative testing patterns.
 - Shell PATH mismatch (zsh vs sh) can make Bun appear installed interactively but unavailable to `pnpm` scripts.
@@ -98,6 +99,13 @@ Goal: remove Node-only runtime overhead after Bun is stable.
   - Kept Hono backend architecture unchanged.
   - Revalidated Node baseline (`pnpm typecheck`, `cd server && pnpm run test:local` with 227 passing tests).
   - Updated Bun scripts to prepend `PATH="$HOME/.bun/bin:$PATH"` for non-interactive shell compatibility.
+  - Restored default Bun scripts for normal local use and added `*:codex` script variants with explicit PATH fallback.
   - Validated Bun test parity (`pnpm --filter @markstagram/server test:bun`: 14 files, 227 tests passed).
   - Validated Bun local startup parity (`pnpm dev:bun`: client + server both booted successfully).
   - Re-ran workspace typecheck successfully after Bun Stage 1 adjustments.
+  - Added shared Socket.IO bootstrap module and refactored Node entrypoint to use it.
+  - Added Bun-native entrypoint (`server/src/index.bun.ts`) with `Bun.serve` for API traffic.
+  - Selected Stage 2 realtime strategy: Socket.IO stays on compatibility server at `SOCKET_PORT` (default `PORT + 1`).
+  - Added Bun-native scripts (`dev:bun:native`, `dev:bun:native:codex`) and client socket URL override support (`VITE_SOCKET_URL`).
+  - Re-ran Bun test suite (`pnpm test:server:bun:codex`) with 14 files / 227 tests passing.
+  - Verified Bun native startup (`pnpm dev:bun:native:codex`) with API on `3001` and Socket.IO on `3002`.
