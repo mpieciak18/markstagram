@@ -1,5 +1,5 @@
-import app from '../server.js';
-import supertest from 'supertest';
+import app from '../app.js';
+import supertest from './helpers/httpClient.js';
 import { SignJWT } from 'jose';
 import { it, describe, expect } from 'vitest';
 import { deleteFileFromStorage } from '../config/gcloud.js';

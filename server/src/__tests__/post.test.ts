@@ -1,5 +1,5 @@
-import supertest from 'supertest';
-import app from '../server.js';
+import supertest from './helpers/httpClient.js';
+import app from '../app.js';
 // import { Blob } from 'node-fetch';
 // import fs from 'fs/promises';
 // import FormData from 'form-data';

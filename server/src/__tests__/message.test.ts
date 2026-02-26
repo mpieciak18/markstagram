@@ -1,5 +1,5 @@
-import supertest from 'supertest';
-import app from '../server.js';
+import supertest from './helpers/httpClient.js';
+import app from '../app.js';
 import { it, describe, expect } from 'vitest';
 import type { Conversation, Message } from '@markstagram/shared-types';
 import { HasUsers } from '@markstagram/shared-types';

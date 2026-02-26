@@ -54,9 +54,20 @@ Last updated: 2026-02-26
 
 ## Stage C: Structural Optimization
 
-- [ ] Complete planned Stage 4 migration from `supertest` to Hono in-process requests.
-- [ ] Remove Node HTTP shim and related test-only compatibility dependencies.
-- [ ] Re-benchmark Node/Bun test times after harness migration.
+- [x] Complete planned Stage 4 migration from `supertest` to Hono in-process requests.
+- [x] Remove Node HTTP shim and related test-only compatibility dependencies.
+- [x] Re-benchmark test times after harness migration.
+
+## Post-Execution Cleanup
+
+- [x] Remove temporary session-specific `*:codex` scripts from root, server, and client package manifests.
+- [x] Prune redundant server test-script variants:
+  - Removed `test:local:parallel` and `test:local:fast`.
+  - Removed `test:bun:parallel` and `test:bun:fast`.
+  - Removed Bun codex-only test variants (`test:bun:*:codex`).
+- [x] Keep a minimal useful matrix:
+  - Node/local: `test:local`, `test:local:fast:parallel`, `test:docker`
+  - Bun: `test:bun`, `test:bun:fast:parallel`
 
 ## Proposed Changes Review (From External Suggestions)
 
@@ -90,6 +101,9 @@ Last updated: 2026-02-26
 - Local Docker Postgres path:
   - `pnpm test:server:docker` end-to-end (container + migrations + tests): about `6.8s`
   - Vitest phase within docker run: about `2.2s`
+- Post-Stage C (single-run snapshot, local Docker Postgres path):
+  - `pnpm test:server:docker` end-to-end (container + migrations + tests): about `5.8s`
+  - Vitest phase within docker run: about `1.5s`
 
 ## Local Docker Test DB Track (Implemented Scope)
 
@@ -128,3 +142,7 @@ Last updated: 2026-02-26
   - Re-ran serial suites for 3-run medians (`test:local` and `test:bun:codex`) and updated measured deltas.
   - Added a shared seeded-user helper for non-auth integration tests and migrated repeated setup flows away from `/create_new_user`.
   - Re-ran serial suites for 3-run medians after helper consolidation and updated measured deltas.
+  - Completed Stage C migration from `supertest` to Hono in-process request helper.
+  - Removed `server/src/server.ts` supertest shim and removed `supertest` + `@types/supertest` from server dev dependencies.
+  - Re-ran docker-backed server suite with `227/227` passing after migration.
+  - Pruned temporary and duplicate test/dev scripts across root/server/client package manifests to reduce command sprawl.

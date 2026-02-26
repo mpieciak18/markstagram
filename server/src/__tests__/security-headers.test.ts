@@ -1,6 +1,6 @@
-import supertest from 'supertest';
+import supertest from './helpers/httpClient.js';
 import { describe, expect, it } from 'vitest';
-import app from '../server.js';
+import app from '../app.js';
 
 describe('cors and security headers', () => {
   it('should allow configured origins via CORS', async () => {

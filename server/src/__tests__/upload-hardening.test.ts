@@ -1,6 +1,6 @@
-import supertest from 'supertest';
+import supertest from './helpers/httpClient.js';
 import { afterEach, describe, expect, it } from 'vitest';
-import app from '../server.js';
+import app from '../app.js';
 import prisma from '../db.js';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
 

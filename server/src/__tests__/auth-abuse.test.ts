@@ -1,5 +1,5 @@
-import app from '../server.js';
-import supertest from 'supertest';
+import app from '../app.js';
+import supertest from './helpers/httpClient.js';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { resetAuthAbuseState } from '../modules/authAbuse.js';
 
