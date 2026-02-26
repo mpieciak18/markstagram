@@ -1,9 +1,10 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
 import { serve } from '@hono/node-server';
 // imports for websockets
 import { Server as SocketIOServer } from 'socket.io';
 import { SocketMessage } from '@markstagram/shared-types';
+import { loadEnvForRuntime } from './config/runtime.js';
+
+await loadEnvForRuntime();
 
 const [{ config }, { default: app }, websocket] = await Promise.all([
   import('./config/index.js'),

@@ -16,6 +16,14 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 
 [Click here](https://markstagram-client.onrender.com/) to check out the live version of the app!
 
+## Runtime Notes
+
+- Current default runtime is Node.
+- Bun migration is staged. See [BUN_MIGRATION_PLAN.md](./BUN_MIGRATION_PLAN.md).
+- Local Bun commands:
+  - `pnpm dev:bun`
+  - `pnpm --filter @markstagram/server test:bun`
+
 ## Project Objectives
 
 1. To recreate a fully-functional clone of Instagram that any external user can sign up for and start using.
