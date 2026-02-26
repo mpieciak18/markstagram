@@ -231,6 +231,7 @@ export type SaveOrderByWithRelationInput = {
 
 export type SaveWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  userId_postId?: Prisma.SaveUserIdPostIdCompoundUniqueInput
   AND?: Prisma.SaveWhereInput | Prisma.SaveWhereInput[]
   OR?: Prisma.SaveWhereInput[]
   NOT?: Prisma.SaveWhereInput | Prisma.SaveWhereInput[]
@@ -239,7 +240,7 @@ export type SaveWhereUniqueInput = Prisma.AtLeast<{
   postId?: Prisma.IntFilter<"Save"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   post?: Prisma.XOR<Prisma.PostScalarRelationFilter, Prisma.PostWhereInput>
-}, "id">
+}, "id" | "userId_postId">
 
 export type SaveOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -315,6 +316,11 @@ export type SaveListRelationFilter = {
 
 export type SaveOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type SaveUserIdPostIdCompoundUniqueInput = {
+  userId: number
+  postId: number
 }
 
 export type SaveCountOrderByAggregateInput = {

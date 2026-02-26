@@ -10,6 +10,7 @@ const [{ config }, { default: app }, websocket] = await Promise.all([
   import('./app.js'),
   import('./modules/websocket.js'),
 ]);
+const { getAllowedOrigins, isAllowedOrigin } = await import('./config/security.js');
 
 const {
   handleInputErrors,
@@ -17,6 +18,7 @@ const {
   createMessage,
   joinConversationRoom,
 } = websocket;
+const allowedOrigins = getAllowedOrigins();
 
 // Start the Hono server via @hono/node-server
 const port = Number(process.env.PORT || config.port);
@@ -28,7 +30,13 @@ const server = serve({
 // configure websockets
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin, allowedOrigins)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST'],
     credentials: true,
   },

@@ -156,9 +156,76 @@ userRoutes.post('/is-username-unique', zValidator('json', usernameSchema), async
 
 userRoutes.delete('/', async (c) => {
   const user = c.get('user');
-  const deletedUser = await prisma.user.delete({
+  const userAssets = await prisma.user.findUnique({
     where: { id: user.id },
-    select: publicUserSelect,
+    select: {
+      image: true,
+      posts: { select: { id: true, image: true } },
+      conversations: { select: { id: true } },
+    },
   });
-  return c.json({ user: deletedUser });
+
+  if (!userAssets) return c.json({ message: 'User not found' }, 404);
+
+  const imagesToDelete = Array.from(
+    new Set(
+      [userAssets.image, ...userAssets.posts.map((post) => post.image)].filter(
+        (value): value is string => Boolean(value),
+      ),
+    ),
+  ).filter((url) => url !== process.env.DEFAULT_IMG);
+  const postIds = userAssets.posts.map((post) => post.id);
+
+  const conversationIds = userAssets.conversations.map((conversation) => conversation.id);
+
+  try {
+    const deletedUser = await prisma.$transaction(async (tx) => {
+      if (postIds.length > 0) {
+        await tx.notification.deleteMany({ where: { postId: { in: postIds } } });
+        await tx.comment.deleteMany({ where: { postId: { in: postIds } } });
+        await tx.like.deleteMany({ where: { postId: { in: postIds } } });
+        await tx.save.deleteMany({ where: { postId: { in: postIds } } });
+      }
+
+      await tx.notification.deleteMany({
+        where: {
+          OR: [{ userId: user.id }, { otherUserId: user.id }],
+        },
+      });
+      await tx.follow.deleteMany({
+        where: {
+          OR: [{ giverId: user.id }, { receiverId: user.id }],
+        },
+      });
+      await tx.message.deleteMany({ where: { senderId: user.id } });
+      await tx.comment.deleteMany({ where: { userId: user.id } });
+      await tx.like.deleteMany({ where: { userId: user.id } });
+      await tx.save.deleteMany({ where: { userId: user.id } });
+
+      if (postIds.length > 0) {
+        await tx.post.deleteMany({ where: { id: { in: postIds } } });
+      }
+
+      return tx.user.delete({
+        where: { id: user.id },
+        select: publicUserSelect,
+      });
+    });
+
+    if (conversationIds.length > 0) {
+      await prisma.conversation.deleteMany({
+        where: {
+          id: { in: conversationIds },
+          users: { none: {} },
+        },
+      });
+    }
+
+    await Promise.allSettled(imagesToDelete.map((imageUrl) => deleteFileFromStorage(imageUrl)));
+    return c.json({ user: deletedUser });
+  } catch (e) {
+    const err = e as PrismaClientKnownRequestError;
+    if (err.code === 'P2025') return c.json({ message: 'User not found' }, 404);
+    throw e;
+  }
 });

@@ -76,6 +76,7 @@ conversationRoutes.delete('/', zValidator('json', idSchema), async (c) => {
     return c.json({ message: 'Conversation not found' }, 404);
   }
 
+  await prisma.message.deleteMany({ where: { conversationId: id } });
   const conversation = await prisma.conversation.delete({
     where: { id },
     include: { users: { select: publicUserSelect }, messages: true },

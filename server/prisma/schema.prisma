@@ -38,9 +38,9 @@ model Follow {
   createdAt DateTime @default(now())
 
   giverId    Int
-  giver      User @relation("givenFollows", fields: [giverId], references: [id])
+  giver      User @relation("givenFollows", fields: [giverId], references: [id], onDelete: Cascade)
   receiverId Int
-  receiver   User @relation("receivedFollows", fields: [receiverId], references: [id])
+  receiver   User @relation("receivedFollows", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@unique([giverId, receiverId])
 }
@@ -53,7 +53,7 @@ model Post {
   caption String
 
   userId   Int
-  user     User      @relation(fields: [userId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments Comment[]
   likes    Like[]
   saves    Save[]
@@ -66,9 +66,9 @@ model Comment {
   message String
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId Int
-  post   Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Like {
@@ -76,9 +76,9 @@ model Like {
   createdAt DateTime @default(now())
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId Int
-  post   Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }
@@ -88,9 +88,9 @@ model Save {
   createdAt DateTime @default(now())
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId Int
-  post   Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }
@@ -110,9 +110,9 @@ model Message {
   message   String
 
   senderId       Int
-  sender         User         @relation(fields: [senderId], references: [id])
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
   conversationId Int
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -120,10 +120,10 @@ model Notification {
   createdAt DateTime @default(now())
 
   userId Int
-  user   User @relation("receivedNotifications", fields: [userId], references: [id])
+  user   User @relation("receivedNotifications", fields: [userId], references: [id], onDelete: Cascade)
 
   otherUserId Int
-  otherUser   User @relation("givenNotifications", fields: [otherUserId], references: [id])
+  otherUser   User @relation("givenNotifications", fields: [otherUserId], references: [id], onDelete: Cascade)
 
   // Pseudo-relational, optional field for post id
   postId Int?

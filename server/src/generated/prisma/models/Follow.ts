@@ -231,6 +231,7 @@ export type FollowOrderByWithRelationInput = {
 
 export type FollowWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  giverId_receiverId?: Prisma.FollowGiverIdReceiverIdCompoundUniqueInput
   AND?: Prisma.FollowWhereInput | Prisma.FollowWhereInput[]
   OR?: Prisma.FollowWhereInput[]
   NOT?: Prisma.FollowWhereInput | Prisma.FollowWhereInput[]
@@ -239,7 +240,7 @@ export type FollowWhereUniqueInput = Prisma.AtLeast<{
   receiverId?: Prisma.IntFilter<"Follow"> | number
   giver?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   receiver?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "giverId_receiverId">
 
 export type FollowOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -315,6 +316,11 @@ export type FollowListRelationFilter = {
 
 export type FollowOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type FollowGiverIdReceiverIdCompoundUniqueInput = {
+  giverId: number
+  receiverId: number
 }
 
 export type FollowCountOrderByAggregateInput = {
