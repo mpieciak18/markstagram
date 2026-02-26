@@ -8,6 +8,15 @@ import {
   publicUserWithCountsSelect,
   withoutPassword,
 } from '../modules/publicUser.js';
+import {
+  applySignInRateLimit,
+  applySignUpRateLimit,
+  checkSignInLock,
+  clearFailedSignIns,
+  getAuthClientId,
+  getSignInAttemptKey,
+  recordFailedSignIn,
+} from '../modules/authAbuse.js';
 
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -25,6 +34,13 @@ export const authRoutes = new Hono();
 
 authRoutes.post('/create_new_user', zValidator('json', createUserSchema), async (c) => {
   const data = c.req.valid('json');
+  const clientId = getAuthClientId(c);
+  const signUpLimit = applySignUpRateLimit(clientId);
+  if (signUpLimit.limited) {
+    c.header('Retry-After', String(signUpLimit.retryAfterSeconds));
+    return c.json({ message: 'Too many sign-up attempts. Please try again later.' }, 429);
+  }
+
   const hashedPassword = await hashPassword(data.password);
 
   try {
@@ -78,6 +94,25 @@ authRoutes.post('/create_new_user', zValidator('json', createUserSchema), async 
 
 authRoutes.post('/sign_in', zValidator('json', signInSchema), async (c) => {
   const { email, password } = c.req.valid('json');
+  const clientId = getAuthClientId(c);
+  const signInRateLimit = applySignInRateLimit(clientId);
+  if (signInRateLimit.limited) {
+    c.header('Retry-After', String(signInRateLimit.retryAfterSeconds));
+    return c.json(
+      { message: 'Too many sign-in attempts. Please try again later.' },
+      429,
+    );
+  }
+
+  const attemptKey = getSignInAttemptKey(clientId, email);
+  const lockStatus = checkSignInLock(attemptKey);
+  if (lockStatus.limited) {
+    c.header('Retry-After', String(lockStatus.retryAfterSeconds));
+    return c.json(
+      { message: 'Too many sign-in attempts. Please try again later.' },
+      429,
+    );
+  }
 
   const user = await prisma.user.findUnique({
     where: { email },
@@ -88,14 +123,31 @@ authRoutes.post('/sign_in', zValidator('json', signInSchema), async (c) => {
   });
 
   if (!user) {
+    const failedAttempt = recordFailedSignIn(attemptKey);
+    if (failedAttempt.limited) {
+      c.header('Retry-After', String(failedAttempt.retryAfterSeconds));
+      return c.json(
+        { message: 'Too many sign-in attempts. Please try again later.' },
+        429,
+      );
+    }
     return c.json({ message: 'Invalid Username or Password' }, 401);
   }
 
   const isValid = await comparePasswords(password, user.password);
   if (!isValid) {
+    const failedAttempt = recordFailedSignIn(attemptKey);
+    if (failedAttempt.limited) {
+      c.header('Retry-After', String(failedAttempt.retryAfterSeconds));
+      return c.json(
+        { message: 'Too many sign-in attempts. Please try again later.' },
+        429,
+      );
+    }
     return c.json({ message: 'Invalid Username or Password' }, 401);
   }
 
+  clearFailedSignIns(attemptKey);
   const token = await createJwt(user);
   return c.json({ token, user: withoutPassword(user) });
 });
