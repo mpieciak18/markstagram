@@ -103,6 +103,16 @@ describe('likes', () => {
     expect(response.body.like.userId).toBe(user.id);
     like = response.body.like;
   });
+  it('should be idempotent for duplicate like creation & return the existing like', async () => {
+    const response = await supertest(app)
+      .post('/api/like')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ id: post.id });
+    expect(response.status).toBe(200);
+    expect(response.body.like.id).toBe(like.id);
+    expect(response.body.like.postId).toBe(post.id);
+    expect(response.body.like.userId).toBe(user.id);
+  });
   //
   it("should fail to get user's like from a post due to an invalid inputs & return a 400 code", async () => {
     const response = await supertest(app)

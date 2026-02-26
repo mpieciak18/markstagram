@@ -41,6 +41,8 @@ model Follow {
   giver      User @relation("givenFollows", fields: [giverId], references: [id])
   receiverId Int
   receiver   User @relation("receivedFollows", fields: [receiverId], references: [id])
+
+  @@unique([giverId, receiverId])
 }
 
 model Post {
@@ -77,6 +79,8 @@ model Like {
   user   User @relation(fields: [userId], references: [id])
   postId Int
   post   Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
 }
 
 model Save {
@@ -87,6 +91,8 @@ model Save {
   user   User @relation(fields: [userId], references: [id])
   postId Int
   post   Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
 }
 
 model Conversation {

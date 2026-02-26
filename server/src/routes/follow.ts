@@ -4,6 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
 import { publicUserSelect } from '../modules/publicUser.js';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 const idSchema = z.object({ id: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
@@ -13,14 +14,32 @@ export const followRoutes = new Hono<AppEnv>();
 followRoutes.post('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
   const user = c.get('user');
+  if (id === user.id) return c.json({ message: 'Cannot follow yourself' }, 400);
 
   const otherUser = await prisma.user.findUnique({ where: { id } });
   if (!otherUser) return c.json({ message: 'User not found' }, 404);
 
-  const follow = await prisma.follow.create({
-    data: { giverId: user.id, receiverId: id },
+  const existingFollow = await prisma.follow.findFirst({
+    where: { giverId: user.id, receiverId: id },
   });
-  return c.json({ follow });
+  if (existingFollow) return c.json({ follow: existingFollow });
+
+  try {
+    const follow = await prisma.follow.create({
+      data: { giverId: user.id, receiverId: id },
+    });
+    return c.json({ follow });
+  } catch (e) {
+    const err = e as PrismaClientKnownRequestError;
+    if (err.code === 'P2002') {
+      const conflictFollow = await prisma.follow.findFirst({
+        where: { giverId: user.id, receiverId: id },
+      });
+      if (conflictFollow) return c.json({ follow: conflictFollow });
+      return c.json({ message: 'Follow already exists' }, 409);
+    }
+    throw e;
+  }
 });
 
 followRoutes.delete('/', zValidator('json', idSchema), async (c) => {

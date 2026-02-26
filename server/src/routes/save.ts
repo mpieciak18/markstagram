@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 const idSchema = z.object({ id: z.number().int() });
 const limitSchema = z.object({ limit: z.number().int() });
@@ -18,10 +19,27 @@ saveRoutes.post('/', zValidator('json', idSchema), async (c) => {
   });
   if (!post) return c.json({ message: 'Post not found' }, 404);
 
-  const save = await prisma.save.create({
-    data: { postId: id, userId: user.id },
+  const existingSave = await prisma.save.findFirst({
+    where: { postId: id, userId: user.id },
   });
-  return c.json({ save });
+  if (existingSave) return c.json({ save: existingSave });
+
+  try {
+    const save = await prisma.save.create({
+      data: { postId: id, userId: user.id },
+    });
+    return c.json({ save });
+  } catch (e) {
+    const err = e as PrismaClientKnownRequestError;
+    if (err.code === 'P2002') {
+      const conflictSave = await prisma.save.findFirst({
+        where: { postId: id, userId: user.id },
+      });
+      if (conflictSave) return c.json({ save: conflictSave });
+      return c.json({ message: 'Save already exists' }, 409);
+    }
+    throw e;
+  }
 });
 
 saveRoutes.post('/user', zValidator('json', limitSchema), async (c) => {

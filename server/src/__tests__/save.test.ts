@@ -85,6 +85,16 @@ describe('saves', () => {
     expect(response.body.save.userId).toBe(user.id);
     save = response.body.save;
   });
+  it('should be idempotent for duplicate save creation & return the existing save', async () => {
+    const response = await supertest(app)
+      .post('/api/save')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ id: post.id });
+    expect(response.status).toBe(200);
+    expect(response.body.save.id).toBe(save.id);
+    expect(response.body.save.postId).toBe(post.id);
+    expect(response.body.save.userId).toBe(user.id);
+  });
   //
   it("should fail to get user's save from a post due to an invalid inputs & return a 400 code", async () => {
     const response = await supertest(app)

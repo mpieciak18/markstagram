@@ -69,6 +69,15 @@ describe('POST /api/follow & DELETE /api/follow', () => {
       });
     expect(response.status).toBe(404);
   });
+  it('should fail to create a follow to self & return a 400 error', async () => {
+    const response = await supertest(app)
+      .post('/api/follow')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        id: user.id,
+      });
+    expect(response.status).toBe(400);
+  });
   it('should create a follow & return a 200 error + correct follow info', async () => {
     const response = await supertest(app)
       .post('/api/follow')
@@ -78,6 +87,18 @@ describe('POST /api/follow & DELETE /api/follow', () => {
       });
     follow = response.body.follow;
     expect(response.status).toBe(200);
+    expect(response.body.follow.giverId).toBe(user.id);
+    expect(response.body.follow.receiverId).toBe(otherUser.id);
+  });
+  it('should be idempotent for duplicate follow creation & return the existing follow', async () => {
+    const response = await supertest(app)
+      .post('/api/follow')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        id: otherUser.id,
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.follow.id).toBe(follow.id);
     expect(response.body.follow.giverId).toBe(user.id);
     expect(response.body.follow.receiverId).toBe(otherUser.id);
   });

@@ -4,6 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 import prisma from '../db.js';
 import type { AppEnv } from '../app.js';
 import { publicUserSelect } from '../modules/publicUser.js';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 const idSchema = z.object({ id: z.number().int() });
 const idLimitSchema = z.object({ id: z.number().int(), limit: z.number().int() });
@@ -19,10 +20,27 @@ likeRoutes.post('/', zValidator('json', idSchema), async (c) => {
   });
   if (!post) return c.json({ message: 'Post not found' }, 404);
 
-  const like = await prisma.like.create({
-    data: { postId: id, userId: user.id },
+  const existingLike = await prisma.like.findFirst({
+    where: { postId: id, userId: user.id },
   });
-  return c.json({ like });
+  if (existingLike) return c.json({ like: existingLike });
+
+  try {
+    const like = await prisma.like.create({
+      data: { postId: id, userId: user.id },
+    });
+    return c.json({ like });
+  } catch (e) {
+    const err = e as PrismaClientKnownRequestError;
+    if (err.code === 'P2002') {
+      const conflictLike = await prisma.like.findFirst({
+        where: { postId: id, userId: user.id },
+      });
+      if (conflictLike) return c.json({ like: conflictLike });
+      return c.json({ message: 'Like already exists' }, 409);
+    }
+    throw e;
+  }
 });
 
 likeRoutes.post('/post', zValidator('json', idLimitSchema), async (c) => {
