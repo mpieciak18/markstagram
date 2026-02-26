@@ -6,6 +6,7 @@ import { deleteFileFromStorage } from '../config/gcloud.js';
 import { UserStatsCount, User } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
+const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 describe('/create_new_user, /sign_in, & /api/user', () => {
   const jwtSecret = process.env.JWT_SECRET ?? 'test-jwt-secret';
@@ -13,22 +14,22 @@ describe('/create_new_user, /sign_in, & /api/user', () => {
   let token: string;
   let otherToken: string;
   const initUser = {
-    email: 'test11@test11.com',
-    username: 'test11',
+    email: `test11-${runId}@test11.com`,
+    username: `test11${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
   };
   const initOtherUser = {
-    email: 'test69@test69.com',
-    username: 'test69',
+    email: `test69-${runId}@test69.com`,
+    username: `test69${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
   };
   let user: User & UserStatsCount;
   let otherUser: User & UserStatsCount;
   const newUser = {
-    email: 'test12345@test12345.com',
-    username: 'test12345',
+    email: `test12345-${runId}@test12345.com`,
+    username: `test12345${runId.slice(0, 4)}`,
     password: '456_dfe',
     name: 'TESTER',
     bio: 'whattup',

@@ -10,6 +10,9 @@ export const loadEnvForRuntime = async (): Promise<void> => {
     return;
   }
 
-  const dotenv = await import('dotenv');
-  dotenv.config();
+  // Node >= 20 supports loading .env natively.
+  const processWithEnvLoader = process as NodeJS.Process & {
+    loadEnvFile?: (path?: string) => void;
+  };
+  processWithEnvLoader.loadEnvFile?.();
 };

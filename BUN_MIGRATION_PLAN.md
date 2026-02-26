@@ -53,10 +53,10 @@ Goal: move from Node server adapter to Bun-native serving while keeping Hono.
 
 Goal: remove Node-only runtime overhead after Bun is stable.
 
-- [ ] Remove `tsx` (Bun runs TS directly).
-- [ ] Remove `dotenv` if Node runtime support is fully dropped.
-- [ ] Remove `@hono/node-server` once Bun-native entrypoint fully adopted.
-- [ ] Evaluate replacing `supertest` with fetch-style tests for runtime-agnostic coverage.
+- [x] Remove `tsx` (Bun runs TS directly).
+- [x] Remove `dotenv` from runtime path; use Bun env loading and Node native env loader fallback.
+- [x] Remove `@hono/node-server` from runtime dependencies (kept as dev/test-only for `supertest` harness).
+- [x] Evaluate replacing `supertest` with fetch-style tests for runtime-agnostic coverage (deferred; keep `supertest` for now).
 
 ## Known Pitfalls / Incompatibilities
 
@@ -78,8 +78,8 @@ Goal: remove Node-only runtime overhead after Bun is stable.
 ### Remove after Bun-native stabilization
 
 - `tsx`
-- `dotenv` (if Node fallback removed)
-- `@hono/node-server`
+- `dotenv` (runtime dependency removed)
+- `@hono/node-server` (runtime dependency removed; dev/test-only)
 
 ### Potential replacement
 
@@ -109,3 +109,8 @@ Goal: remove Node-only runtime overhead after Bun is stable.
   - Added Bun-native scripts (`dev:bun:native`, `dev:bun:native:codex`) and client socket URL override support (`VITE_SOCKET_URL`).
   - Re-ran Bun test suite (`pnpm test:server:bun:codex`) with 14 files / 227 tests passing.
   - Verified Bun native startup (`pnpm dev:bun:native:codex`) with API on `3001` and Socket.IO on `3002`.
+  - Made Bun native-first for dev/start scripts and added explicit `compat` script variants for comparison/debug.
+  - Removed `tsx` dependency and removed `dotenv` runtime dependency.
+  - Moved `@hono/node-server` from runtime dependencies to dev dependencies.
+  - Hardened flaky tests for shared DB environments by increasing Vitest timeout and adding unique IDs in user/notification tests.
+  - Re-validated Stage 3 with workspace typecheck + full Bun test suite (`14/14 files`, `227/227 tests`) + Bun native dev startup.

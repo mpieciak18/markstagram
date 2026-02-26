@@ -4,21 +4,22 @@ import { it, describe, expect } from 'vitest';
 import type { Notification, Post } from '@markstagram/shared-types';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
+const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 describe('/api/notification', () => {
   let token: string;
   let otherToken: string;
   let notification: Notification;
   const user = {
-    email: 'test888@test3888.com',
-    username: 'test3888',
+    email: `test888-${runId}@test3888.com`,
+    username: `test3888${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
     id: undefined,
   };
   const otherUser = {
-    email: 'test999@test999.com',
-    username: 'test999',
+    email: `test999-${runId}@test999.com`,
+    username: `test999${runId.slice(0, 4)}`,
     password: '456_dfe',
     name: 'TESTER',
     id: undefined,
