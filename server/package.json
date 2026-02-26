@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "test:local": "if [ -f .env ]; then set -a; . ./.env; set +a; fi; vitest run --threads false",
+    "test:docker": "if [ -f .env.test ]; then set -a; . ./.env.test; set +a; elif [ -f .env.test.sample ]; then set -a; . ./.env.test.sample; set +a; fi; DATABASE_ADAPTER=${DATABASE_ADAPTER:-direct} vitest run --threads false",
     "dev": "bun run src/index.bun.ts",
     "dev:bun": "bun run src/index.bun.ts",
     "dev:bun:compat": "bun run src/index.ts",
@@ -25,6 +26,7 @@
     "test:bun": "if [ -f .env ]; then set -a; . ./.env; set +a; fi; bunx vitest run --threads false",
     "test:bun:codex": "PATH=\"$HOME/.bun/bin:$PATH\"; if [ -f .env ]; then set -a; . ./.env; set +a; fi; bunx vitest run --threads false",
     "prisma:generate": "prisma generate",
+    "prisma:migrate:test": "if [ -f .env.test ]; then set -a; . ./.env.test; set +a; elif [ -f .env.test.sample ]; then set -a; . ./.env.test.sample; set +a; fi; DATABASE_ADAPTER=${DATABASE_ADAPTER:-direct} prisma migrate deploy",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],

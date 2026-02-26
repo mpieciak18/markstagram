@@ -28,6 +28,19 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
   - If `VITE_SOCKET_URL` is set, the client uses it directly.
   - If unset in local dev, client defaults to `VITE_API_URL` with `+1` port (for example, `3001 -> 3002`).
 
+## Local Docker Test DB
+
+- Use `pnpm test:server:docker` to run the server tests against a local Postgres container.
+- One-time prerequisite for `DATABASE_ADAPTER=direct`:
+  - `pnpm --filter @markstagram/server add @prisma/adapter-pg pg`
+- The command:
+  - starts `docker-compose.test.yml`,
+  - applies Prisma migrations,
+  - runs `server` tests with `DATABASE_ADAPTER=direct`,
+  - tears the container down automatically.
+- Optional: run `pnpm test:server:docker:keepdb` to keep the test DB up after tests finish.
+- Env defaults come from [`server/.env.test.sample`](./server/.env.test.sample). Create `server/.env.test` to override.
+
 ## Project Objectives
 
 1. To recreate a fully-functional clone of Instagram that any external user can sign up for and start using.
