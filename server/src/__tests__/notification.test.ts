@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
 import type { Notification, Post } from '@markstagram/shared-types';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -15,31 +16,27 @@ describe('/api/notification', () => {
     username: `test3888${runId.slice(0, 4)}`,
     password: '123_abc',
     name: 'Tester',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   const otherUser = {
     email: `test999-${runId}@test999.com`,
     username: `test999${runId.slice(0, 4)}`,
     password: '456_dfe',
     name: 'TESTER',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   let post: Post;
-  it('should create both users + a post, get web tokens, user ids, & a 200 statuses', async () => {
-    const response = await supertest(app).post('/create_new_user').send(user);
-    token = response.body.token;
-    expect(response.body.token).toBeDefined();
-    user.id = response.body.user?.id;
-    expect(response.body.user?.id).toBeDefined();
-    expect(response.status).toBe(200);
+  it('should seed both users + a post, get web tokens + user ids', async () => {
+    const seeded = await createSeededUserWithToken(user);
+    token = seeded.token;
+    expect(token).toBeDefined();
+    user.id = seeded.user.id;
+    expect(user.id).toBeDefined();
     // // //
-    const response2 = await supertest(app)
-      .post('/create_new_user')
-      .send(otherUser);
-    otherToken = response2.body.token;
-    otherUser.id = response2.body.user?.id;
-    expect(response2.body.user?.id).toBeDefined();
-    expect(response2.status).toBe(200);
+    const seededOther = await createSeededUserWithToken(otherUser);
+    otherToken = seededOther.token;
+    otherUser.id = seededOther.user.id;
+    expect(otherUser.id).toBeDefined();
     // // //
     const caption = 'this is a test';
     const response3 = await supertest(app)

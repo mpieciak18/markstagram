@@ -11,7 +11,10 @@ type Bucket = {
   file: (name: string) => FileRef;
 };
 
-const hasStorageConfig = Boolean(process.env.GCLOUD_KEY && process.env.APP_URL);
+const shouldMockCloudStorage =
+  process.env.MOCK_CLOUD_STORAGE === '1' || process.env.NODE_ENV === 'test';
+const hasStorageConfig =
+  !shouldMockCloudStorage && Boolean(process.env.GCLOUD_KEY && process.env.APP_URL);
 
 let bucket: Bucket;
 if (hasStorageConfig) {

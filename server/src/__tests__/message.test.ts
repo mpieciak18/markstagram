@@ -3,6 +3,7 @@ import app from '../server.js';
 import { it, describe, expect } from 'vitest';
 import type { Conversation, Message } from '@markstagram/shared-types';
 import { HasUsers } from '@markstagram/shared-types';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 describe('messages', () => {
   let token: string;
@@ -18,7 +19,7 @@ describe('messages', () => {
     bio: "I'm a test account.",
     image:
       'https://images.rawpixel.com/image_png_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   const otherUser = {
     email: 'test222@test222.com',
@@ -28,23 +29,19 @@ describe('messages', () => {
     image:
       'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png',
     bio: 'whattup',
-    id: undefined,
+    id: undefined as number | undefined,
   };
-  it('should create user, get web token, user id, & a 200 status', async () => {
-    const response = await supertest(app).post('/create_new_user').send(user);
-    token = response.body.token;
-    expect(response.body.token).toBeDefined();
-    user.id = response.body.user?.id;
-    expect(response.body.user?.id).toBeDefined();
-    expect(response.status).toBe(200);
+  it('should seed users and get web tokens + user ids', async () => {
+    const seeded = await createSeededUserWithToken(user);
+    token = seeded.token;
+    expect(token).toBeDefined();
+    user.id = seeded.user.id;
+    expect(user.id).toBeDefined();
     // // //
-    const response2 = await supertest(app)
-      .post('/create_new_user')
-      .send(otherUser);
-    otherToken = response2.body.token;
-    otherUser.id = response2.body.user?.id;
-    expect(response2.body.user?.id).toBeDefined();
-    expect(response2.status).toBe(200);
+    const seededOther = await createSeededUserWithToken(otherUser);
+    otherToken = seededOther.token;
+    otherUser.id = seededOther.user.id;
+    expect(otherUser.id).toBeDefined();
   });
   it('should create a conversation & return a 200 error + correct conversation info', async () => {
     const response = await supertest(app)

@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
 import type { Comment, Post } from '@markstagram/shared-types';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 
@@ -15,7 +16,7 @@ describe('comments', () => {
     bio: "I'm a test account.",
     image:
       'https://firebasestorage.googleapis.com/v0/b/ig-clone-5b7ab.appspot.com/o/lsNWDlodVDUB7RmeRY9qZDe1S3k2%2FScreenshot%202023-04-14%20at%2017-10-51%20Markstagram.png?alt=media&token=7a1080c3-c648-4ef4-b5e4-f6da3760182d',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   const caption = 'testing, 1, 2, 3';
   let post: Post;
@@ -23,13 +24,12 @@ describe('comments', () => {
   const updatedMessage = 'this is an updated message';
   const limit = 10;
   let comment: Comment;
-  it('should create user, get web token, user id, & a 200 status', async () => {
-    const response = await supertest(app).post('/create_new_user').send(user);
-    token = response.body.token;
-    expect(response.body.token).toBeDefined();
-    user.id = response.body.user?.id;
-    expect(response.body.user?.id).toBeDefined();
-    expect(response.status).toBe(200);
+  it('should seed user and get web token + user id', async () => {
+    const seeded = await createSeededUserWithToken(user);
+    token = seeded.token;
+    expect(token).toBeDefined();
+    user.id = seeded.user.id;
+    expect(user.id).toBeDefined();
   });
   it('should create a post & return a 200 error + correct post info', async () => {
     const response = await supertest(app)

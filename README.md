@@ -52,6 +52,9 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Fast + parallel (test-only lower bcrypt cost):
   - `pnpm --filter @markstagram/server test:local:fast:parallel`
   - `pnpm --filter @markstagram/server test:bun:fast:parallel`
+- Notes:
+  - Test runs default to `MOCK_CLOUD_STORAGE=1` in Vitest config, so uploads use local/no-op storage instead of external Firebase calls.
+  - Serial scripts remain available for deterministic debugging.
 
 ## Project Objectives
 

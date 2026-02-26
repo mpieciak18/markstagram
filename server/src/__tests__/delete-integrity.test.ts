@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import { describe, expect, it } from 'vitest';
 import app from '../server.js';
 import prisma from '../db.js';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 const imageUrlPattern = /^(http|https):\/\/[^ "]+$/;
@@ -9,25 +10,19 @@ const imageUrlPattern = /^(http|https):\/\/[^ "]+$/;
 describe('delete integrity and cascade behavior', () => {
   it('should delete a conversation that still has messages', async () => {
     const suffix = `${runId}-conv`;
-    const userA = await supertest(app).post('/create_new_user').send({
+    const userA = await createSeededUserWithToken({
       email: `delete-conv-a-${suffix}@test.com`,
       username: `dcva${suffix.slice(0, 6)}`,
-      password: '123_abc',
       name: 'Delete Conv A',
     });
-    const userB = await supertest(app).post('/create_new_user').send({
+    const userB = await createSeededUserWithToken({
       email: `delete-conv-b-${suffix}@test.com`,
       username: `dcvb${suffix.slice(0, 6)}`,
-      password: '123_abc',
       name: 'Delete Conv B',
     });
-
-    expect(userA.status).toBe(200);
-    expect(userB.status).toBe(200);
-
-    const tokenA = userA.body.token as string;
-    const tokenB = userB.body.token as string;
-    const userBId = userB.body.user.id as number;
+    const tokenA = userA.token;
+    const tokenB = userB.token;
+    const userBId = userB.user.id;
 
     const createConvo = await supertest(app)
       .post('/api/conversation')
@@ -66,26 +61,20 @@ describe('delete integrity and cascade behavior', () => {
 
   it('should delete a user and cascade/remove dependent records', async () => {
     const suffix = `${runId}-user`;
-    const userA = await supertest(app).post('/create_new_user').send({
+    const userA = await createSeededUserWithToken({
       email: `delete-user-a-${suffix}@test.com`,
       username: `dua${suffix.slice(0, 6)}`,
-      password: '123_abc',
       name: 'Delete User A',
     });
-    const userB = await supertest(app).post('/create_new_user').send({
+    const userB = await createSeededUserWithToken({
       email: `delete-user-b-${suffix}@test.com`,
       username: `dub${suffix.slice(0, 6)}`,
-      password: '123_abc',
       name: 'Delete User B',
     });
-
-    expect(userA.status).toBe(200);
-    expect(userB.status).toBe(200);
-
-    const tokenA = userA.body.token as string;
-    const tokenB = userB.body.token as string;
-    const userAId = userA.body.user.id as number;
-    const userBId = userB.body.user.id as number;
+    const tokenA = userA.token;
+    const tokenB = userB.token;
+    const userAId = userA.user.id;
+    const userBId = userB.user.id;
 
     const createdPost = await supertest(app)
       .post('/api/post')

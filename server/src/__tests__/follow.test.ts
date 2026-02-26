@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
 import type { Follow } from '@markstagram/shared-types';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
@@ -17,7 +18,7 @@ describe('POST /api/follow & DELETE /api/follow', () => {
     bio: "I'm a test account.",
     image:
       'https://images.rawpixel.com/image_png_1300/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   const otherUser = {
     email: `test23456-${runId}@test23456.com`,
@@ -27,23 +28,19 @@ describe('POST /api/follow & DELETE /api/follow', () => {
     image:
       'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png',
     bio: 'whattup',
-    id: undefined,
+    id: undefined as number | undefined,
   };
-  it('should create both users, get own web token, other user id, & a 200 status', async () => {
-    const response = await supertest(app).post('/create_new_user').send(user);
-    token = response.body.token;
-    expect(response.body.token).toBeDefined();
-    user.id = response.body.user?.id;
-    expect(response.body.user?.id).toBeDefined();
-    expect(response.status).toBe(200);
+  it('should seed both users and get own web token + other user id', async () => {
+    const seeded = await createSeededUserWithToken(user);
+    token = seeded.token;
+    expect(token).toBeDefined();
+    user.id = seeded.user.id;
+    expect(user.id).toBeDefined();
     // // //
-    const response2 = await supertest(app)
-      .post('/create_new_user')
-      .send(otherUser);
-    otherToken = response2.body.token;
-    otherUser.id = response2.body.user?.id;
-    expect(response2.body.user?.id).toBeDefined();
-    expect(response2.status).toBe(200);
+    const seededOther = await createSeededUserWithToken(otherUser);
+    otherToken = seededOther.token;
+    otherUser.id = seededOther.user.id;
+    expect(otherUser.id).toBeDefined();
   });
   //
   it('should fail to create a follow due to an invalid input (ie, no other user id) & return a 400 error', async () => {

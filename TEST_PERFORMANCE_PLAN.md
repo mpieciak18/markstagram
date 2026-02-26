@@ -20,9 +20,9 @@ Last updated: 2026-02-26
 
 ## Baseline
 
-- [-] Record baseline timings (3 runs each, median):
+- [x] Record baseline timings (3 runs each, median):
   - [x] Captured 1-run snapshots before and after Stage A.
-  - [ ] Expand to 3-run medians for stricter comparison.
+  - [x] Captured 3-run medians for stricter comparison.
 - [x] Capture slowest files to prioritize first-pass fixes.
   - Slowest files are consistently:
     - `delete-integrity.test.ts`
@@ -42,14 +42,15 @@ Last updated: 2026-02-26
 
 ## Stage B: Medium-Risk, High-Impact
 
-- [ ] Remove avoidable network work from tests (stub/mock upload/storage paths where possible).
-- [ ] Consolidate repeated setup helpers (shared user factory/token helper) to reduce duplicated per-file setup costs.
+- [x] Remove avoidable network work from tests (stub/mock upload/storage paths where possible).
+- [x] Consolidate repeated setup helpers (shared user factory/token helper) to reduce duplicated per-file setup costs.
 - [x] Evaluate local dedicated test DB path (if current DB is remote/high-latency).
   - [x] Added local Docker Postgres plan + implementation track.
   - [x] Captured before/after timing against remote DB setup.
-- [-] Re-measure and compare against Stage A.
+- [x] Re-measure and compare against Stage A.
   - [x] Captured local docker timing snapshot.
-  - [ ] Re-measure after Stage B code-level optimizations.
+  - [x] Re-measured after Stage B storage-mock optimization.
+  - [x] Re-measured after Stage B setup-helper optimizations.
 
 ## Stage C: Structural Optimization
 
@@ -80,9 +81,15 @@ Last updated: 2026-02-26
 - Post-Stage A (fast + parallel):
   - `pnpm --filter @markstagram/server test:local:fast:parallel`: `7.36s` (about `82.7%` faster vs pre-local serial)
   - `pnpm --filter @markstagram/server test:bun:fast:parallel:codex`: `7.03s` (about `83.4%` faster vs pre-bun serial)
+- Stage B (3-run serial medians, with mock cloud storage in tests):
+  - `pnpm --filter @markstagram/server test:local`: median `31.69s` (about `25.5%` faster vs pre-Stage A local)
+  - `pnpm --filter @markstagram/server test:bun:codex`: median `32.21s` (about `23.8%` faster vs pre-Stage A bun)
+- Stage B (3-run serial medians after setup-helper consolidation):
+  - `pnpm --filter @markstagram/server test:local`: median `31.26s` (about `26.5%` faster vs pre-Stage A local)
+  - `pnpm --filter @markstagram/server test:bun:codex`: median `31.95s` (about `24.4%` faster vs pre-Stage A bun)
 - Local Docker Postgres path:
-  - `pnpm test:server:docker` end-to-end (container + migrations + tests): `6.66s`
-  - Vitest phase within docker run: about `2.07s`
+  - `pnpm test:server:docker` end-to-end (container + migrations + tests): about `6.8s`
+  - Vitest phase within docker run: about `2.2s`
 
 ## Local Docker Test DB Track (Implemented Scope)
 
@@ -117,3 +124,7 @@ Last updated: 2026-02-26
   - Captured local Docker Postgres timing and validated full suite in docker.
   - Fixed `websocket-auth.test.ts` to satisfy password hash integrity constraints under fresh local migrations.
   - Fixed env restoration in `upload-hardening.test.ts` to prevent cross-test pollution when running against fresh local databases.
+  - Added test-mode cloud storage mocking to avoid external storage network calls.
+  - Re-ran serial suites for 3-run medians (`test:local` and `test:bun:codex`) and updated measured deltas.
+  - Added a shared seeded-user helper for non-auth integration tests and migrated repeated setup flows away from `/create_new_user`.
+  - Re-ran serial suites for 3-run medians after helper consolidation and updated measured deltas.

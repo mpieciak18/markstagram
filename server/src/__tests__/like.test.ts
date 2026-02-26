@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import app from '../server.js';
 import { it, describe, expect } from 'vitest';
 import type { Like, Post } from '@markstagram/shared-types';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const urlPattern = /^(http|https):\/\/[^ "]+$/;
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -16,7 +17,7 @@ describe('likes', () => {
     bio: "I'm a test account.",
     image:
       'https://firebasestorage.googleapis.com/v0/b/ig-clone-5b7ab.appspot.com/o/lsNWDlodVDUB7RmeRY9qZDe1S3k2%2FScreenshot%202023-04-14%20at%2017-10-51%20Markstagram.png?alt=media&token=7a1080c3-c648-4ef4-b5e4-f6da3760182d',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   let token2: string;
   const user2 = {
@@ -27,26 +28,24 @@ describe('likes', () => {
     bio: "I'm a test account.",
     image:
       'https://firebasestorage.googleapis.com/v0/b/ig-clone-5b7ab.appspot.com/o/lsNWDlodVDUB7RmeRY9qZDe1S3k2%2FScreenshot%202023-04-14%20at%2017-10-51%20Markstagram.png?alt=media&token=7a1080c3-c648-4ef4-b5e4-f6da3760182d',
-    id: undefined,
+    id: undefined as number | undefined,
   };
   const caption = 'testing, 1, 2, 3';
   let post: Post;
   const limit = 10;
   let like: Like;
-  it('should create users, get web tokens, user ids, & a 200 status', async () => {
-    const response = await supertest(app).post('/create_new_user').send(user);
-    token = response.body.token;
-    expect(response.body.token).toBeDefined();
-    user.id = response.body.user?.id;
-    expect(response.body.user?.id).toBeDefined();
-    expect(response.status).toBe(200);
+  it('should seed users and get web tokens + user ids', async () => {
+    const seeded = await createSeededUserWithToken(user);
+    token = seeded.token;
+    expect(token).toBeDefined();
+    user.id = seeded.user.id;
+    expect(user.id).toBeDefined();
     //
-    const response2 = await supertest(app).post('/create_new_user').send(user2);
-    token2 = response2.body.token;
-    expect(response2.body.token).toBeDefined();
-    user2.id = response2.body.user?.id;
-    expect(response2.body.user?.id).toBeDefined();
-    expect(response2.status).toBe(200);
+    const seededTwo = await createSeededUserWithToken(user2);
+    token2 = seededTwo.token;
+    expect(token2).toBeDefined();
+    user2.id = seededTwo.user.id;
+    expect(user2.id).toBeDefined();
   });
   it('should create a post & return a 200 error + correct post info', async () => {
     const response = await supertest(app)

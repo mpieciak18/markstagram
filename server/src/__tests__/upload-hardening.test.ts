@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
 import app from '../server.js';
 import prisma from '../db.js';
+import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 const originalUploadMaxBytes = process.env.UPLOAD_MAX_BYTES;
@@ -22,20 +23,18 @@ const restoreEnvVar = (
 };
 
 const createUserAndToken = async (suffix: string) => {
-  const response = await supertest(app).post('/create_new_user').send({
+  const seeded = await createSeededUserWithToken({
     email: `upload-hardening-${suffix}-${runId}@test.com`,
     username: `uph${suffix}${runId.slice(0, 4)}`,
-    password: '123_abc',
     name: `Upload ${suffix}`,
   });
 
-  expect(response.status).toBe(200);
-  tokensToCleanup.push(response.body.token as string);
-  userIdsToCleanup.push(response.body.user.id as number);
+  tokensToCleanup.push(seeded.token);
+  userIdsToCleanup.push(seeded.user.id);
 
   return {
-    token: response.body.token as string,
-    userId: response.body.user.id as number,
+    token: seeded.token,
+    userId: seeded.user.id,
   };
 };
 

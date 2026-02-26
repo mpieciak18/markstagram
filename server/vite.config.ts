@@ -10,6 +10,7 @@ export default defineConfig({
       // Keep local test runtime reasonable while production uses a higher default.
       BCRYPT_SALT_ROUNDS: '8',
       DISABLE_REQUEST_LOGGING: '1',
+      MOCK_CLOUD_STORAGE: '1',
     },
   },
 });
