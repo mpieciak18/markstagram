@@ -22,7 +22,6 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Bun migration is staged. See [BUN_MIGRATION_PLAN.md](./BUN_MIGRATION_PLAN.md).
 - Local Bun commands:
   - `pnpm dev:bun` (native-first Bun API + Socket.IO compatibility server)
-  - `pnpm dev:bun:compat` (legacy adapter path for comparison/debug)
   - `pnpm --filter @markstagram/server test:bun`
 - Socket URL behavior:
   - If `VITE_SOCKET_URL` is set, the client uses it directly.

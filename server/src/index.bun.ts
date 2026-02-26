@@ -1,6 +1,5 @@
 import { createServer } from 'node:http';
 import type { Server as HttpServer } from 'node:http';
-import { loadEnvForRuntime } from './config/runtime.js';
 
 type BunApiServer = {
   port: number;
@@ -25,8 +24,6 @@ const closeServer = async (server: HttpServer): Promise<void> => {
     });
   });
 };
-
-await loadEnvForRuntime();
 
 const [{ config }, { default: app }, { attachSocketServer }] = await Promise.all([
   import('./config/index.js'),

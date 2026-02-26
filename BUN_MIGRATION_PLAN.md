@@ -54,8 +54,8 @@ Goal: move from Node server adapter to Bun-native serving while keeping Hono.
 Goal: remove Node-only runtime overhead after Bun is stable.
 
 - [x] Remove `tsx` (Bun runs TS directly).
-- [x] Remove `dotenv` from runtime path; use Bun env loading and Node native env loader fallback.
-- [x] Remove `@hono/node-server` from runtime dependencies (kept in dev dependencies while Node compat entrypoint still exists).
+- [x] Remove `dotenv` from runtime path; use Bun env loading.
+- [x] Remove `@hono/node-server` from runtime dependencies.
 - [x] Evaluate replacing `supertest` with fetch-style tests for runtime-agnostic coverage (promoted to Stage 4).
 
 ## Stage 4: Runtime-Agnostic Test Harness
@@ -72,8 +72,8 @@ Goal: replace `supertest` and remove the Node test shim.
 
 Goal: replace `bcryptjs` with Bun-native hashing after rollback is retired.
 
-- [ ] Implement Bun-native hashing/verification (`Bun.password`) for auth module.
-- [ ] Validate compatibility strategy for existing stored bcrypt hashes.
+- [x] Implement Bun-native hashing/verification (`Bun.password`) for auth module.
+- [x] Validate compatibility strategy for existing stored bcrypt hashes.
 - [ ] Remove `bcryptjs` dependency.
 - [ ] Re-run auth-focused tests and full suite under Bun.
 
@@ -81,18 +81,18 @@ Goal: replace `bcryptjs` with Bun-native hashing after rollback is retired.
 
 Goal: remove Node fallback after stability criteria are met.
 
-- [ ] Wait for two stable Bun deploy cycles (per exit criteria).
-- [ ] Remove `server/src/index.ts` and Bun compat script variants once no longer needed.
-- [ ] Remove remaining Bun/Node branching that only exists for rollback support.
-- [ ] Confirm deployment docs and runtime defaults are Bun-only.
+- [x] User-approved fast path: retire rollback path without waiting for deploy-cycle gate (pet-project scope).
+- [x] Remove `server/src/index.ts` and Bun compat script variants.
+- [x] Remove remaining Bun/Node branching that only exists for rollback support.
+- [x] Confirm deployment docs and runtime defaults are Bun-only.
 
 ## Stage 7: Test Runner Modernization
 
 Goal: upgrade test tooling independently of runtime migration.
 
-- [ ] Upgrade Vitest from `0.34.x` to current major.
-- [ ] Address config/runtime differences introduced by the upgrade.
-- [ ] Re-run full suite and validate no regressions.
+- [x] Upgrade Vitest from `0.34.x` to current major (`3.2.x`).
+- [x] Address config/runtime differences introduced by the upgrade (replace deprecated `--threads false` usage).
+- [x] Re-run full suite and validate no regressions (`227/227` passing via docker-backed test flow).
 
 ## Stage 8: Replace Socket.IO with Native Bun/Hono WebSockets
 
@@ -131,8 +131,6 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 
 ## Recommended Execution Order
 
-- [ ] Stage 6 (retire rollback path)
-- [ ] Stage 7 (Vitest upgrade)
 - [ ] Stage 5 (Bun-native password hashing)
 - [ ] Stage 8 (native Bun/Hono websocket replacement)
 
@@ -159,7 +157,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 
 - `tsx`
 - `dotenv` (runtime dependency removed)
-- `@hono/node-server` (remove after Stage 6 when Node compat path is retired)
+- `@hono/node-server` (removed in Stage 6)
 - `supertest` + `@types/supertest` (removed in Stage 4)
 - `bcryptjs` (after Stage 5)
 - `socket.io` + `socket.io-client` (after Stage 8)
@@ -173,7 +171,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 
 - All critical flows pass under Bun in staging.
 - No auth/upload/websocket regressions.
-- Node rollback path maintained until at least two stable Bun deploy cycles.
+- Bun-only runtime remains stable across at least two deploy cycles.
 
 ## Progress Log
 
@@ -200,4 +198,16 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
   - Re-validated Stage 3 with workspace typecheck + full Bun test suite (`14/14 files`, `227/227 tests`) + Bun native dev startup.
   - Completed Stage 4 by migrating away from supertest to in-process request testing and removing test shim/dependencies.
   - Pruned temporary `*:codex` scripts and redundant test-script variants from package manifests.
+  - Completed Stage 6 fast-path retirement of Node rollback:
+    - removed `server/src/index.ts`,
+    - removed root/server Bun compat scripts,
+    - removed `@hono/node-server`,
+    - removed Node-specific runtime env loader branching.
+  - Completed Stage 7 test runner modernization:
+    - upgraded `vitest` to `^3.2.4` in server,
+    - updated serial test scripts to `--maxWorkers=1 --no-file-parallelism`,
+    - revalidated server suite with `pnpm test:server:docker` (`227/227` passing).
+  - Started Stage 5 auth migration:
+    - added Bun-native password hashing/verification branch in `modules/auth.ts`,
+    - retained `bcryptjs` fallback for non-Bun environments to preserve local Node-based test execution.
   - Added Stage 8 native websocket replacement plan for Socket.IO retirement.

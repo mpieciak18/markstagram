@@ -32,6 +32,23 @@ const getBcryptSaltRounds = (): number => {
   return parsed;
 };
 
+type BunPasswordApi = {
+  hash: (
+    password: string,
+    options: { algorithm: 'bcrypt'; cost: number },
+  ) => Promise<string>;
+  verify: (password: string, hash: string) => Promise<boolean>;
+};
+
+const getBunPasswordApi = (): BunPasswordApi | null => {
+  const bunGlobal = (globalThis as { Bun?: { password?: BunPasswordApi } }).Bun;
+  if (!bunGlobal?.password) {
+    return null;
+  }
+
+  return bunGlobal.password;
+};
+
 export const createJwt = async (user: {
   id: number;
   username: string;
@@ -58,11 +75,24 @@ export const comparePasswords = async (
   password: string,
   hash: string,
 ): Promise<boolean> => {
+  const bunPassword = getBunPasswordApi();
+  if (bunPassword) {
+    return bunPassword.verify(password, hash);
+  }
+
   const result = await bcrypt.compare(password, hash);
   return result;
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
+  const bunPassword = getBunPasswordApi();
+  if (bunPassword) {
+    return bunPassword.hash(password, {
+      algorithm: 'bcrypt',
+      cost: getBcryptSaltRounds(),
+    });
+  }
+
   const result = await bcrypt.hash(password, getBcryptSaltRounds());
   return result;
 };
