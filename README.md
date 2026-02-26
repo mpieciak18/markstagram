@@ -46,9 +46,6 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Standard serial:
   - `pnpm --filter @markstagram/server test:local`
   - `pnpm --filter @markstagram/server test:bun`
-- Parallel:
-  - `pnpm --filter @markstagram/server test:local:parallel`
-  - `pnpm --filter @markstagram/server test:bun:parallel`
 - Fast + parallel (test-only lower bcrypt cost):
   - `pnpm --filter @markstagram/server test:local:fast:parallel`
   - `pnpm --filter @markstagram/server test:bun:fast:parallel`

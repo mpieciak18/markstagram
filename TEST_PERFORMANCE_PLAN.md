@@ -85,19 +85,19 @@ Last updated: 2026-02-26
 
 - Pre-Stage A (serial):
   - `pnpm --filter @markstagram/server test:local`: `42.54s`
-  - `pnpm --filter @markstagram/server test:bun:codex`: `42.25s`
+  - `pnpm --filter @markstagram/server test:bun`: `42.25s`
 - Post-Stage A (serial):
   - `pnpm --filter @markstagram/server test:local`: `41.16s` (about `3.2%` faster)
-  - `pnpm --filter @markstagram/server test:bun:codex`: `39.45s` (about `6.6%` faster)
+  - `pnpm --filter @markstagram/server test:bun`: `39.45s` (about `6.6%` faster)
 - Post-Stage A (fast + parallel):
   - `pnpm --filter @markstagram/server test:local:fast:parallel`: `7.36s` (about `82.7%` faster vs pre-local serial)
-  - `pnpm --filter @markstagram/server test:bun:fast:parallel:codex`: `7.03s` (about `83.4%` faster vs pre-bun serial)
+  - `pnpm --filter @markstagram/server test:bun:fast:parallel`: `7.03s` (about `83.4%` faster vs pre-bun serial)
 - Stage B (3-run serial medians, with mock cloud storage in tests):
   - `pnpm --filter @markstagram/server test:local`: median `31.69s` (about `25.5%` faster vs pre-Stage A local)
-  - `pnpm --filter @markstagram/server test:bun:codex`: median `32.21s` (about `23.8%` faster vs pre-Stage A bun)
+  - `pnpm --filter @markstagram/server test:bun`: median `32.21s` (about `23.8%` faster vs pre-Stage A bun)
 - Stage B (3-run serial medians after setup-helper consolidation):
   - `pnpm --filter @markstagram/server test:local`: median `31.26s` (about `26.5%` faster vs pre-Stage A local)
-  - `pnpm --filter @markstagram/server test:bun:codex`: median `31.95s` (about `24.4%` faster vs pre-Stage A bun)
+  - `pnpm --filter @markstagram/server test:bun`: median `31.95s` (about `24.4%` faster vs pre-Stage A bun)
 - Local Docker Postgres path:
   - `pnpm test:server:docker` end-to-end (container + migrations + tests): about `6.8s`
   - Vitest phase within docker run: about `2.2s`
@@ -139,7 +139,7 @@ Last updated: 2026-02-26
   - Fixed `websocket-auth.test.ts` to satisfy password hash integrity constraints under fresh local migrations.
   - Fixed env restoration in `upload-hardening.test.ts` to prevent cross-test pollution when running against fresh local databases.
   - Added test-mode cloud storage mocking to avoid external storage network calls.
-  - Re-ran serial suites for 3-run medians (`test:local` and `test:bun:codex`) and updated measured deltas.
+  - Re-ran serial suites for 3-run medians (`test:local` and `test:bun`) and updated measured deltas.
   - Added a shared seeded-user helper for non-auth integration tests and migrated repeated setup flows away from `/create_new_user`.
   - Re-ran serial suites for 3-run medians after helper consolidation and updated measured deltas.
   - Completed Stage C migration from `supertest` to Hono in-process request helper.
