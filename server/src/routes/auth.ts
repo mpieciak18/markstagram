@@ -1,11 +1,13 @@
 import { Hono } from 'hono';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
-import prisma from '../db.js';
+import db from '../db.js';
 import { comparePasswords, createJwt, hashPassword } from '../modules/auth.js';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { DatabaseError } from 'pg';
 import {
-  publicUserWithCountsSelect,
+  publicUserWithCountsColumns,
+  toPublicUserWithCounts,
   withoutPassword,
 } from '../modules/publicUser.js';
 import {
@@ -17,6 +19,7 @@ import {
   getSignInAttemptKey,
   recordFailedSignIn,
 } from '../modules/authAbuse.js';
+import { users } from '../db/schema.js';
 
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -32,6 +35,58 @@ const signInSchema = z.object({
 
 export const authRoutes = new Hono();
 
+const userWithPasswordAndCountsColumns = {
+  ...publicUserWithCountsColumns,
+  password: users.password,
+} as const;
+
+const findUserWithCountsById = async (id: number) => {
+  const row = await db
+    .select(publicUserWithCountsColumns)
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1);
+
+  return row[0] ? toPublicUserWithCounts(row[0]) : null;
+};
+
+const unwrapDatabaseError = (error: unknown): DatabaseError | null => {
+  if (error instanceof DatabaseError) return error;
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'cause' in error &&
+    (error as { cause?: unknown }).cause instanceof DatabaseError
+  ) {
+    return (error as { cause: DatabaseError }).cause;
+  }
+  return null;
+};
+
+const extractNotUniqueUserFields = (error: unknown): Array<'email' | 'username'> | null => {
+  const databaseError = unwrapDatabaseError(error);
+  if (!databaseError || databaseError.code !== '23505') {
+    return null;
+  }
+
+  const notUnique = new Set<'email' | 'username'>();
+
+  if (databaseError.constraint === 'User_email_key') notUnique.add('email');
+  if (databaseError.constraint === 'User_username_key') notUnique.add('username');
+
+  const detail = `${databaseError.detail ?? ''} ${databaseError.message ?? ''}`.toLowerCase();
+  if (detail.includes('email')) notUnique.add('email');
+  if (detail.includes('username')) notUnique.add('username');
+
+  if (notUnique.size === 0) {
+    notUnique.add('email');
+  }
+
+  return (['email', 'username'] as const).filter((field): field is 'email' | 'username' =>
+    notUnique.has(field),
+  );
+};
+
 authRoutes.post('/create_new_user', zValidator('json', createUserSchema), async (c) => {
   const data = c.req.valid('json');
   const clientId = getAuthClientId(c);
@@ -44,49 +99,20 @@ authRoutes.post('/create_new_user', zValidator('json', createUserSchema), async 
   const hashedPassword = await hashPassword(data.password);
 
   try {
-    const user = await prisma.user.create({
-      data: { ...data, password: hashedPassword },
-      select: publicUserWithCountsSelect,
-    });
+    const inserted = await db
+      .insert(users)
+      .values({ ...data, password: hashedPassword })
+      .returning({ id: users.id });
+
+    const user = await findUserWithCountsById(inserted[0].id);
+    if (!user) throw new Error('Failed to load created user');
+
     const token = await createJwt(user);
     return c.json({ token, user });
   } catch (e) {
-    const err = e as PrismaClientKnownRequestError;
-    if (err.code === 'P2002') {
-      const notUnique = new Set<string>();
-      if (Array.isArray(err.meta?.target)) {
-        err.meta.target.forEach((field) => {
-          if (field === 'email' || field === 'username') notUnique.add(field);
-        });
-      }
-
-      if (notUnique.size === 0) {
-        const existingUsers = await prisma.user.findMany({
-          where: {
-            OR: [{ email: data.email }, { username: data.username }],
-          },
-          select: { email: true, username: true },
-        });
-
-        if (existingUsers.some((user) => user.email === data.email)) {
-          notUnique.add('email');
-        }
-        if (existingUsers.some((user) => user.username === data.username)) {
-          notUnique.add('username');
-        }
-      }
-
-      // Fallback for adapters that omit `meta.target`
-      const message = String(err.message).toLowerCase();
-      if (message.includes('email')) notUnique.add('email');
-      if (message.includes('username')) notUnique.add('username');
-
-      if (notUnique.size === 0) notUnique.add('email');
-
-      const orderedFields = ['email', 'username'].filter((field) =>
-        notUnique.has(field),
-      );
-      return c.json({ notUnique: orderedFields }, 400);
+    const notUnique = extractNotUniqueUserFields(e);
+    if (notUnique) {
+      return c.json({ notUnique }, 400);
     }
     throw e;
   }
@@ -114,13 +140,13 @@ authRoutes.post('/sign_in', zValidator('json', signInSchema), async (c) => {
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      ...publicUserWithCountsSelect,
-      password: true,
-    },
-  });
+  const rows = await db
+    .select(userWithPasswordAndCountsColumns)
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  const user = rows[0];
 
   if (!user) {
     const failedAttempt = recordFailedSignIn(attemptKey);
@@ -148,6 +174,7 @@ authRoutes.post('/sign_in', zValidator('json', signInSchema), async (c) => {
   }
 
   clearFailedSignIns(attemptKey);
-  const token = await createJwt(user);
-  return c.json({ token, user: withoutPassword(user) });
+  const userWithoutPassword = withoutPassword(user);
+  const token = await createJwt(userWithoutPassword);
+  return c.json({ token, user: toPublicUserWithCounts(userWithoutPassword) });
 });

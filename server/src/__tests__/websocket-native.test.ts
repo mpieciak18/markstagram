@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import { eq, inArray } from 'drizzle-orm';
 import {
   RealtimeServerFrameSchema,
   type RealtimeServerFrame,
 } from '@markstagram/shared-types';
-import prisma from '../db.js';
+import db from '../db.js';
+import { conversations, conversationsToUsers, messages, users } from '../db/schema.js';
 import { createJwt } from '../modules/auth.js';
 import { NativeRealtimeHub, type NativeWsConnectionData } from '../realtime/nativeWs.js';
 
@@ -51,48 +53,50 @@ beforeEach(async () => {
   hub = new NativeRealtimeHub();
 
   const unique = `${runId}-${Math.random().toString(36).slice(2, 6)}`;
-  const userA = await prisma.user.create({
-    data: {
-      email: `native-ws-a-${unique}@test.com`,
-      username: `nwsA${unique.slice(0, 6)}`,
-      password: BCRYPT_TEST_PASSWORD_HASH,
-      name: 'Native WebSocket A',
-    },
-    select: { id: true, username: true },
-  });
-  const userB = await prisma.user.create({
-    data: {
-      email: `native-ws-b-${unique}@test.com`,
-      username: `nwsB${unique.slice(0, 6)}`,
-      password: BCRYPT_TEST_PASSWORD_HASH,
-      name: 'Native WebSocket B',
-    },
-    select: { id: true, username: true },
-  });
-  const blockedUser = await prisma.user.create({
-    data: {
-      email: `native-ws-c-${unique}@test.com`,
-      username: `nwsC${unique.slice(0, 6)}`,
-      password: BCRYPT_TEST_PASSWORD_HASH,
-      name: 'Native WebSocket Blocked',
-    },
-    select: { id: true, username: true },
-  });
 
-  const conversation = await prisma.conversation.create({
-    data: {
-      users: {
-        connect: [{ id: userA.id }, { id: userB.id }],
+  const insertedUsers = await db
+    .insert(users)
+    .values([
+      {
+        email: `native-ws-a-${unique}@test.com`,
+        username: `nwsA${unique.slice(0, 6)}`,
+        password: BCRYPT_TEST_PASSWORD_HASH,
+        name: 'Native WebSocket A',
       },
-    },
-    select: { id: true },
-  });
+      {
+        email: `native-ws-b-${unique}@test.com`,
+        username: `nwsB${unique.slice(0, 6)}`,
+        password: BCRYPT_TEST_PASSWORD_HASH,
+        name: 'Native WebSocket B',
+      },
+      {
+        email: `native-ws-c-${unique}@test.com`,
+        username: `nwsC${unique.slice(0, 6)}`,
+        password: BCRYPT_TEST_PASSWORD_HASH,
+        name: 'Native WebSocket Blocked',
+      },
+    ])
+    .returning({ id: users.id, username: users.username });
+
+  const [userA, userB, blockedUser] = insertedUsers;
+
+  const createdConversation = await db
+    .insert(conversations)
+    .values({})
+    .returning({ id: conversations.id });
+
+  const conversationId = createdConversation[0].id;
+
+  await db.insert(conversationsToUsers).values([
+    { conversationId, userId: userA.id },
+    { conversationId, userId: userB.id },
+  ]);
 
   fixture = {
     userA,
     userB,
     blockedUser,
-    conversationId: conversation.id,
+    conversationId,
   };
 });
 
@@ -101,17 +105,11 @@ afterEach(async () => {
     return;
   }
 
-  await prisma.message.deleteMany({
-    where: { conversationId: fixture.conversationId },
-  });
-  await prisma.conversation.deleteMany({
-    where: { id: fixture.conversationId },
-  });
-  await prisma.user.deleteMany({
-    where: {
-      id: { in: [fixture.userA.id, fixture.userB.id, fixture.blockedUser.id] },
-    },
-  });
+  await db.delete(messages).where(eq(messages.conversationId, fixture.conversationId));
+  await db.delete(conversations).where(eq(conversations.id, fixture.conversationId));
+  await db
+    .delete(users)
+    .where(inArray(users.id, [fixture.userA.id, fixture.userB.id, fixture.blockedUser.id]));
 });
 
 describe('native websocket realtime hub', () => {

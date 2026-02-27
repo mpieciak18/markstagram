@@ -1,5 +1,7 @@
 import type { Message } from '@markstagram/shared-types';
-import prisma from '../db.js';
+import { and, eq } from 'drizzle-orm';
+import db from '../db.js';
+import { conversationsToUsers, messages, users } from '../db/schema.js';
 import { jwtVerify } from 'jose';
 import { SocketMessage, SocketMessageErr } from '@markstagram/shared-types';
 
@@ -51,14 +53,18 @@ export const isConversationParticipant = async (
   userId: number,
   conversationId: number,
 ): Promise<boolean> => {
-  const conversation = await prisma.conversation.findFirst({
-    where: {
-      id: conversationId,
-      users: { some: { id: userId } },
-    },
-    select: { id: true },
-  });
-  return Boolean(conversation);
+  const rows = await db
+    .select({ conversationId: conversationsToUsers.conversationId })
+    .from(conversationsToUsers)
+    .where(
+      and(
+        eq(conversationsToUsers.userId, userId),
+        eq(conversationsToUsers.conversationId, conversationId),
+      ),
+    )
+    .limit(1);
+
+  return rows.length > 0;
 };
 
 export const createConversationMessage = async (
@@ -66,13 +72,16 @@ export const createConversationMessage = async (
   conversationId: number,
   message: string,
 ): Promise<Message> => {
-  return prisma.message.create({
-    data: {
+  const inserted = await db
+    .insert(messages)
+    .values({
       conversationId,
       senderId: userId,
       message,
-    },
-  });
+    })
+    .returning();
+
+  return inserted[0] as Message;
 };
 
 // Middleware for creating new messages from websocket
@@ -105,12 +114,10 @@ export const createMessage = async (
     if (message) {
       socket.emit('newMessage', message);
       return message;
-    } else {
-      // Handle error: No message created
-      socket.emit('error', { message: 'Message creation failed.' });
     }
-  } catch (e) {
-    // Handle database error
+
+    socket.emit('error', { message: 'Message creation failed.' });
+  } catch {
     socket.emit('error', { message: 'Database error occurred.' });
   }
 };
@@ -179,17 +186,20 @@ export const retrieveUserFromToken = async (
       throw new Error('Authentication error');
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: { id: true, username: true },
-    });
+    const rows = await db
+      .select({ id: users.id, username: users.username })
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    const user = rows[0];
 
     if (!user) {
       throw new Error('Authentication error');
     }
 
     return user;
-  } catch (e) {
+  } catch {
     throw new Error('Authentication error');
   }
 };

@@ -1,11 +1,31 @@
 import supertest from './helpers/httpClient.js';
+import { and, eq, or, sql } from 'drizzle-orm';
 import { describe, expect, it } from 'bun:test';
 import app from '../app.js';
-import prisma from '../db.js';
+import db from '../db.js';
+import {
+  comments,
+  follows,
+  likes,
+  messages,
+  notifications,
+  posts,
+  saves,
+  users,
+} from '../db/schema.js';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 const imageUrlPattern = /^(http|https):\/\/[^ "]+$/;
+
+const countWhere = async (table: any, whereClause: any) => {
+  const rows = await db
+    .select({ count: sql<number>`COUNT(*)::int` })
+    .from(table)
+    .where(whereClause);
+
+  return rows[0]?.count ?? 0;
+};
 
 describe('delete integrity and cascade behavior', () => {
   it('should delete a conversation that still has messages', async () => {
@@ -43,9 +63,7 @@ describe('delete integrity and cascade behavior', () => {
       .send({ id: conversationId });
     expect(deleteConvo.status).toBe(200);
 
-    const remainingMessages = await prisma.message.count({
-      where: { conversationId },
-    });
+    const remainingMessages = await countWhere(messages, eq(messages.conversationId, conversationId));
     expect(remainingMessages).toBe(0);
 
     const deleteA = await supertest(app)
@@ -147,47 +165,30 @@ describe('delete integrity and cascade behavior', () => {
       .set('Authorization', `Bearer ${tokenA}`);
     expect(deleteA.status).toBe(200);
 
-    const [
-      remainingUserA,
-      remainingPosts,
-      remainingComments,
-      remainingLikes,
-      remainingSaves,
-      remainingFollows,
-      remainingMessages,
-      remainingNotifications,
-    ] = await Promise.all([
-      prisma.user.findUnique({ where: { id: userAId } }),
-      prisma.post.count({ where: { OR: [{ userId: userAId }, { id: postId }] } }),
-      prisma.comment.count({
-        where: {
-          OR: [{ userId: userAId }, { postId }],
-        },
-      }),
-      prisma.like.count({
-        where: {
-          OR: [{ userId: userAId }, { postId }],
-        },
-      }),
-      prisma.save.count({
-        where: {
-          OR: [{ userId: userAId }, { postId }],
-        },
-      }),
-      prisma.follow.count({
-        where: {
-          OR: [{ giverId: userAId }, { receiverId: userAId }],
-        },
-      }),
-      prisma.message.count({ where: { senderId: userAId } }),
-      prisma.notification.count({
-        where: {
-          OR: [{ userId: userAId }, { otherUserId: userAId }, { postId }],
-        },
-      }),
-    ]);
+    const [remainingUserA, remainingPosts, remainingComments, remainingLikes, remainingSaves, remainingFollows, remainingMessages, remainingNotifications] =
+      await Promise.all([
+        db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, userAId))
+          .limit(1),
+        countWhere(posts, or(eq(posts.userId, userAId), eq(posts.id, postId))),
+        countWhere(comments, or(eq(comments.userId, userAId), eq(comments.postId, postId))),
+        countWhere(likes, or(eq(likes.userId, userAId), eq(likes.postId, postId))),
+        countWhere(saves, or(eq(saves.userId, userAId), eq(saves.postId, postId))),
+        countWhere(follows, or(eq(follows.giverId, userAId), eq(follows.receiverId, userAId))),
+        countWhere(messages, eq(messages.senderId, userAId)),
+        countWhere(
+          notifications,
+          or(
+            eq(notifications.userId, userAId),
+            eq(notifications.otherUserId, userAId),
+            eq(notifications.postId, postId),
+          ),
+        ),
+      ]);
 
-    expect(remainingUserA).toBeNull();
+    expect(remainingUserA[0]).toBeUndefined();
     expect(remainingPosts).toBe(0);
     expect(remainingComments).toBe(0);
     expect(remainingLikes).toBe(0);

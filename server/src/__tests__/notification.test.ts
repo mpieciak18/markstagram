@@ -47,7 +47,7 @@ describe('/api/notification', () => {
       .attach('file', './src/__tests__/test.png');
     post = response3.body.post;
     expect(response3.status).toBe(200);
-    expect(post?.userId).toBe(otherUser.id);
+    expect(post?.userId).toBe(otherUser.id!);
     expect(post?.caption).toBe(caption);
     expect(post?.image).toMatch(urlPattern);
   });

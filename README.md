@@ -6,7 +6,7 @@ This project is from the [the Odin Project](https://www.theodinproject.com) (spe
 
 ~~[Click here] to read more about the project specifications.~~ (Update: the Odin Project has restructured their Full Stack Javascript curriculum since version 1.0 of this app was created, and the original link no longer works. [Click here](https://www.theodinproject.com/lessons/nodejs-odin-book) for what this project has since been ported to.)
 
-Version 2.0 has replaced Firebase as its server (for database API calls & authentication) with its own server, built in Typescript, Node, Express, Prisma, and Postgres.
+Version 2.0 has replaced Firebase as its server (for database API calls & authentication) with its own server, built in Typescript, Bun, Hono, Drizzle ORM, and Postgres.
 
 Additionally, the client has been rewritten from Javascript to Typescript, as well as converted from CRA to Vite.
 
@@ -30,12 +30,10 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 ## Local Docker Test DB
 
 - Use `pnpm test:server:docker` to run the server tests against a local Postgres container.
-- One-time prerequisite for `DATABASE_ADAPTER=direct`:
-  - `pnpm --filter @markstagram/server add @prisma/adapter-pg pg`
 - The command:
   - starts `docker-compose.test.yml`,
-  - applies Prisma migrations,
-  - runs `server` tests with `DATABASE_ADAPTER=direct`,
+  - applies Drizzle migrations,
+  - runs `server` tests against Docker Postgres,
   - tears the container down automatically.
 - Optional: run `pnpm test:server:docker:keepdb` to keep the test DB up after tests finish.
 - Env defaults come from [`server/.env.test.sample`](./server/.env.test.sample). Create `server/.env.test` to override.
@@ -54,7 +52,7 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 
 1. To recreate a fully-functional clone of Instagram that any external user can sign up for and start using.
 2. To implement a polished client-side app that is written in React & Typescript.
-3. To write & integrate an API built in Node, Express, Typescript, Prisma, and Postgres.
+3. To write & integrate an API built in Bun, Hono, Typescript, Drizzle ORM, and Postgres.
 
 ## Current Technologies Used
 
@@ -87,7 +85,7 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 5. View individual post pages and scroll through its full list of comments.
 6. Comment on, like, and save posts along with clicking-to-copy URLs for sharing with others.
 7. Send other users private direct messages in a chat system that updates in real-time, powered by native WebSockets.
-8. Search for user profiles to view & users to direct message, thanks to queries in Prisma & Postgres.
+8. Search for user profiles to view & users to direct message, thanks to queries in Drizzle ORM & Postgres.
 
 ## Instructions
 

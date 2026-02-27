@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
+import { eq, inArray } from 'drizzle-orm';
 import { createJwt } from '../modules/auth.js';
-import prisma from '../db.js';
+import db from '../db.js';
+import { conversations, conversationsToUsers, messages, users } from '../db/schema.js';
 import {
   createMessage,
   joinConversationRoom,
@@ -47,48 +49,50 @@ beforeEach(async () => {
   process.env.JWT_SECRET = process.env.JWT_SECRET ?? 'test-jwt-secret';
 
   const unique = `${runId}-${Math.random().toString(36).slice(2, 6)}`;
-  const userA = await prisma.user.create({
-    data: {
-      email: `ws-a-${unique}@test.com`,
-      username: `wsa${unique.slice(0, 6)}`,
-      password: BCRYPT_TEST_PASSWORD_HASH,
-      name: 'Websocket A',
-    },
-    select: { id: true, username: true },
-  });
-  const userB = await prisma.user.create({
-    data: {
-      email: `ws-b-${unique}@test.com`,
-      username: `wsb${unique.slice(0, 6)}`,
-      password: BCRYPT_TEST_PASSWORD_HASH,
-      name: 'Websocket B',
-    },
-    select: { id: true, username: true },
-  });
-  const userC = await prisma.user.create({
-    data: {
-      email: `ws-c-${unique}@test.com`,
-      username: `wsc${unique.slice(0, 6)}`,
-      password: BCRYPT_TEST_PASSWORD_HASH,
-      name: 'Websocket C',
-    },
-    select: { id: true, username: true },
-  });
 
-  const conversation = await prisma.conversation.create({
-    data: {
-      users: {
-        connect: [{ id: userA.id }, { id: userB.id }],
+  const insertedUsers = await db
+    .insert(users)
+    .values([
+      {
+        email: `ws-a-${unique}@test.com`,
+        username: `wsa${unique.slice(0, 6)}`,
+        password: BCRYPT_TEST_PASSWORD_HASH,
+        name: 'Websocket A',
       },
-    },
-    select: { id: true },
-  });
+      {
+        email: `ws-b-${unique}@test.com`,
+        username: `wsb${unique.slice(0, 6)}`,
+        password: BCRYPT_TEST_PASSWORD_HASH,
+        name: 'Websocket B',
+      },
+      {
+        email: `ws-c-${unique}@test.com`,
+        username: `wsc${unique.slice(0, 6)}`,
+        password: BCRYPT_TEST_PASSWORD_HASH,
+        name: 'Websocket C',
+      },
+    ])
+    .returning({ id: users.id, username: users.username });
+
+  const [userA, userB, userC] = insertedUsers;
+
+  const createdConversation = await db
+    .insert(conversations)
+    .values({})
+    .returning({ id: conversations.id });
+
+  const conversationId = createdConversation[0].id;
+
+  await db.insert(conversationsToUsers).values([
+    { conversationId, userId: userA.id },
+    { conversationId, userId: userB.id },
+  ]);
 
   fixture = {
     allowedUser: userA,
     allowedUserTwo: userB,
     blockedUser: userC,
-    conversationId: conversation.id,
+    conversationId,
   };
 });
 
@@ -97,25 +101,13 @@ afterEach(async () => {
     return;
   }
 
-  await prisma.message.deleteMany({
-    where: {
-      conversationId: fixture.conversationId,
-    },
-  });
-
-  await prisma.conversation.deleteMany({
-    where: {
-      id: fixture.conversationId,
-    },
-  });
-
-  await prisma.user.deleteMany({
-    where: {
-      id: {
-        in: [fixture.allowedUser.id, fixture.allowedUserTwo.id, fixture.blockedUser.id],
-      },
-    },
-  });
+  await db.delete(messages).where(eq(messages.conversationId, fixture.conversationId));
+  await db.delete(conversations).where(eq(conversations.id, fixture.conversationId));
+  await db
+    .delete(users)
+    .where(
+      inArray(users.id, [fixture.allowedUser.id, fixture.allowedUserTwo.id, fixture.blockedUser.id]),
+    );
 });
 
 describe('websocket auth hardening', () => {
@@ -132,7 +124,7 @@ describe('websocket auth hardening', () => {
       username: fixture.blockedUser.username,
     });
 
-    await prisma.user.delete({ where: { id: fixture.blockedUser.id } });
+    await db.delete(users).where(eq(users.id, fixture.blockedUser.id));
 
     await expect(retrieveUserFromToken(token)).rejects.toThrow('Authentication error');
   });

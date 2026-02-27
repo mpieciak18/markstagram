@@ -39,21 +39,12 @@ else
 fi
 
 : "${DATABASE_URL:?DATABASE_URL must be set for local docker tests}"
-export DATABASE_ADAPTER="${DATABASE_ADAPTER:-direct}"
-
-if [[ "$DATABASE_ADAPTER" == "direct" ]]; then
-  if ! pnpm exec node -e "require.resolve('@prisma/adapter-pg'); require.resolve('pg')" >/dev/null 2>&1; then
-    echo "Missing required packages for DATABASE_ADAPTER=direct."
-    echo "Install with: pnpm --filter @markstagram/server add @prisma/adapter-pg pg"
-    exit 1
-  fi
-fi
 
 echo "Starting local Postgres test container..."
 "${DOCKER_COMPOSE[@]}" -f "$COMPOSE_FILE" up -d --wait
 
-echo "Applying Prisma migrations..."
-pnpm prisma:migrate:test
+echo "Applying Drizzle migrations..."
+pnpm db:migrate
 
 echo "Running server test suite..."
 SERVER_TEST_SCRIPT="${SERVER_TEST_SCRIPT:-test:inner:run}"

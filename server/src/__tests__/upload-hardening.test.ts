@@ -1,7 +1,9 @@
 import supertest from './helpers/httpClient.js';
 import { afterEach, describe, expect, it } from 'bun:test';
+import { eq, inArray, sql } from 'drizzle-orm';
 import app from '../app.js';
-import prisma from '../db.js';
+import db from '../db.js';
+import { posts, users } from '../db/schema.js';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
 
 const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -20,6 +22,15 @@ const restoreEnvVar = (
   }
 
   process.env[key] = value;
+};
+
+const countPostsForUser = async (userId: number): Promise<number> => {
+  const rows = await db
+    .select({ count: sql<number>`COUNT(*)::int` })
+    .from(posts)
+    .where(eq(posts.userId, userId));
+
+  return rows[0]?.count ?? 0;
 };
 
 const createUserAndToken = async (suffix: string) => {
@@ -49,11 +60,7 @@ afterEach(async () => {
   }
 
   if (userIdsToCleanup.length > 0) {
-    await prisma.user.deleteMany({
-      where: {
-        id: { in: userIdsToCleanup.splice(0, userIdsToCleanup.length) },
-      },
-    });
+    await db.delete(users).where(inArray(users.id, userIdsToCleanup.splice(0, userIdsToCleanup.length)));
   }
 });
 
@@ -74,7 +81,7 @@ describe('upload hardening', () => {
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('Unsupported file type');
 
-    const count = await prisma.post.count({ where: { userId } });
+    const count = await countPostsForUser(userId);
     expect(count).toBe(0);
   });
 
@@ -96,7 +103,7 @@ describe('upload hardening', () => {
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('Invalid file signature');
 
-    const count = await prisma.post.count({ where: { userId } });
+    const count = await countPostsForUser(userId);
     expect(count).toBe(0);
   });
 
@@ -116,7 +123,7 @@ describe('upload hardening', () => {
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('File is too large');
 
-    const count = await prisma.post.count({ where: { userId } });
+    const count = await countPostsForUser(userId);
     expect(count).toBe(0);
   });
 });

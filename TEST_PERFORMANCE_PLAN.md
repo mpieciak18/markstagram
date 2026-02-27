@@ -113,17 +113,15 @@ Last updated: 2026-02-27
 - [x] Add root `docker-compose.test.yml` for Postgres 16 with healthcheck.
 - [x] Add `server/.env.test.sample` with local DB defaults.
 - [x] Add one-command local flow to boot DB, run migrations, run server tests, and tear DB down.
-- [x] Add DB adapter mode for tests to use direct Postgres (`DATABASE_ADAPTER=direct`) while keeping Neon default behavior.
-- [x] Document one-time dependency requirement for direct adapter mode:
-  - `pnpm --filter @markstagram/server add @prisma/adapter-pg pg`
+- [x] Standardize tests on direct Postgres via `DATABASE_URL` only (no adapter flag).
+- [x] Remove adapter-specific dependency/documentation requirements.
 
 ## CI/CD Note (Documentation Only for Now)
 
 - [x] Document CI strategy (GitHub Actions service container + migrate + test).
   - Use a Postgres service container (`postgres:16`) with health checks.
   - Set `DATABASE_URL` to the service host/port.
-  - Set `DATABASE_ADAPTER=direct` for CI test jobs using local Postgres service.
-  - Run `pnpm --filter @markstagram/server prisma:migrate:test` then `pnpm --filter @markstagram/server test`.
+  - Run `pnpm --filter @markstagram/server db:migrate` then `pnpm --filter @markstagram/server test`.
 - [ ] Implement CI workflow file (deferred by request).
 
 ## Future Scope: Bun Test Rewrite

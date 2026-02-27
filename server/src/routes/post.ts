@@ -1,11 +1,13 @@
 import { Hono } from 'hono';
+import { desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
-import prisma from '../db.js';
+import db from '../db.js';
+import { posts, users } from '../db/schema.js';
 import { deleteFileFromStorage } from '../config/gcloud.js';
 import { uploadImage } from '../middleware/upload.js';
 import type { AppEnv } from '../app.js';
-import { publicUserSelect } from '../modules/publicUser.js';
+import { publicUserColumns, toPublicUser } from '../modules/publicUser.js';
 
 const idSchema = z.object({ id: z.number().int() });
 const limitSchema = z.object({ limit: z.number().int() });
@@ -16,6 +18,44 @@ const updateSchema = z.object({ id: z.number().int(), caption: captionSchema });
 
 export const postRoutes = new Hono<AppEnv>();
 
+const postWithCountsColumns = {
+  id: posts.id,
+  createdAt: posts.createdAt,
+  image: posts.image,
+  caption: posts.caption,
+  userId: posts.userId,
+  commentsCount: sql<number>`(
+    SELECT COUNT(*)::int
+    FROM "Comment"
+    WHERE "Comment"."postId" = ${posts.id}
+  )`.as('commentsCount'),
+  likesCount: sql<number>`(
+    SELECT COUNT(*)::int
+    FROM "Like"
+    WHERE "Like"."postId" = ${posts.id}
+  )`.as('likesCount'),
+} as const;
+
+const toPostWithCounts = (row: {
+  id: number;
+  createdAt: Date;
+  image: string;
+  caption: string;
+  userId: number;
+  commentsCount: number;
+  likesCount: number;
+}) => ({
+  id: row.id,
+  createdAt: row.createdAt,
+  image: row.image,
+  caption: row.caption,
+  userId: row.userId,
+  _count: {
+    comments: row.commentsCount,
+    likes: row.likesCount,
+  },
+});
+
 postRoutes.post('/', uploadImage, async (c) => {
   const user = c.get('user');
   const image = c.get('image' as never) as string;
@@ -25,83 +65,121 @@ postRoutes.post('/', uploadImage, async (c) => {
   if (!image) return c.json({ message: 'Image upload failed' }, 500);
   if (!parsed.success) return c.json({ message: 'Invalid input' }, 400);
 
-  const post = await prisma.post.create({
-    data: { image, caption: parsed.data.caption, userId: user.id },
-  });
-  return c.json({ post });
+  const inserted = await db
+    .insert(posts)
+    .values({ image, caption: parsed.data.caption, userId: user.id })
+    .returning();
+
+  return c.json({ post: inserted[0] });
 });
 
 postRoutes.post('/all', zValidator('json', limitSchema), async (c) => {
   const { limit } = c.req.valid('json');
-  const posts = await prisma.post.findMany({
-    take: limit,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      _count: { select: { comments: true, likes: true } },
-      user: { select: publicUserSelect },
-    },
-  });
-  return c.json({ posts });
+
+  const rows = await db
+    .select({
+      post: postWithCountsColumns,
+      user: publicUserColumns,
+    })
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .orderBy(desc(posts.createdAt))
+    .limit(limit);
+
+  const mapped = rows.map((row) => ({
+    ...toPostWithCounts(row.post),
+    user: toPublicUser(row.user),
+  }));
+
+  return c.json({ posts: mapped });
 });
 
 postRoutes.post('/single', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
-  const post = await prisma.post.findUnique({
-    where: { id },
-    include: {
-      _count: { select: { comments: true, likes: true } },
-      user: { select: publicUserSelect },
+
+  const rows = await db
+    .select({
+      post: postWithCountsColumns,
+      user: publicUserColumns,
+    })
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .where(eq(posts.id, id))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) return c.json({ message: 'Post not found' }, 404);
+
+  return c.json({
+    post: {
+      ...toPostWithCounts(row.post),
+      user: toPublicUser(row.user),
     },
   });
-  if (!post) return c.json({ message: 'Post not found' }, 404);
-  return c.json({ post });
 });
 
 postRoutes.post('/user', zValidator('json', idLimitSchema), async (c) => {
   const { id, limit } = c.req.valid('json');
 
-  const otherUser = await prisma.user.findUnique({ where: { id } });
-  if (!otherUser) return c.json({ message: 'User not found' }, 404);
+  const otherUser = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1);
 
-  const posts = await prisma.post.findMany({
-    where: { userId: id },
-    take: limit,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      _count: { select: { comments: true, likes: true } },
-    },
-  });
-  return c.json({ posts });
+  if (!otherUser[0]) return c.json({ message: 'User not found' }, 404);
+
+  const rows = await db
+    .select(postWithCountsColumns)
+    .from(posts)
+    .where(eq(posts.userId, id))
+    .orderBy(desc(posts.createdAt))
+    .limit(limit);
+
+  return c.json({ posts: rows.map((row) => toPostWithCounts(row)) });
 });
 
 postRoutes.put('/', zValidator('json', updateSchema), async (c) => {
   const { id, caption } = c.req.valid('json');
   const user = c.get('user');
-  const existingPost = await prisma.post.findUnique({
-    where: { id },
-    select: { id: true, userId: true },
-  });
-  if (!existingPost) return c.json({ message: 'Post not found' }, 404);
-  if (existingPost.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
 
-  const post = await prisma.post.update({
-    where: { id },
-    data: { caption },
-  });
-  return c.json({ post });
+  const existingPost = await db
+    .select({ id: posts.id, userId: posts.userId })
+    .from(posts)
+    .where(eq(posts.id, id))
+    .limit(1);
+
+  if (!existingPost[0]) return c.json({ message: 'Post not found' }, 404);
+  if (existingPost[0].userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
+  const updated = await db
+    .update(posts)
+    .set({ caption })
+    .where(eq(posts.id, id))
+    .returning();
+
+  return c.json({ post: updated[0] });
 });
 
 postRoutes.delete('/', zValidator('json', idSchema), async (c) => {
   const { id } = c.req.valid('json');
   const user = c.get('user');
-  const existingPost = await prisma.post.findUnique({
-    where: { id },
-    select: { id: true, userId: true },
-  });
-  if (!existingPost) return c.json({ message: 'Post not found' }, 404);
-  if (existingPost.userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
 
-  const post = await prisma.post.delete({ where: { id } });
-  await deleteFileFromStorage(post.image);
+  const existingPost = await db
+    .select({ id: posts.id, userId: posts.userId })
+    .from(posts)
+    .where(eq(posts.id, id))
+    .limit(1);
+
+  if (!existingPost[0]) return c.json({ message: 'Post not found' }, 404);
+  if (existingPost[0].userId !== user.id) return c.json({ message: 'Forbidden' }, 403);
+
+  const deleted = await db.delete(posts).where(eq(posts.id, id)).returning();
+  const post = deleted[0];
+
+  if (post) {
+    await deleteFileFromStorage(post.image);
+  }
+
   return c.json({ post });
 });

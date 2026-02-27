@@ -1,8 +1,10 @@
 import { createMiddleware } from 'hono/factory';
 import { jwtVerify } from 'jose';
-import prisma from '../db.js';
+import { eq } from 'drizzle-orm';
+import db from '../db.js';
+import { users } from '../db/schema.js';
 import type { AppEnv } from '../app.js';
-import { publicUserSelect } from '../modules/publicUser.js';
+import { publicUserColumns, toPublicUser } from '../modules/publicUser.js';
 
 export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   if (!process.env.JWT_SECRET) {
@@ -23,19 +25,26 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    const { id } = payload as { id: number; username: string };
+    const id = Number(payload.id);
 
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: publicUserSelect,
-    });
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return c.json({ message: 'Token Unverifiable' }, 401);
+    }
+
+    const rows = await db
+      .select(publicUserColumns)
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    const user = rows[0] ? toPublicUser(rows[0]) : null;
     if (!user) {
       return c.json({ message: 'User not found' }, 401);
     }
 
     c.set('user', user);
     await next();
-  } catch (e) {
+  } catch {
     return c.json({ message: 'Token Unverifiable' }, 401);
   }
 });
