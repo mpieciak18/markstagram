@@ -132,7 +132,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 
 ## Separate Scope Backlog (Lower Priority)
 
-- [ ] Optional runtime-agnostic cleanup:
+- [x] Optional runtime-agnostic cleanup:
   - replace `import { randomUUID } from 'crypto'` with `globalThis.crypto.randomUUID()`
 
 ## Recommended Execution Order
@@ -247,3 +247,5 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - removed `dev:bun` aliases from root/client/server,
     - removed redundant `startbuilt:bun`,
     - added canonical server `start` script (`bun run dist/index.bun.js`).
+  - Completed optional runtime-agnostic cleanup:
+    - replaced Node `randomUUID` import in upload middleware with `globalThis.crypto.randomUUID()`.

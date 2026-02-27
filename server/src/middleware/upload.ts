@@ -1,6 +1,5 @@
 import { createMiddleware } from 'hono/factory';
 import { bucket, getUrl } from '../config/gcloud.js';
-import { randomUUID } from 'crypto';
 import type { AppEnv } from '../app.js';
 
 type UploadEnv = AppEnv & {
@@ -130,7 +129,7 @@ export const uploadImage = createMiddleware<UploadEnv>(async (c, next) => {
       return c.json({ message: 'Invalid file signature' }, 400);
     }
 
-    const fileName = `${randomUUID()}.${extension}`;
+    const fileName = `${globalThis.crypto.randomUUID()}.${extension}`;
     const fileRef = bucket.file(fileName);
     await fileRef.save(buffer, { contentType: normalizedMimeType });
     const image = await getUrl(fileRef);
