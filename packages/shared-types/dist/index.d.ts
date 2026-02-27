@@ -133,4 +133,5 @@ export interface SyncErr extends Error {
 export interface HasOtherUser {
     otherUser: User;
 }
+export * from './realtime.js';
 //# sourceMappingURL=index.d.ts.map

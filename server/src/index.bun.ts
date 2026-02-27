@@ -1,15 +1,22 @@
 import { createServer } from 'node:http';
 import type { Server as HttpServer } from 'node:http';
+import { NativeRealtimeHub } from './realtime/nativeWs.js';
 
 type BunApiServer = {
   port: number;
+  upgrade: (request: Request, options?: { data?: unknown }) => boolean;
   stop: (closeActiveConnections?: boolean) => void;
 };
 
 type BunRuntime = {
   serve: (options: {
     port: number;
-    fetch: (request: Request) => Response | Promise<Response>;
+    fetch: (request: Request, server: BunApiServer) => Response | Promise<Response> | undefined;
+    websocket?: {
+      open?: (ws: unknown) => void;
+      message?: (ws: unknown, message: string | ArrayBuffer | Uint8Array) => void;
+      close?: (ws: unknown) => void;
+    };
   }) => BunApiServer;
 };
 
@@ -25,10 +32,9 @@ const closeServer = async (server: HttpServer): Promise<void> => {
   });
 };
 
-const [{ config }, { default: app }, { attachSocketServer }] = await Promise.all([
+const [{ config }, { default: app }] = await Promise.all([
   import('./config/index.js'),
   import('./app.js'),
-  import('./socketServer.js'),
 ]);
 
 const bunRuntime = (globalThis as { Bun?: BunRuntime }).Bun;
@@ -37,35 +43,74 @@ if (!bunRuntime) {
 }
 
 const apiPort = Number(process.env.PORT || config.port);
+const realtimeTransport = (process.env.REALTIME_TRANSPORT ?? 'native-ws').toLowerCase();
+
+if (realtimeTransport !== 'native-ws' && realtimeTransport !== 'socketio') {
+  throw new Error('REALTIME_TRANSPORT must be one of: native-ws, socketio');
+}
+
+const nativeRealtimeHub = realtimeTransport === 'native-ws' ? new NativeRealtimeHub() : null;
+
 const socketPort = Number(process.env.SOCKET_PORT || apiPort + 1);
 
-if (socketPort === apiPort) {
+if (realtimeTransport === 'socketio' && socketPort === apiPort) {
   throw new Error('SOCKET_PORT must differ from PORT when running index.bun.ts');
 }
 
 const apiServer = bunRuntime.serve({
   port: apiPort,
-  fetch: app.fetch,
+  fetch: (request, server) => {
+    if (!nativeRealtimeHub) {
+      return app.fetch(request);
+    }
+
+    const url = new URL(request.url);
+    if (url.pathname !== '/ws') {
+      return app.fetch(request);
+    }
+
+    if (!nativeRealtimeHub.canUpgrade(request)) {
+      return new Response('Not allowed by CORS', { status: 403 });
+    }
+
+    if (!server.upgrade(request, { data: nativeRealtimeHub.createConnectionData() })) {
+      return new Response('WebSocket upgrade failed.', { status: 400 });
+    }
+
+    return;
+  },
+  websocket: nativeRealtimeHub?.getBunHandlers(),
 });
 
-const socketHttpServer = createServer((_, res) => {
-  res.writeHead(404, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ message: 'not found' }));
-});
+let socketHttpServer: HttpServer | null = null;
 
-attachSocketServer(socketHttpServer);
+if (realtimeTransport === 'socketio') {
+  const { attachSocketServer } = await import('./socketServer.js');
+  socketHttpServer = createServer((_, res) => {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'not found' }));
+  });
 
-await new Promise<void>((resolve, reject) => {
-  socketHttpServer.once('error', reject);
-  socketHttpServer.listen(socketPort, () => resolve());
-});
+  attachSocketServer(socketHttpServer);
+
+  await new Promise<void>((resolve, reject) => {
+    socketHttpServer?.once('error', reject);
+    socketHttpServer?.listen(socketPort, () => resolve());
+  });
+}
 
 console.log(`bun api server running on port ${apiServer.port}`);
-console.log(`socket.io compatibility server running on port ${socketPort}`);
+if (realtimeTransport === 'socketio') {
+  console.log(`socket.io compatibility server running on port ${socketPort}`);
+} else {
+  console.log('native websocket server running on /ws');
+}
 
 const shutdown = async (): Promise<void> => {
   try {
-    await closeServer(socketHttpServer);
+    if (socketHttpServer) {
+      await closeServer(socketHttpServer);
+    }
   } finally {
     apiServer.stop(true);
   }

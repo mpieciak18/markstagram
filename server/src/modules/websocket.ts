@@ -2,7 +2,6 @@ import type { Message } from '@markstagram/shared-types';
 import prisma from '../db.js';
 import { jwtVerify } from 'jose';
 import { SocketMessage, SocketMessageErr } from '@markstagram/shared-types';
-import type { Socket } from 'socket.io';
 
 export interface TokenPayload {
   id: number;
@@ -17,7 +16,7 @@ export interface SocketRoomClient extends SocketEventClient {
   join(room: string): void | Promise<void>;
 }
 
-const parseConversationId = (value: unknown): number | null => {
+export const parseConversationId = (value: unknown): number | null => {
   if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
     return value;
   }
@@ -48,7 +47,7 @@ const normalizeSocketToken = (tokenInput: unknown): string => {
   return raw;
 };
 
-const isConversationParticipant = async (
+export const isConversationParticipant = async (
   userId: number,
   conversationId: number,
 ): Promise<boolean> => {
@@ -60,6 +59,20 @@ const isConversationParticipant = async (
     select: { id: true },
   });
   return Boolean(conversation);
+};
+
+export const createConversationMessage = async (
+  userId: number,
+  conversationId: number,
+  message: string,
+): Promise<Message> => {
+  return prisma.message.create({
+    data: {
+      conversationId,
+      senderId: userId,
+      message,
+    },
+  });
 };
 
 // Middleware for creating new messages from websocket
@@ -87,13 +100,7 @@ export const createMessage = async (
       return;
     }
 
-    const message: Message = await prisma.message.create({
-      data: {
-        conversationId,
-        senderId: user.id,
-        message: data.message as string,
-      },
-    });
+    const message = await createConversationMessage(user.id, conversationId, data.message as string);
 
     if (message) {
       socket.emit('newMessage', message);

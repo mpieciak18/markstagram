@@ -21,11 +21,12 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Current default runtime is Bun (native-first).
 - Bun migration is staged. See [BUN_MIGRATION_PLAN.md](./BUN_MIGRATION_PLAN.md).
 - Local Bun commands:
-  - `pnpm dev:bun` (native-first Bun API + Socket.IO compatibility server)
+  - `pnpm dev:bun` (Bun API + native WebSocket on `/ws`)
   - `pnpm --filter @markstagram/server test`
-- Socket URL behavior:
-  - If `VITE_SOCKET_URL` is set, the client uses it directly.
-  - If unset in local dev, client defaults to `VITE_API_URL` with `+1` port (for example, `3001 -> 3002`).
+- Realtime transport behavior:
+  - `VITE_REALTIME_TRANSPORT` defaults to `native-ws`.
+  - Native WS endpoint defaults to `VITE_API_URL` with `/ws` and `ws://` / `wss://` protocol mapping.
+  - Optional rollback path remains available via `REALTIME_TRANSPORT=socketio` (server) + `VITE_REALTIME_TRANSPORT=socketio` (client), using `VITE_SOCKET_URL`.
 
 ## Local Docker Test DB
 

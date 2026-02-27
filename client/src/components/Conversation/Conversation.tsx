@@ -6,10 +6,9 @@ import type {
 	Message,
 } from '@markstagram/shared-types';
 import { useEffect, useState } from 'react';
-import { type Socket, io } from 'socket.io-client';
 import { getToken } from '../../services/localstor';
-import { SOCKET_BASE_URL } from '../../services/api';
 import { createConvo, getSingleConvo } from '../../services/messages';
+import { createRealtimeClient, type RealtimeClient } from '../../services/realtime';
 import { useUser } from '../../queries/useUserQueries';
 import { Navbar } from '../other/Navbar';
 import { ConvoMessages } from './children/ConvoMessages';
@@ -22,8 +21,7 @@ const ConvoPage = () => {
 	const navigate = useNavigate();
 	const [isFetching, setIsFetching] = useState(false);
 
-	// Socket state
-	const [socket, setSocket] = useState<Socket>();
+	const [realtimeClient, setRealtimeClient] = useState<RealtimeClient | null>(null);
 
 	// Grab other user's id from url parameters
 	const otherUserId = Number(useParams({ strict: false }).otherUserId);
@@ -65,28 +63,26 @@ const ConvoPage = () => {
 	// Set initial message input value & reset it on submission
 	const [messageValue, setMessageValue] = useState('');
 
-	const initSocket = async (): Promise<Socket> => {
-		return new Promise((resolve, reject) => {
-			const socket = io(SOCKET_BASE_URL, {
-				auth: {
-					token: getToken(),
-				},
-			});
-			socket.on('connect', () => {
-				resolve(socket);
-			});
-
-			socket.on('connect_error', (error) => {
-				reject(error);
-			});
-		});
-	};
-
-	// Init socket upon mount
+	// Init realtime client upon mount
 	useEffect(() => {
-		initSocket().then((newSocket) => {
-			setSocket(newSocket);
-		});
+		const token = getToken();
+		if (!token) {
+			return;
+		}
+
+		const client = createRealtimeClient();
+		void client
+			.connect(token)
+			.then(() => {
+				setRealtimeClient(client);
+			})
+			.catch(() => {
+				setRealtimeClient(null);
+			});
+
+		return () => {
+			client.disconnect();
+		};
 	}, []);
 
 	// Update convo state when otherUser or messagesNumber changes
@@ -111,23 +107,33 @@ const ConvoPage = () => {
 		}
 	}, [otherUser, messagesNumber]);
 
-	// Init websocket & establish connection to it once we have a convo id
+	// Join conversation + listen for live message broadcasts once convo id is available.
 	useEffect(() => {
-		if (convo?.id && socket) {
-			// Establish WebSocket connection
-			socket.emit('joinConversation', { conversationId: convo.id });
-			socket.on('receiveNewMessage', (newMessage: Message) => {
-				updateConvoMessages(newMessage);
-			});
-			// Disconnect from WebSocket on unmount
-			return () => {
-				socket.disconnect();
-				socket.off('sendNewMessage');
-				socket.off('receiveNewMessage');
-				setSocket(undefined);
-			};
+		if (!convo?.id || !realtimeClient) {
+			return;
 		}
-	}, [convo?.id, socket]);
+
+		realtimeClient.joinConversation(convo.id);
+		const offReceive = realtimeClient.on('receive_new_message', ({ message: newMessage }) => {
+			updateConvoMessages(newMessage);
+		});
+		const offAuthError = realtimeClient.on('auth_error', ({ message }) => {
+			console.error(`Realtime auth error: ${message}`);
+		});
+		const offInputError = realtimeClient.on('input_error', ({ errors }) => {
+			console.error('Realtime input error:', errors);
+		});
+		const offServerError = realtimeClient.on('server_error', ({ message }) => {
+			console.error(`Realtime server error: ${message}`);
+		});
+
+		return () => {
+			offReceive();
+			offAuthError();
+			offInputError();
+			offServerError();
+		};
+	}, [convo?.id, realtimeClient]);
 
 	// Update scroll height when convo.messages changes (only on new message, ie diffMessNumber > 0)
 	useEffect(() => {
@@ -159,20 +165,17 @@ const ConvoPage = () => {
 		if (messageValue.length > 0) {
 			setMessageValue('');
 			let id = convo?.id;
-			if (!id) {
-				const newConvo = await createConvo(otherUserId);
-				setConvo(newConvo);
-				id = newConvo.id;
+				if (!id) {
+					const newConvo = await createConvo(otherUserId);
+					setConvo(newConvo);
+					id = newConvo.id;
+				}
+				if (realtimeClient) {
+					realtimeClient.sendMessage(id, messageValue);
+				}
+				setDiffMessNumber((prev) => prev + 1);
 			}
-			if (socket) {
-				socket.emit('sendNewMessage', {
-					id,
-					message: messageValue,
-				});
-			}
-			setDiffMessNumber(diffMessNumber + 1);
-		}
-	};
+		};
 
 	// Redirect back to messages page
 	const goBack = () => navigate({ to: '/messages' });

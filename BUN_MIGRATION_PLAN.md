@@ -105,26 +105,27 @@ Goal: upgrade test tooling independently of runtime migration.
 Goal: remove Socket.IO and move realtime chat to native WebSocket transport on Bun/Hono.
 
 - [ ] Define and document a transport-agnostic event contract (client -> server and server -> client):
+- [x] Define and document a transport-agnostic event contract (client -> server and server -> client):
   - client: `auth`, `join_conversation`, `send_message`
   - server: `auth_ok`, `auth_error`, `input_error`, `new_message`, `receive_new_message`, `server_error`
-- [ ] Add shared runtime validation schemas for all WS frames (Zod + shared types package).
-- [ ] Implement Bun-native WebSocket hub:
+- [x] Add shared runtime validation schemas for all WS frames (Zod + shared types package).
+- [x] Implement Bun-native WebSocket hub:
   - in-memory connection registry keyed by `conversationId`
   - per-connection auth state and joined conversation set
   - bounded payload size and malformed-frame handling
-- [ ] Implement WS auth flow with explicit `auth` message and timeout-based disconnect if not authenticated.
-- [ ] Implement `join_conversation` + `send_message` using existing DB authorization logic from `modules/websocket.ts`.
-- [ ] Expose native WS endpoint on the Bun API server (`/ws`) and keep same-origin/single-port behavior by default.
-- [ ] Add client transport adapter and migrate conversation UI from `socket.io-client` to browser `WebSocket`:
+- [x] Implement WS auth flow with explicit `auth` message and timeout-based disconnect if not authenticated.
+- [x] Implement `join_conversation` + `send_message` using existing DB authorization logic from `modules/websocket.ts`.
+- [x] Expose native WS endpoint on the Bun API server (`/ws`) and keep same-origin/single-port behavior by default.
+- [x] Add client transport adapter and migrate conversation UI from `socket.io-client` to browser `WebSocket`:
   - reconnect with backoff
   - event dispatch by `type`
   - clean connect/disconnect lifecycle on route changes
-- [ ] Add websocket integration tests for:
+- [x] Add websocket integration tests for:
   - auth success/failure
   - unauthorized conversation join rejection
   - successful broadcast to conversation participants
   - malformed message handling
-- [ ] Introduce a short dual-transport transition flag (`REALTIME_TRANSPORT=socketio|native-ws`) for rollout and rollback.
+- [x] Introduce a short dual-transport transition flag (`REALTIME_TRANSPORT=socketio|native-ws`) for rollout and rollback.
 - [ ] Remove Socket.IO artifacts after native transport is stable:
   - delete `server/src/socketServer.ts`
   - remove `socket.io` and `socket.io-client`
@@ -138,14 +139,14 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 ## Recommended Execution Order
 
 - [x] Stage 5 (Bun-native password hashing)
-- [ ] Stage 8 (native Bun/Hono websocket replacement)
+- [-] Stage 8 (native Bun/Hono websocket replacement)
 
 ## Known Pitfalls / Incompatibilities
 
 - Browser WebSockets cannot send arbitrary auth headers; auth needs to be an explicit message or query strategy.
 - Native WebSocket transport does not provide Socket.IO features (rooms/reconnect/acks) out of the box; all must be implemented explicitly.
 - Multi-instance scaling requires a pub/sub fanout backend (for example Redis) if realtime rooms move beyond a single server instance.
-- Bun-native API mode currently uses a dedicated Socket.IO compatibility server (`SOCKET_PORT`, default `PORT + 1`) until Stage 8 completes.
+- Native WS mode is now default (`REALTIME_TRANSPORT=native-ws`), while Socket.IO remains as a temporary compatibility path (`REALTIME_TRANSPORT=socketio`).
 - `firebase-admin` may surface runtime-specific behavior differences (credential loading, request handling).
 - Shell PATH mismatch (zsh vs sh) can make Bun appear installed interactively but unavailable to `pnpm` scripts.
 - Stale processes on `3001` / `5173` can produce false startup failures during Bun parity checks.
@@ -231,3 +232,10 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - removed `bcryptjs` dependency from `server/package.json`,
     - revalidated auth-focused suites (`user.test.ts`, `auth-abuse.test.ts`: `34/34`),
     - revalidated full docker-backed suite (`227/227`).
+  - Progressed Stage 8 native websocket migration:
+    - added shared realtime frame contracts/schemas in `@markstagram/shared-types` (Zod),
+    - implemented Bun-native realtime hub with auth timeout, bounded payload handling, and room registry,
+    - exposed `/ws` on Bun API server and kept `REALTIME_TRANSPORT=socketio|native-ws` flag for transition,
+    - migrated conversation UI to a realtime client adapter with native WebSocket default + reconnect backoff,
+    - added native websocket integration coverage (`websocket-native.test.ts`),
+    - revalidated docker-backed server suite (`231/231` tests across `15` files).
