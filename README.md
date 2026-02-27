@@ -27,6 +27,16 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
   - Native WS endpoint defaults to `VITE_API_URL` with `/ws` and `ws://` / `wss://` protocol mapping.
   - Optional override via `VITE_WS_URL`.
 
+## Deployment Notes (Render + Neon)
+
+- Recommended Render build command:
+  - `pnpm install --frozen-lockfile && pnpm --filter @markstagram/shared-types build && pnpm --filter @markstagram/server build`
+- Recommended Render start command:
+  - `pnpm --filter @markstagram/server db:migrate && pnpm --filter @markstagram/server start`
+- Important Neon baseline note:
+  - If your Neon database already existed before Drizzle migration files were introduced, baseline the initial Drizzle migration in `drizzle.__drizzle_migrations` first.
+  - Do not run the initial table-creation migration against an already-populated production schema without a baseline strategy.
+
 ## Local Docker Test DB
 
 - Use `pnpm test:server:docker` to run the server tests against a local Postgres container.
@@ -79,7 +89,7 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 ## App Features
 
 1. Enjoy responsive styling tailored for both desktop and mobile, created from scratch in vanilla CSS.
-2. Create your own account and log in / log out whenever you please, facilitated by Express.
+2. Create your own account and log in / log out whenever you please, facilitated by the Bun + Hono API.
 3. Add posts by uploading photos & adding captions, which are stored & retrieved from the app's relational database (Postgres) and storage (Firebase Storage).
 4. View a set number of posts on a given page (ie, home, profile, or saved), and load more by scrolling down the page.
 5. View individual post pages and scroll through its full list of comments.

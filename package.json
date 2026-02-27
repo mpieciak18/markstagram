@@ -9,7 +9,6 @@
     "db:test:down": "docker compose -f docker-compose.test.yml down -v --remove-orphans",
     "test:server:docker": "bash ./scripts/test-server-docker.sh",
     "test:server:docker:keepdb": "KEEP_TEST_DB=1 bash ./scripts/test-server-docker.sh",
-    "db:generate": "pnpm --filter @markstagram/shared-types build",
     "typecheck": "pnpm --filter @markstagram/shared-types build && pnpm -r run typecheck"
   }
 }

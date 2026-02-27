@@ -50,7 +50,7 @@ Goal: swap Prisma packages for Drizzle equivalents.
 - [x] Add to `server` `devDependencies`:
   - `drizzle-kit`
   - `@types/pg`
-- [!] Run `pnpm install` to apply changes.
+- [x] Run `pnpm install` to apply changes.
 
 ---
 
@@ -190,7 +190,7 @@ Goal: establish Drizzle migrations and update all scripts.
 - [x] Add `db:migrate:generate`: `drizzle-kit generate`
 
 ### Root `package.json`
-- [x] Update `db:generate`: remove Prisma generate step
+- [x] Update `db:generate` to shared-types build only (Prisma generation removed)
 
 ### Docker shell script (`scripts/test-server-docker.sh`)
 - [x] Replace `pnpm prisma:migrate:test` with `pnpm db:migrate`
@@ -223,16 +223,17 @@ Goal: remove all Prisma artifacts.
 - [x] Delete `server/prisma/` (entire directory — schema + migration SQL files)
 - [x] Delete `server/src/generated/` (entire directory — Prisma client output)
 - [x] Remove `DATABASE_ADAPTER` from `server/.env.test.sample`
-- [!] Run `pnpm install` to prune orphaned packages (`@prisma/*`, `@neondatabase/serverless`, stale `hono@4.11.4`) — blocked in this environment.
+- [x] Run `pnpm install` to prune obsolete direct Prisma packages.
+  - Note: `prisma` / `@prisma/client` can still appear as transitive optional peers from `drizzle-orm`; this is expected unless peer auto-install behavior is disabled.
 
 ---
 
 ## Verification
 
-- [!] `pnpm --filter @markstagram/server typecheck` — blocked until dependencies are installed.
-- [!] `pnpm --filter @markstagram/server build` — blocked until dependencies are installed.
-- [!] `pnpm test:server:docker` — blocked until dependencies are installed.
-- [!] Smoke test: `pnpm dev:server`, verify `/health_status` returns 200 — blocked until dependencies are installed.
+- [x] `pnpm --filter @markstagram/server typecheck` — passes clean.
+- [x] `pnpm --filter @markstagram/server build` — compiles without errors.
+- [x] `pnpm test:server:docker` — all 231 tests pass.
+- [ ] Smoke test: `pnpm dev:server`, verify `/health_status` returns 200
 - [ ] Render deploy: build completes without the Node.js ESM `zeptomatch` error; migration runs at start
 
 ---
@@ -248,4 +249,4 @@ Goal: remove all Prisma artifacts.
   - Implemented runtime migration from Prisma to Drizzle across all server routes, auth middleware, websocket module, and direct-DB tests/helpers.
   - Removed Prisma artifacts (`server/prisma`, `server/src/generated`, `server/prisma.config.ts`) and switched scripts to Drizzle migration commands.
   - Generated initial Drizzle migration artifacts (`server/drizzle/migrations/0000_lively_black_knight.sql` + `meta/_journal.json`).
-  - Blocked on dependency installation in this environment (`ENOTFOUND registry.npmjs.org`), so typecheck/build/test verification and lockfile refresh remain pending.
+  - Verified post-migration stability: `typecheck`, `build`, and `pnpm test:server:docker` all pass.

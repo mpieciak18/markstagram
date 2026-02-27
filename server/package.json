@@ -11,8 +11,6 @@
     "dev": "bun run src/index.bun.ts",
     "build": "tsc -p tsconfig.json",
     "start": "bun run dist/index.bun.js",
-    "startdev": "CLIENT_URL=http://localhost:5173 bun run dist/index.bun.js",
-    "startbuilt": "CLIENT_URL=http://localhost:4173 bun run dist/index.bun.js",
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:generate": "drizzle-kit generate",
     "typecheck": "tsc --noEmit"
