@@ -13,8 +13,8 @@
     "start": "bun run dist/index.bun.js",
     "startdev": "CLIENT_URL=http://localhost:5173 bun run dist/index.bun.js",
     "startbuilt": "CLIENT_URL=http://localhost:4173 bun run dist/index.bun.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate:test": "DATABASE_ADAPTER=${DATABASE_ADAPTER:-direct} prisma migrate deploy",
+    "prisma:generate": "bun x prisma generate",
+    "prisma:migrate:test": "DATABASE_ADAPTER=${DATABASE_ADAPTER:-direct} bun x prisma migrate deploy",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
