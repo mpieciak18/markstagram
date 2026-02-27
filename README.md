@@ -67,15 +67,33 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 ## Current Technologies Used
 
 <p align="left"> 
-<a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="50" height="50"/></a> 
-<a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="50" height="50"/></a>
-<a href="https://www.typescriptlang.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="50" height="50"/></a>
-<a href="https://reactjs.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react" width="50" height="50"/></a>
-<a href="https://nodejs.org/en/learn/getting-started/introduction-to-nodejs" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="nodejs" width="50" height="50"/></a>
-<a href="https://expressjs.com/" target="_blank"><img src="./client/public/images/express.svg" alt="express" width="50" height="50"/></a>
-<a href="https://www.prisma.io/" target="_blank"><img src="./client/public/images/prisma.svg" alt="prisma" width="50" height="50"/></a>
-<a href="https://www.postgresql.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" alt="postgres" width="50" height="50"/></a>
-<a href="https://vitejs.dev/" target="_blank"><img src="./client/public/images/vite.svg" alt="vite" width="50" height="50"/></a>
+  <a href="https://bun.com/" target="_blank">
+    <img src="http://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/bun/bun-original.svg" alt="bun" width="50" height="50"/>
+  </a> 
+  <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="50" height="50"/>
+  </a> 
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="50" height="50"/>
+  </a>
+  <a href="https://www.typescriptlang.org/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="50" height="50"/>
+  </a>
+  <a href="https://reactjs.org/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react" width="50" height="50"/>
+  </a>
+  <a href="https://www.postgresql.org/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" alt="postgres" width="50" height="50"/>
+  </a>
+  <a href="https://orm.drizzle.team/" target="_blank">
+    <svg  xmlns="http://www.w3.org/2000/svg" width="5-" height="50"  
+    fill="currentColor" viewBox="0 0 24 24" >
+    <path d="M6.13 10.67c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19L4.93 11c.24-.42.78-.57 1.2-.33M12.21 6.9c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19l2.82-4.92c.24-.42.78-.57 1.2-.33M21.56 6.9c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19l2.82-4.92c.24-.42.78-.57 1.2-.33M15.48 10.67c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19L14.28 11c.24-.42.78-.57 1.2-.33" />
+  </svg>
+  </a>
+  <a href="https://vitejs.dev/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/vitejs/vitejs-original.svg" alt="vite" width="50" height="50"/>
+  </a>
 </p>
 
 ## Former Technologies Used
@@ -84,6 +102,12 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="50" height="50"/></a>
 <a href="https://create-react-app.dev/" target="_blank"><img src="./client/public/images/cra.svg" alt="creat-react-app" width="50" height="50"/></a>
 <a href="https://firebase.google.com/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/firebase/firebase-plain.svg" alt="firebase" width="50" height="50"/></a>
+<a href="https://nodejs.org/en/learn/getting-started/introduction-to-nodejs" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="nodejs" width="50" height="50"/></a>
+<a href="https://expressjs.com/" target="_blank"><img src="./client/public/images/express.svg" alt="express" width="50" height="50"/></a>
+<a href="https://www.prisma.io/" target="_blank"><img src="./client/public/images/prisma.svg" alt="prisma" width="50" height="50"/></a>
+<a href="https://vitest.dev/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/vitest/vitest-original.svg" alt="vite" width="50" height="50"/>
+</a>
 </p>
 
 ## App Features
