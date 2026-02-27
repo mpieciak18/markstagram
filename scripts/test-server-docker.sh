@@ -56,7 +56,8 @@ echo "Applying Prisma migrations..."
 pnpm prisma:migrate:test
 
 echo "Running server test suite..."
-pnpm test:docker
+SERVER_TEST_SCRIPT="${SERVER_TEST_SCRIPT:-test:inner:run}"
+pnpm "$SERVER_TEST_SCRIPT"
 
 if [[ "${KEEP_TEST_DB:-0}" == "1" ]]; then
   echo "Leaving test database running because KEEP_TEST_DB=1."

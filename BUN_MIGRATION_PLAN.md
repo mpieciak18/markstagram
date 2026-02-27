@@ -195,9 +195,9 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
   - Added shared Socket.IO bootstrap module and refactored Node entrypoint to use it.
   - Added Bun-native entrypoint (`server/src/index.bun.ts`) with `Bun.serve` for API traffic.
   - Selected Stage 2 realtime strategy: Socket.IO stays on compatibility server at `SOCKET_PORT` (default `PORT + 1`).
-  - Added Bun-native scripts (`dev:bun:native`) and client socket URL override support (`VITE_SOCKET_URL`).
+  - Added Bun-native script variants during Stage 2 plus client socket URL override support (`VITE_SOCKET_URL`).
   - Re-ran Bun test suite (`pnpm --filter @markstagram/server test:bun`) with 14 files / 227 tests passing.
-  - Verified Bun native startup (`pnpm dev:bun:native`) with API on `3001` and Socket.IO on `3002`.
+  - Verified Bun native startup (at that time via `pnpm dev:bun:native`) with API on `3001` and Socket.IO on `3002`.
   - Made Bun native-first for dev/start scripts and added explicit `compat` script variants for comparison/debug.
   - Removed `tsx` dependency and removed `dotenv` runtime dependency.
   - Moved `@hono/node-server` from runtime dependencies to dev dependencies.
@@ -205,6 +205,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
   - Re-validated Stage 3 with workspace typecheck + full Bun test suite (`14/14 files`, `227/227 tests`) + Bun native dev startup.
   - Completed Stage 4 by migrating away from supertest to in-process request testing and removing test shim/dependencies.
   - Pruned temporary `*:codex` scripts and redundant test-script variants from package manifests.
+  - Consolidated redundant Bun alias scripts (`*:bun:native`) after runtime parity was established.
   - Completed Stage 6 fast-path retirement of Node rollback:
     - removed `server/src/index.ts`,
     - removed root/server Bun compat scripts,

@@ -22,7 +22,7 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Bun migration is staged. See [BUN_MIGRATION_PLAN.md](./BUN_MIGRATION_PLAN.md).
 - Local Bun commands:
   - `pnpm dev:bun` (native-first Bun API + Socket.IO compatibility server)
-  - `pnpm --filter @markstagram/server test:bun`
+  - `pnpm --filter @markstagram/server test`
 - Socket URL behavior:
   - If `VITE_SOCKET_URL` is set, the client uses it directly.
   - If unset in local dev, client defaults to `VITE_API_URL` with `+1` port (for example, `3001 -> 3002`).
@@ -40,17 +40,15 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Optional: run `pnpm test:server:docker:keepdb` to keep the test DB up after tests finish.
 - Env defaults come from [`server/.env.test.sample`](./server/.env.test.sample). Create `server/.env.test` to override.
 
-## Test Performance Scripts
+## Server Test Commands
 
-- Standard serial:
-  - `pnpm --filter @markstagram/server test:local`
-  - `pnpm --filter @markstagram/server test:bun`
-- Fast + parallel (test-only lower bcrypt cost):
-  - `pnpm --filter @markstagram/server test:local:fast:parallel`
-  - `pnpm --filter @markstagram/server test:bun:fast:parallel`
-- Notes:
-  - Test runs default to `MOCK_CLOUD_STORAGE=1` in Vitest config, so uploads use local/no-op storage instead of external Firebase calls.
-  - Serial scripts remain available for deterministic debugging.
+- Docker-orchestrated standard run:
+  - `pnpm --filter @markstagram/server test`
+- Docker-orchestrated fast + parallel run:
+  - `pnpm --filter @markstagram/server test:fast:parallel`
+- Inner test commands (assume DB is already up/migrated):
+  - `pnpm --filter @markstagram/server test:inner:run`
+  - `pnpm --filter @markstagram/server test:inner:run:fast:parallel`
 
 ## Project Objectives
 

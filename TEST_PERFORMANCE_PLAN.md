@@ -66,8 +66,8 @@ Last updated: 2026-02-27
   - Removed `test:bun:parallel` and `test:bun:fast`.
   - Removed Bun codex-only test variants (`test:bun:*:codex`).
 - [x] Keep a minimal useful matrix:
-  - Node/local: `test:local`, `test:local:fast:parallel`, `test:docker`
-  - Bun: `test:bun`, `test:bun:fast:parallel`
+  - Docker-orchestrated (primary): `test`, `test:fast:parallel`
+  - Inner server test commands (called by docker harness): `test:inner:run`, `test:inner:run:fast:parallel`
 
 ## Proposed Changes Review (From External Suggestions)
 
@@ -123,7 +123,7 @@ Last updated: 2026-02-27
   - Use a Postgres service container (`postgres:16`) with health checks.
   - Set `DATABASE_URL` to the service host/port.
   - Set `DATABASE_ADAPTER=direct` for CI test jobs using local Postgres service.
-  - Run `pnpm --filter @markstagram/server prisma:migrate:test` then `pnpm --filter @markstagram/server test:docker`.
+  - Run `pnpm --filter @markstagram/server prisma:migrate:test` then `pnpm --filter @markstagram/server test`.
 - [ ] Implement CI workflow file (deferred by request).
 
 ## Future Scope: Bun Test Rewrite
