@@ -1,7 +1,6 @@
 import type { Message, RealtimeServerFrame } from '@markstagram/shared-types';
 import { RealtimeServerFrameSchema } from '@markstagram/shared-types';
-import { type Socket, io } from 'socket.io-client';
-import { REALTIME_TRANSPORT, SOCKET_BASE_URL, WS_ENDPOINT_URL } from './api';
+import { WS_ENDPOINT_URL } from './api';
 
 type EventPayloadMap = {
 	auth_ok: { user: { id: number; username: string } };
@@ -26,26 +25,6 @@ const createListenerMap = (): ListenerMap => ({
 	receive_new_message: new Set(),
 	server_error: new Set(),
 });
-
-const normalizeLegacyInputErrors = (
-	payload: unknown,
-): EventPayloadMap['input_error'] => {
-	if (Array.isArray(payload)) {
-		return {
-			errors: payload
-				.filter((entry): entry is { message: string } => {
-					return (
-						typeof entry === 'object' &&
-						entry !== null &&
-						typeof (entry as { message?: unknown }).message === 'string'
-					);
-				})
-				.map((entry) => ({ message: entry.message })),
-		};
-	}
-
-	return { errors: [{ message: 'Invalid realtime payload.' }] };
-};
 
 const dispatch = <T extends EventType>(
 	listeners: ListenerMap,
@@ -242,94 +221,4 @@ class NativeRealtimeClient implements RealtimeClient {
 	}
 }
 
-class SocketIoRealtimeClient implements RealtimeClient {
-	private socket?: Socket;
-	private listeners: ListenerMap = createListenerMap();
-
-	async connect(token: string): Promise<void> {
-		await new Promise<void>((resolve, reject) => {
-			const socket = io(SOCKET_BASE_URL, {
-				auth: { token },
-			});
-
-			let settled = false;
-			socket.on('connect', () => {
-				if (settled) return;
-				settled = true;
-				this.socket = socket;
-				dispatch(this.listeners, 'auth_ok', { user: { id: 0, username: '' } });
-				resolve();
-			});
-
-			socket.on('connect_error', (error) => {
-				if (settled) {
-					dispatch(this.listeners, 'auth_error', {
-						message: error?.message || 'Realtime connection failed.',
-					});
-					return;
-				}
-				settled = true;
-				reject(error);
-			});
-
-			socket.on('authError', (payload: unknown) => {
-				const message =
-					typeof payload === 'object' &&
-					payload !== null &&
-					typeof (payload as { message?: unknown }).message === 'string'
-						? (payload as { message: string }).message
-						: 'Authentication error.';
-				dispatch(this.listeners, 'auth_error', { message });
-			});
-
-			socket.on('inputError', (payload: unknown) => {
-				dispatch(this.listeners, 'input_error', normalizeLegacyInputErrors(payload));
-			});
-
-			socket.on('newMessage', (message: Message) => {
-				dispatch(this.listeners, 'new_message', { message });
-			});
-
-			socket.on('receiveNewMessage', (message: Message) => {
-				dispatch(this.listeners, 'receive_new_message', { message });
-			});
-
-			socket.on('error', (payload: unknown) => {
-				const message =
-					typeof payload === 'object' &&
-					payload !== null &&
-					typeof (payload as { message?: unknown }).message === 'string'
-						? (payload as { message: string }).message
-						: 'Realtime server error.';
-				dispatch(this.listeners, 'server_error', { message });
-			});
-		});
-	}
-
-	disconnect(): void {
-		this.socket?.disconnect();
-		this.socket = undefined;
-	}
-
-	joinConversation(conversationId: number): void {
-		this.socket?.emit('joinConversation', { conversationId });
-	}
-
-	sendMessage(conversationId: number, message: string): void {
-		this.socket?.emit('sendNewMessage', { id: conversationId, message });
-	}
-
-	on<T extends EventType>(type: T, listener: Listener<T>): () => void {
-		this.listeners[type].add(listener);
-		return () => {
-			this.listeners[type].delete(listener);
-		};
-	}
-}
-
-export const createRealtimeClient = (): RealtimeClient => {
-	if (REALTIME_TRANSPORT === 'socketio') {
-		return new SocketIoRealtimeClient();
-	}
-	return new NativeRealtimeClient();
-};
+export const createRealtimeClient = (): RealtimeClient => new NativeRealtimeClient();

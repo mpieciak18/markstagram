@@ -21,12 +21,11 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 - Current default runtime is Bun (native-first).
 - Bun migration is staged. See [BUN_MIGRATION_PLAN.md](./BUN_MIGRATION_PLAN.md).
 - Local Bun commands:
-  - `pnpm dev:bun` (Bun API + native WebSocket on `/ws`)
+  - `pnpm dev` (Bun API + native WebSocket on `/ws`)
   - `pnpm --filter @markstagram/server test`
 - Realtime transport behavior:
-  - `VITE_REALTIME_TRANSPORT` defaults to `native-ws`.
   - Native WS endpoint defaults to `VITE_API_URL` with `/ws` and `ws://` / `wss://` protocol mapping.
-  - Optional rollback path remains available via `REALTIME_TRANSPORT=socketio` (server) + `VITE_REALTIME_TRANSPORT=socketio` (client), using `VITE_SOCKET_URL`.
+  - Optional override via `VITE_WS_URL`.
 
 ## Local Docker Test DB
 
@@ -69,7 +68,6 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 <a href="https://www.prisma.io/" target="_blank"><img src="./client/public/images/prisma.svg" alt="prisma" width="50" height="50"/></a>
 <a href="https://www.postgresql.org/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" alt="postgres" width="50" height="50"/></a>
 <a href="https://vitejs.dev/" target="_blank"><img src="./client/public/images/vite.svg" alt="vite" width="50" height="50"/></a>
-<a href="https://socket.io/" target="_blank"><img src="./client/public/images/socketio.svg" alt="socket.io" width="50" height="50"/></a>
 </p>
 
 ## Former Technologies Used
@@ -88,7 +86,7 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 4. View a set number of posts on a given page (ie, home, profile, or saved), and load more by scrolling down the page.
 5. View individual post pages and scroll through its full list of comments.
 6. Comment on, like, and save posts along with clicking-to-copy URLs for sharing with others.
-7. Send other users private direct messages in a chat system that updates in real-time, powered by Socket.io.
+7. Send other users private direct messages in a chat system that updates in real-time, powered by native WebSockets.
 8. Search for user profiles to view & users to direct message, thanks to queries in Prisma & Postgres.
 
 ## Instructions

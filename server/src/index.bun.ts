@@ -1,5 +1,3 @@
-import { createServer } from 'node:http';
-import type { Server as HttpServer } from 'node:http';
 import { NativeRealtimeHub } from './realtime/nativeWs.js';
 
 type BunApiServer = {
@@ -20,18 +18,6 @@ type BunRuntime = {
   }) => BunApiServer;
 };
 
-const closeServer = async (server: HttpServer): Promise<void> => {
-  await new Promise<void>((resolve, reject) => {
-    server.close((err) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve();
-    });
-  });
-};
-
 const [{ config }, { default: app }] = await Promise.all([
   import('./config/index.js'),
   import('./app.js'),
@@ -43,27 +29,11 @@ if (!bunRuntime) {
 }
 
 const apiPort = Number(process.env.PORT || config.port);
-const realtimeTransport = (process.env.REALTIME_TRANSPORT ?? 'native-ws').toLowerCase();
-
-if (realtimeTransport !== 'native-ws' && realtimeTransport !== 'socketio') {
-  throw new Error('REALTIME_TRANSPORT must be one of: native-ws, socketio');
-}
-
-const nativeRealtimeHub = realtimeTransport === 'native-ws' ? new NativeRealtimeHub() : null;
-
-const socketPort = Number(process.env.SOCKET_PORT || apiPort + 1);
-
-if (realtimeTransport === 'socketio' && socketPort === apiPort) {
-  throw new Error('SOCKET_PORT must differ from PORT when running index.bun.ts');
-}
+const nativeRealtimeHub = new NativeRealtimeHub();
 
 const apiServer = bunRuntime.serve({
   port: apiPort,
   fetch: (request, server) => {
-    if (!nativeRealtimeHub) {
-      return app.fetch(request);
-    }
-
     const url = new URL(request.url);
     if (url.pathname !== '/ws') {
       return app.fetch(request);
@@ -79,41 +49,14 @@ const apiServer = bunRuntime.serve({
 
     return;
   },
-  websocket: nativeRealtimeHub?.getBunHandlers(),
+  websocket: nativeRealtimeHub.getBunHandlers(),
 });
 
-let socketHttpServer: HttpServer | null = null;
-
-if (realtimeTransport === 'socketio') {
-  const { attachSocketServer } = await import('./socketServer.js');
-  socketHttpServer = createServer((_, res) => {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ message: 'not found' }));
-  });
-
-  attachSocketServer(socketHttpServer);
-
-  await new Promise<void>((resolve, reject) => {
-    socketHttpServer?.once('error', reject);
-    socketHttpServer?.listen(socketPort, () => resolve());
-  });
-}
-
 console.log(`bun api server running on port ${apiServer.port}`);
-if (realtimeTransport === 'socketio') {
-  console.log(`socket.io compatibility server running on port ${socketPort}`);
-} else {
-  console.log('native websocket server running on /ws');
-}
+console.log('native websocket server running on /ws');
 
 const shutdown = async (): Promise<void> => {
-  try {
-    if (socketHttpServer) {
-      await closeServer(socketHttpServer);
-    }
-  } finally {
-    apiServer.stop(true);
-  }
+  apiServer.stop(true);
 };
 
 process.on('SIGINT', () => {

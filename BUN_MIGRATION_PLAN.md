@@ -104,7 +104,6 @@ Goal: upgrade test tooling independently of runtime migration.
 
 Goal: remove Socket.IO and move realtime chat to native WebSocket transport on Bun/Hono.
 
-- [ ] Define and document a transport-agnostic event contract (client -> server and server -> client):
 - [x] Define and document a transport-agnostic event contract (client -> server and server -> client):
   - client: `auth`, `join_conversation`, `send_message`
   - server: `auth_ok`, `auth_error`, `input_error`, `new_message`, `receive_new_message`, `server_error`
@@ -126,10 +125,10 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
   - successful broadcast to conversation participants
   - malformed message handling
 - [x] Introduce a short dual-transport transition flag (`REALTIME_TRANSPORT=socketio|native-ws`) for rollout and rollback.
-- [ ] Remove Socket.IO artifacts after native transport is stable:
+- [x] Remove transition/rollback artifacts after native transport was validated:
   - delete `server/src/socketServer.ts`
   - remove `socket.io` and `socket.io-client`
-  - remove `SOCKET_PORT` and simplify `VITE_SOCKET_URL` defaults
+  - remove `SOCKET_PORT`, `REALTIME_TRANSPORT`, `VITE_SOCKET_URL`, and `VITE_REALTIME_TRANSPORT`
 
 ## Separate Scope Backlog (Lower Priority)
 
@@ -139,14 +138,13 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 ## Recommended Execution Order
 
 - [x] Stage 5 (Bun-native password hashing)
-- [-] Stage 8 (native Bun/Hono websocket replacement)
+- [x] Stage 8 (native Bun/Hono websocket replacement)
 
 ## Known Pitfalls / Incompatibilities
 
 - Browser WebSockets cannot send arbitrary auth headers; auth needs to be an explicit message or query strategy.
 - Native WebSocket transport does not provide Socket.IO features (rooms/reconnect/acks) out of the box; all must be implemented explicitly.
 - Multi-instance scaling requires a pub/sub fanout backend (for example Redis) if realtime rooms move beyond a single server instance.
-- Native WS mode is now default (`REALTIME_TRANSPORT=native-ws`), while Socket.IO remains as a temporary compatibility path (`REALTIME_TRANSPORT=socketio`).
 - `firebase-admin` may surface runtime-specific behavior differences (credential loading, request handling).
 - Shell PATH mismatch (zsh vs sh) can make Bun appear installed interactively but unavailable to `pnpm` scripts.
 - Stale processes on `3001` / `5173` can produce false startup failures during Bun parity checks.
@@ -157,7 +155,6 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 ### Keep during migration
 
 - `hono`
-- `socket.io` / `socket.io-client` (until Stage 8)
 - Prisma stack: `@prisma/client`, `prisma`, `@prisma/adapter-neon`
 
 ### Remove after Bun-native stabilization
@@ -167,13 +164,13 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 - `@hono/node-server` (removed in Stage 6)
 - `supertest` + `@types/supertest` (removed in Stage 4)
 - `bcryptjs` (removed in Stage 5)
-- `socket.io` + `socket.io-client` (after Stage 8)
+- `socket.io` + `socket.io-client` (removed in Stage 8)
 - `vitest` (removed in Stage 7 follow-up Bun test migration)
 
 ### Potential replacement
 
 - `supertest` -> fetch-based/in-process request tests
-- `socket.io` -> Bun native `WebSocket` + Hono/Bun route upgrade + JSON event protocol
+- `socket.io` -> Bun native `WebSocket` + Hono/Bun route upgrade + JSON event protocol (completed in Stage 8)
 
 ## Exit Criteria
 
@@ -239,3 +236,14 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - migrated conversation UI to a realtime client adapter with native WebSocket default + reconnect backoff,
     - added native websocket integration coverage (`websocket-native.test.ts`),
     - revalidated docker-backed server suite (`231/231` tests across `15` files).
+- 2026-02-27:
+  - Completed Stage 8 cleanup pass:
+    - removed Socket.IO rollback runtime path from `index.bun.ts`,
+    - deleted `server/src/socketServer.ts` and the unused `server/src/types/types.ts`,
+    - removed `socket.io` and `socket.io-client` from package manifests,
+    - simplified client realtime services to native WebSocket only,
+    - removed `SOCKET_PORT`, `REALTIME_TRANSPORT`, `VITE_SOCKET_URL`, and `VITE_REALTIME_TRANSPORT` from env documentation.
+  - Consolidated redundant runtime scripts after Bun became default:
+    - removed `dev:bun` aliases from root/client/server,
+    - removed redundant `startbuilt:bun`,
+    - added canonical server `start` script (`bun run dist/index.bun.js`).
