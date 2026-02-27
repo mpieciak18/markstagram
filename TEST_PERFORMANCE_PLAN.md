@@ -125,13 +125,37 @@ Last updated: 2026-02-26
 
 ## Future Scope: Bun Test Rewrite
 
-- [ ] Plan full migration from Vitest to Bun's built-in test runner (`bun test`).
-- [ ] Before rewriting, audit all current `227` server tests:
-  - identify duplicates and overlap,
-  - consolidate repetitive cases and setup patterns,
-  - eliminate low-value or redundant tests.
-- [ ] Rewrite only the retained/optimized suite to `bun test`.
-- [ ] Re-benchmark and compare against current Vitest + Bun-runtime execution.
+- [x] Reviewed external recommendation for full Vitest -> Bun test migration.
+- [x] Validation summary:
+  - Mostly valid: the API migration is likely close to mechanical for this repo (`vitest` imports -> `bun:test`, and `vi.fn` usage is limited).
+  - Valid cleanup target: remove `vitest` dependency and retire `server/vite.config.ts` once Bun test setup is in place.
+  - Valid risk: env defaults currently injected by Vitest config must be replaced with Bun test preload/setup behavior.
+  - Incomplete claim: timeout behavior must be preserved (`testTimeout`/`hookTimeout` currently set to `15000` in Vitest config).
+  - Incomplete claim: serial-debugging behavior changes, but Bun still provides control via `--max-concurrency`; exact parity with `--no-file-parallelism` should be validated in practice.
+- [ ] Execute Bun test migration plan:
+  - [ ] Stage D0: Pre-migration test audit (mandatory)
+    - Analyze all `227` server tests.
+    - Identify overlap/duplicates by endpoint + behavior class.
+    - Consolidate repetitive setup/teardown patterns.
+    - Eliminate low-value or redundant assertions before runner rewrite.
+  - [ ] Stage D1: Bun test foundation
+    - Add Bun test preload/setup file for env defaults:
+      - `BCRYPT_SALT_ROUNDS=8`
+      - `DISABLE_REQUEST_LOGGING=1`
+      - `MOCK_CLOUD_STORAGE=1`
+    - Preserve timeout behavior (`15000`) via Bun test flags/config.
+  - [ ] Stage D2: Mechanical API migration
+    - Replace `from 'vitest'` imports with `from 'bun:test'`.
+    - Replace `vi.fn(...)` usage with Bun mock API usage.
+    - Ensure websocket-auth test mock assertions still behave identically.
+  - [ ] Stage D3: Scripts and dependency cleanup
+    - Replace Vitest scripts with Bun test scripts in `server/package.json`.
+    - Remove `vitest` dev dependency.
+    - Remove `server/vite.config.ts` after equivalent Bun setup is confirmed.
+  - [ ] Stage D4: Validation + benchmarking
+    - Run full docker-backed suite (`227` tests) and compare pass/fail parity.
+    - Re-benchmark runtime against current baseline.
+    - Keep a rollback script path until two consecutive green runs are confirmed.
 
 ## Progress Log
 
@@ -157,3 +181,6 @@ Last updated: 2026-02-26
   - Re-ran docker-backed server suite with `227/227` passing after migration.
   - Pruned temporary and duplicate test/dev scripts across root/server/client package manifests to reduce command sprawl.
   - Added future-scope Bun test rewrite track with a required pre-migration audit of all `227` tests for consolidation/elimination.
+- 2026-02-27:
+  - Reviewed external Vitest -> Bun test feedback and marked it as mostly valid with additional constraints (timeouts, env preload replacement, serial-debug parity verification).
+  - Added staged execution plan (D0-D4) for Bun test migration, including mandatory pre-migration audit of all `227` tests before rewrite.

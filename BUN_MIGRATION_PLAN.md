@@ -2,7 +2,7 @@
 
 This is the canonical Bun migration tracker for this repo.
 
-Last updated: 2026-02-26
+Last updated: 2026-02-27
 
 ## Status Legend
 
@@ -10,6 +10,11 @@ Last updated: 2026-02-26
 - `[-]` in progress
 - `[ ]` not started
 - `[!]` blocked/risk to resolve
+
+## Related Documentation
+
+- Server test-runner migration and performance workstream:
+  - `TEST_PERFORMANCE_PLAN.md` (see "Future Scope: Bun Test Rewrite", Stages `D0-D4`)
 
 ## Stage 0: Baseline + Safety Rails
 
@@ -93,6 +98,7 @@ Goal: upgrade test tooling independently of runtime migration.
 - [x] Upgrade Vitest from `0.34.x` to current major (`3.2.x`).
 - [x] Address config/runtime differences introduced by the upgrade (replace deprecated `--threads false` usage).
 - [x] Re-run full suite and validate no regressions (`227/227` passing via docker-backed test flow).
+- [ ] Follow-up (separate workstream): migrate Vitest -> Bun test per `TEST_PERFORMANCE_PLAN.md` Future Scope (D0-D4).
 
 ## Stage 8: Replace Socket.IO with Native Bun/Hono WebSockets
 
@@ -161,6 +167,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 - `supertest` + `@types/supertest` (removed in Stage 4)
 - `bcryptjs` (after Stage 5)
 - `socket.io` + `socket.io-client` (after Stage 8)
+- `vitest` (after Bun test migration in `TEST_PERFORMANCE_PLAN.md`)
 
 ### Potential replacement
 
@@ -214,3 +221,4 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - in this repo setup, `test:bun` currently executes Vitest without Bun globals,
     - removing `bcryptjs` now would break auth-heavy tests, so dependency removal remains pending.
   - Added Stage 8 native websocket replacement plan for Socket.IO retirement.
+  - Linked Bun plan to `TEST_PERFORMANCE_PLAN.md` for the staged Vitest -> Bun test migration scope (D0-D4).
