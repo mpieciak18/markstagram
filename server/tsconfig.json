@@ -17,8 +17,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "ts-node": {
-    "esm": true
-  },
   "include": ["src/**/*.ts", "src/**/*.js"]
 }

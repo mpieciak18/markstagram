@@ -249,3 +249,11 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - added canonical server `start` script (`bun run dist/index.bun.js`).
   - Completed optional runtime-agnostic cleanup:
     - replaced Node `randomUUID` import in upload middleware with `globalThis.crypto.randomUUID()`.
+  - Completed post-migration dependency cleanup pass:
+    - removed dead `ts-node` config block from `server/tsconfig.json`,
+    - moved `@prisma/adapter-pg` + `pg` to `server` devDependencies (test/local direct adapter path),
+    - removed direct `@types/node` devDependency from `server` (typecheck remains green under Bun types),
+    - resynced workspace install (`pnpm install`) to prune stale removed packages.
+  - Note on duplicate `hono` versions:
+    - retained as a transitive Prisma toolchain artifact (`prisma` -> `@prisma/dev` -> `@hono/node-server`),
+    - app/runtime still uses `hono@4.12.2`; no functional regression observed.
