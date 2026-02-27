@@ -1,6 +1,6 @@
 import supertest from './helpers/httpClient.js';
 import app from '../app.js';
-import { it, describe, expect } from 'vitest';
+import { it, describe, expect } from 'bun:test';
 import type { Notification, Post } from '@markstagram/shared-types';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
 

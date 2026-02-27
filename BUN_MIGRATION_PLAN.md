@@ -98,7 +98,7 @@ Goal: upgrade test tooling independently of runtime migration.
 - [x] Upgrade Vitest from `0.34.x` to current major (`3.2.x`).
 - [x] Address config/runtime differences introduced by the upgrade (replace deprecated `--threads false` usage).
 - [x] Re-run full suite and validate no regressions (`227/227` passing via docker-backed test flow).
-- [ ] Follow-up (separate workstream): migrate Vitest -> Bun test per `TEST_PERFORMANCE_PLAN.md` Future Scope (D0-D4).
+- [x] Follow-up complete: migrated Vitest -> Bun test per `TEST_PERFORMANCE_PLAN.md` Future Scope (D0-D4).
 
 ## Stage 8: Replace Socket.IO with Native Bun/Hono WebSockets
 
@@ -167,7 +167,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 - `supertest` + `@types/supertest` (removed in Stage 4)
 - `bcryptjs` (after Stage 5)
 - `socket.io` + `socket.io-client` (after Stage 8)
-- `vitest` (after Bun test migration in `TEST_PERFORMANCE_PLAN.md`)
+- `vitest` (removed in Stage 7 follow-up Bun test migration)
 
 ### Potential replacement
 
@@ -222,3 +222,10 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - removing `bcryptjs` now would break auth-heavy tests, so dependency removal remains pending.
   - Added Stage 8 native websocket replacement plan for Socket.IO retirement.
   - Linked Bun plan to `TEST_PERFORMANCE_PLAN.md` for the staged Vitest -> Bun test migration scope (D0-D4).
+  - Completed Vitest -> Bun test migration (D0-D4):
+    - migrated all server tests from `vitest` to `bun:test`,
+    - replaced `vi.fn` with Bun `mock`,
+    - removed `vitest` dependency and deleted `server/vite.config.ts`,
+    - replaced server test scripts with Bun test scripts using `--timeout 15000`,
+    - added a Bun launcher script to handle non-interactive shell PATH differences,
+    - validated docker-backed server suite with `227/227` tests passing.

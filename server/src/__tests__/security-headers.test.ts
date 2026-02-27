@@ -1,5 +1,5 @@
 import supertest from './helpers/httpClient.js';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import app from '../app.js';
 
 describe('cors and security headers', () => {

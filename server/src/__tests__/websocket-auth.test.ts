@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
 import { createJwt } from '../modules/auth.js';
 import prisma from '../db.js';
 import {
@@ -25,11 +25,11 @@ const createFakeSocket = () => {
   const events: Array<{ event: string; args: unknown[] }> = [];
   const joinedRooms: string[] = [];
   const socket = {
-    emit: vi.fn((event: string, ...args: unknown[]) => {
+    emit: mock((event: string, ...args: unknown[]) => {
       events.push({ event, args });
       return true;
     }),
-    join: vi.fn((room: string) => {
+    join: mock((room: string) => {
       joinedRooms.push(String(room));
     }),
   };

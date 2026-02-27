@@ -1,6 +1,6 @@
 import app from '../app.js';
 import supertest from './helpers/httpClient.js';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { resetAuthAbuseState } from '../modules/authAbuse.js';
 
 const AUTH_ENV_KEYS = [

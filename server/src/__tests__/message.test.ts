@@ -1,6 +1,6 @@
 import supertest from './helpers/httpClient.js';
 import app from '../app.js';
-import { it, describe, expect } from 'vitest';
+import { it, describe, expect } from 'bun:test';
 import type { Conversation, Message } from '@markstagram/shared-types';
 import { HasUsers } from '@markstagram/shared-types';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
@@ -92,7 +92,7 @@ describe('messages', () => {
     message = response.body.message;
     expect(response.status).toBe(200);
     expect(message.conversationId).toBe(conversation.id);
-    expect(message.senderId).toBe(user.id);
+    expect(message.senderId).toBe(user.id!);
     expect(message.message).toBe(messageText);
   });
   //

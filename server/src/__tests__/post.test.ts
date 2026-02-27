@@ -3,7 +3,7 @@ import app from '../app.js';
 // import { Blob } from 'node-fetch';
 // import fs from 'fs/promises';
 // import FormData from 'form-data';
-import { it, describe, expect } from 'vitest';
+import { it, describe, expect } from 'bun:test';
 import type { Post } from '@markstagram/shared-types';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
 
@@ -52,9 +52,9 @@ describe('POST /api/post & DELETE /api/post', () => {
     // .send(formData);
     post = response.body.post;
     expect(response.status).toBe(200);
-    expect(post?.userId).toBe(user.id);
-    expect(post?.caption).toBe(caption);
-    expect(post?.image).toMatch(urlPattern);
+    expect(post.userId).toBe(user.id!);
+    expect(post.caption).toBe(caption);
+    expect(post.image).toMatch(urlPattern);
   });
   //
   it('should fail to get a post by id due to a non-existent post id & return a 404 code', async () => {

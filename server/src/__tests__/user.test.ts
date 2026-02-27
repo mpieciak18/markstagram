@@ -1,7 +1,7 @@
 import app from '../app.js';
 import supertest from './helpers/httpClient.js';
 import { SignJWT } from 'jose';
-import { it, describe, expect } from 'vitest';
+import { it, describe, expect } from 'bun:test';
 import { deleteFileFromStorage } from '../config/gcloud.js';
 import { UserStatsCount, User } from '@markstagram/shared-types';
 

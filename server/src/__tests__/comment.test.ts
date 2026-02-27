@@ -1,6 +1,6 @@
 import supertest from './helpers/httpClient.js';
 import app from '../app.js';
-import { it, describe, expect } from 'vitest';
+import { it, describe, expect } from 'bun:test';
 import type { Comment, Post } from '@markstagram/shared-types';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
 
@@ -40,9 +40,9 @@ describe('comments', () => {
       .attach('file', './src/__tests__/test.png');
     post = response.body.post;
     expect(response.status).toBe(200);
-    expect(post?.userId).toBe(user.id);
-    expect(post?.caption).toBe(caption);
-    expect(post?.image).toMatch(urlPattern);
+    expect(post.userId).toBe(user.id!);
+    expect(post.caption).toBe(caption);
+    expect(post.image).toMatch(urlPattern);
   });
   //
   it('should fail to create a comment due to a non-existent post id & return a 404 code', async () => {

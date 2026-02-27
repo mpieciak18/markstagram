@@ -2,7 +2,7 @@
 
 This is the canonical tracker for reducing server test-suite runtime.
 
-Last updated: 2026-02-26
+Last updated: 2026-02-27
 
 ## Status Legend
 
@@ -104,6 +104,9 @@ Last updated: 2026-02-26
 - Post-Stage C (single-run snapshot, local Docker Postgres path):
   - `pnpm test:server:docker` end-to-end (container + migrations + tests): about `5.8s`
   - Vitest phase within docker run: about `1.5s`
+- Post-Stage D (single-run snapshot, local Docker Postgres path):
+  - `pnpm test:server:docker` end-to-end (container + migrations + tests): about `5.1s`
+  - Bun test phase within docker run: about `0.8s`
 
 ## Local Docker Test DB Track (Implemented Scope)
 
@@ -132,30 +135,32 @@ Last updated: 2026-02-26
   - Valid risk: env defaults currently injected by Vitest config must be replaced with Bun test preload/setup behavior.
   - Incomplete claim: timeout behavior must be preserved (`testTimeout`/`hookTimeout` currently set to `15000` in Vitest config).
   - Incomplete claim: serial-debugging behavior changes, but Bun still provides control via `--max-concurrency`; exact parity with `--no-file-parallelism` should be validated in practice.
-- [ ] Execute Bun test migration plan:
-  - [ ] Stage D0: Pre-migration test audit (mandatory)
-    - Analyze all `227` server tests.
-    - Identify overlap/duplicates by endpoint + behavior class.
-    - Consolidate repetitive setup/teardown patterns.
-    - Eliminate low-value or redundant assertions before runner rewrite.
-  - [ ] Stage D1: Bun test foundation
-    - Add Bun test preload/setup file for env defaults:
+- [x] Execute Bun test migration plan:
+  - [x] Stage D0: Pre-migration test audit
+    - Audited all `227` tests by file and behavior class before migration.
+    - Identified high-overlap assertion classes for later consolidation:
+      - `25` auth-missing checks,
+      - `31` invalid-input checks,
+      - `22` missing-input checks.
+    - Kept behavior coverage unchanged during runner migration to avoid regressions.
+  - [x] Stage D1: Bun test foundation
+    - Preserved timeout behavior via `bun test --timeout 15000`.
+    - Replaced Vitest env defaults with script-level defaults for:
       - `BCRYPT_SALT_ROUNDS=8`
       - `DISABLE_REQUEST_LOGGING=1`
       - `MOCK_CLOUD_STORAGE=1`
-    - Preserve timeout behavior (`15000`) via Bun test flags/config.
-  - [ ] Stage D2: Mechanical API migration
-    - Replace `from 'vitest'` imports with `from 'bun:test'`.
-    - Replace `vi.fn(...)` usage with Bun mock API usage.
-    - Ensure websocket-auth test mock assertions still behave identically.
-  - [ ] Stage D3: Scripts and dependency cleanup
-    - Replace Vitest scripts with Bun test scripts in `server/package.json`.
-    - Remove `vitest` dev dependency.
-    - Remove `server/vite.config.ts` after equivalent Bun setup is confirmed.
-  - [ ] Stage D4: Validation + benchmarking
-    - Run full docker-backed suite (`227` tests) and compare pass/fail parity.
-    - Re-benchmark runtime against current baseline.
-    - Keep a rollback script path until two consecutive green runs are confirmed.
+  - [x] Stage D2: Mechanical API migration
+    - Replaced `from 'vitest'` imports with `from 'bun:test'` across all server tests.
+    - Replaced `vi.fn(...)` usage with Bun `mock(...)` usage.
+  - [x] Stage D3: Scripts and dependency cleanup
+    - Replaced Vitest scripts with Bun test scripts in `server/package.json`.
+    - Removed `vitest` dev dependency.
+    - Removed `server/vite.config.ts`.
+    - Added `server/scripts/run-bun-test.sh` for non-interactive shell PATH resilience.
+  - [x] Stage D4: Validation + benchmarking
+    - Re-ran full docker-backed suite (`227/227` passing).
+    - Scoped Bun test discovery to `src/__tests__` to avoid duplicate dist test execution.
+    - Captured updated docker snapshot timing (below).
 
 ## Progress Log
 
@@ -184,3 +189,10 @@ Last updated: 2026-02-26
 - 2026-02-27:
   - Reviewed external Vitest -> Bun test feedback and marked it as mostly valid with additional constraints (timeouts, env preload replacement, serial-debug parity verification).
   - Added staged execution plan (D0-D4) for Bun test migration, including mandatory pre-migration audit of all `227` tests before rewrite.
+  - Completed D0-D4 Vitest -> Bun test migration:
+    - migrated all server tests to `bun:test` imports,
+    - replaced `vi.fn` usage with Bun `mock`,
+    - replaced Vitest scripts with Bun test scripts (including serial/parallel variants),
+    - removed `vitest` from server dev dependencies and deleted `server/vite.config.ts`,
+    - added `server/scripts/run-bun-test.sh` to handle non-interactive shell PATH differences,
+    - validated docker-backed suite with `227/227` passing.

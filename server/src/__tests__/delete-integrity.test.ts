@@ -1,5 +1,5 @@
 import supertest from './helpers/httpClient.js';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import app from '../app.js';
 import prisma from '../db.js';
 import { createSeededUserWithToken } from './helpers/userFactory.js';
