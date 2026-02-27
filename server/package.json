@@ -26,7 +26,6 @@
     "@prisma/adapter-neon": "^7.4.0",
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.0",
-    "bcryptjs": "^3.0.3",
     "firebase-admin": "^11.10.1",
     "hono": "^4.12.2",
     "jose": "^6.1.3",

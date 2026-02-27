@@ -79,8 +79,8 @@ Goal: replace `bcryptjs` with Bun-native hashing after rollback is retired.
 
 - [x] Implement Bun-native hashing/verification (`Bun.password`) for auth module.
 - [x] Validate compatibility strategy for existing stored bcrypt hashes.
-- [ ] Remove `bcryptjs` dependency.
-- [ ] Re-run auth-focused tests and full suite under Bun.
+- [x] Remove `bcryptjs` dependency.
+- [x] Re-run auth-focused tests and full suite under Bun.
 
 ## Stage 6: Retire Node Rollback Path
 
@@ -137,7 +137,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 
 ## Recommended Execution Order
 
-- [ ] Stage 5 (Bun-native password hashing)
+- [x] Stage 5 (Bun-native password hashing)
 - [ ] Stage 8 (native Bun/Hono websocket replacement)
 
 ## Known Pitfalls / Incompatibilities
@@ -165,7 +165,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
 - `dotenv` (runtime dependency removed)
 - `@hono/node-server` (removed in Stage 6)
 - `supertest` + `@types/supertest` (removed in Stage 4)
-- `bcryptjs` (after Stage 5)
+- `bcryptjs` (removed in Stage 5)
 - `socket.io` + `socket.io-client` (after Stage 8)
 - `vitest` (removed in Stage 7 follow-up Bun test migration)
 
@@ -216,11 +216,7 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - updated serial test scripts to `--maxWorkers=1 --no-file-parallelism`,
     - revalidated server suite with `pnpm test:server:docker` (`227/227` passing).
   - Started Stage 5 auth migration:
-    - added Bun-native password hashing/verification branch in `modules/auth.ts`,
-    - retained `bcryptjs` fallback for non-Bun environments to preserve local Node-based test execution.
-  - Re-checked Stage 5 completion path and kept fallback in place:
-    - in this repo setup, `test:bun` currently executes Vitest without Bun globals,
-    - removing `bcryptjs` now would break auth-heavy tests, so dependency removal remains pending.
+    - added Bun-native password hashing/verification branch in `modules/auth.ts`.
   - Added Stage 8 native websocket replacement plan for Socket.IO retirement.
   - Linked Bun plan to `TEST_PERFORMANCE_PLAN.md` for the staged Vitest -> Bun test migration scope (D0-D4).
   - Completed Vitest -> Bun test migration (D0-D4):
@@ -230,3 +226,8 @@ Goal: remove Socket.IO and move realtime chat to native WebSocket transport on B
     - replaced server test scripts with Bun test scripts using `--timeout 15000`,
     - added a Bun launcher script to handle non-interactive shell PATH differences,
     - validated docker-backed server suite with `227/227` tests passing.
+  - Completed Stage 5 Bun-native password hashing:
+    - removed `bcryptjs` fallback path from `modules/auth.ts`,
+    - removed `bcryptjs` dependency from `server/package.json`,
+    - revalidated auth-focused suites (`user.test.ts`, `auth-abuse.test.ts`: `34/34`),
+    - revalidated full docker-backed suite (`227/227`).

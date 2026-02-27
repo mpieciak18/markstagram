@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
 const DEFAULT_BCRYPT_SALT_ROUNDS = 12;
@@ -40,10 +39,10 @@ type BunPasswordApi = {
   verify: (password: string, hash: string) => Promise<boolean>;
 };
 
-const getBunPasswordApi = (): BunPasswordApi | null => {
+const getBunPasswordApi = (): BunPasswordApi => {
   const bunGlobal = (globalThis as { Bun?: { password?: BunPasswordApi } }).Bun;
   if (!bunGlobal?.password) {
-    return null;
+    throw new Error('Bun.password API is required for password operations.');
   }
 
   return bunGlobal.password;
@@ -77,21 +76,13 @@ export const comparePasswords = async (
   hash: string,
 ): Promise<boolean> => {
   const bunPassword = getBunPasswordApi();
-  if (bunPassword) {
-    return bunPassword.verify(password, hash);
-  }
-
-  return bcrypt.compare(password, hash);
+  return bunPassword.verify(password, hash);
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
   const bunPassword = getBunPasswordApi();
-  if (bunPassword) {
-    return bunPassword.hash(password, {
-      algorithm: 'bcrypt',
-      cost: getBcryptSaltRounds(),
-    });
-  }
-
-  return bcrypt.hash(password, getBcryptSaltRounds());
+  return bunPassword.hash(password, {
+    algorithm: 'bcrypt',
+    cost: getBcryptSaltRounds(),
+  });
 };
