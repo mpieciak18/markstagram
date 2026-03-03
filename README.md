@@ -1,4 +1,4 @@
-# Markstagram 2.0
+# Markstagram 3.0
 
 "A personal recreation of Instagram. Sign up and start posting today!"
 
@@ -6,9 +6,7 @@ This project is from the [the Odin Project](https://www.theodinproject.com) (spe
 
 ~~[Click here] to read more about the project specifications.~~ (Update: the Odin Project has restructured their Full Stack Javascript curriculum since version 1.0 of this app was created, and the original link no longer works. [Click here](https://www.theodinproject.com/lessons/nodejs-odin-book) for what this project has since been ported to.)
 
-Version 2.0 has replaced Firebase as its server (for database API calls & authentication) with its own server, built in Typescript, Bun, Hono, Drizzle ORM, and Postgres.
-
-Additionally, the client has been rewritten from Javascript to Typescript, as well as converted from CRA to Vite.
+Version 3.0 includes a number of migrations, including Prisma to Drizzle, Node and many dependencies to Bun, and React Router to TanStack Router.
 
 ![Live preview of the Markstagram app](./client/public/images/sample.gif)
 
@@ -37,27 +35,6 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
   - If your Neon database already existed before Drizzle migration files were introduced, baseline the initial Drizzle migration in `drizzle.__drizzle_migrations` first.
   - Do not run the initial table-creation migration against an already-populated production schema without a baseline strategy.
 
-## Local Docker Test DB
-
-- Use `pnpm test:server:docker` to run the server tests against a local Postgres container.
-- The command:
-  - starts `docker-compose.test.yml`,
-  - applies Drizzle migrations,
-  - runs `server` tests against Docker Postgres,
-  - tears the container down automatically.
-- Optional: run `pnpm test:server:docker:keepdb` to keep the test DB up after tests finish.
-- Env defaults come from [`server/.env.test.sample`](./server/.env.test.sample). Create `server/.env.test` to override.
-
-## Server Test Commands
-
-- Docker-orchestrated standard run:
-  - `pnpm --filter @markstagram/server test`
-- Docker-orchestrated fast + parallel run:
-  - `pnpm --filter @markstagram/server test:fast:parallel`
-- Inner test commands (assume DB is already up/migrated):
-  - `pnpm --filter @markstagram/server test:inner:run`
-  - `pnpm --filter @markstagram/server test:inner:run:fast:parallel`
-
 ## Project Objectives
 
 1. To recreate a fully-functional clone of Instagram that any external user can sign up for and start using.
@@ -69,12 +46,6 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 <p align="left"> 
   <a href="https://bun.com/" target="_blank">
     <img src="http://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/bun/bun-original.svg" alt="bun" width="50" height="50"/>
-  </a> 
-  <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="50" height="50"/>
-  </a> 
-  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="50" height="50"/>
   </a>
   <a href="https://www.typescriptlang.org/" target="_blank">
     <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="50" height="50"/>
@@ -82,14 +53,14 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
   <a href="https://reactjs.org/" target="_blank">
     <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react" width="50" height="50"/>
   </a>
+  <a href="https://tanstack.com/" target="_blank">
+    <img src="https://tanstack.com/images/logos/logo-color-banner-600.png" alt="react" width="50" height="50"/>
+  </a>
   <a href="https://www.postgresql.org/" target="_blank">
     <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" alt="postgres" width="50" height="50"/>
   </a>
-  <a href="https://orm.drizzle.team/" target="_blank">
-    <svg  xmlns="http://www.w3.org/2000/svg" width="5-" height="50"  
-    fill="currentColor" viewBox="0 0 24 24" >
-    <path d="M6.13 10.67c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19L4.93 11c.24-.42.78-.57 1.2-.33M12.21 6.9c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19l2.82-4.92c.24-.42.78-.57 1.2-.33M21.56 6.9c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19l2.82-4.92c.24-.42.78-.57 1.2-.33M15.48 10.67c.42.24.57.77.33 1.19l-2.82 4.92c-.24.42-.78.57-1.2.33a.87.87 0 0 1-.33-1.19L14.28 11c.24-.42.78-.57 1.2-.33" />
-  </svg>
+  <a href="https://pnpm.io/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/pnpm/pnpm-original.svg" alt="postgres" width="50" height="50"/>
   </a>
   <a href="https://vitejs.dev/" target="_blank">
     <img src="https://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/vitejs/vitejs-original.svg" alt="vite" width="50" height="50"/>
@@ -99,15 +70,27 @@ Additionally, the client has been rewritten from Javascript to Typescript, as we
 ## Former Technologies Used
 
 <p align="left"> 
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="50" height="50"/></a>
-<a href="https://create-react-app.dev/" target="_blank"><img src="./client/public/images/cra.svg" alt="creat-react-app" width="50" height="50"/></a>
-<a href="https://firebase.google.com/" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/firebase/firebase-plain.svg" alt="firebase" width="50" height="50"/></a>
-<a href="https://nodejs.org/en/learn/getting-started/introduction-to-nodejs" target="_blank"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="nodejs" width="50" height="50"/></a>
-<a href="https://expressjs.com/" target="_blank"><img src="./client/public/images/express.svg" alt="express" width="50" height="50"/></a>
-<a href="https://www.prisma.io/" target="_blank"><img src="./client/public/images/prisma.svg" alt="prisma" width="50" height="50"/></a>
-<a href="https://vitest.dev/" target="_blank">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/vitest/vitest-original.svg" alt="vite" width="50" height="50"/>
-</a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="50" height="50"/>
+  </a>
+  <a href="https://create-react-app.dev/" target="_blank">
+    <img src="./client/public/images/cra.svg" alt="creat-react-app" width="50" height="50"/>
+  </a>
+  <a href="https://firebase.google.com/" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/1119b9f84c0290e0f0b38982099a2bd027a48bf1/icons/firebase/firebase-plain.svg" alt="firebase" width="50" height="50"/>
+  </a>
+  <a href="https://nodejs.org/en/learn/getting-started/introduction-to-nodejs" target="_blank">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="nodejs" width="50" height="50"/>
+  </a>
+  <a href="https://expressjs.com/" target="_blank">
+    <img src="./client/public/images/express.svg" alt="express" width="50" height="50"/>
+  </a>
+  <a href="https://www.prisma.io/" target="_blank">
+    <img src="./client/public/images/prisma.svg" alt="prisma" width="50" height="50"/>
+  </a>
+  <a href="https://vitest.dev/" target="_blank">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/670a611ad1c3e057ee385168d65c8ab27a7e1be5/icons/vitest/vitest-original.svg" alt="vite" width="50" height="50"/>
+  </a>
 </p>
 
 ## App Features
